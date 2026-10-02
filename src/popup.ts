@@ -2,6 +2,7 @@ import type { TranslationClient } from "./client";
 import { DEFAULT_SETTINGS, LANGUAGES, isLanguage, publicPreferences } from "./settings";
 import { applyPageStyle, samplePageStyle } from "./page-style";
 import { MAX_SELECTION_LENGTH, TranslationError } from "./translation";
+import { copyTranslation } from "./clipboard";
 
 const CSS = `
 :host { all: initial; }
@@ -228,15 +229,17 @@ export function mountTranslator(client: TranslationClient): () => void {
       status.hidden = false;
     }
   });
-  copy.addEventListener("click", () => {
-    void navigator.clipboard.writeText(output.textContent ?? "").then(() => {
+  copy.addEventListener("click", async () => {
+    const result = await copyTranslation({ text: output.textContent ?? "", clipboard: navigator.clipboard });
+    if (result === "copied") {
       copy.setAttribute("aria-label", "Translation copied");
       copy.title = "Copied";
-    }).catch(() => {
+    } else {
       status.textContent = "Select the translation to copy it.";
       status.className = "status";
       status.hidden = false;
-    });
+      position(panel);
+    }
   });
 
   const events = new AbortController();
