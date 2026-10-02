@@ -1,0 +1,165 @@
+{
+  "metadata": {
+    "started_at": "2026-10-02T21:36:26.187494+00:00",
+    "pair": "en->uk",
+    "rounds": 3,
+    "endpoint": "https://opencode.ai/zen/go/v1/chat/completions",
+    "model_endpoints": {
+      "qwen3.8-flash": "https://opencode.ai/zen/go/v1/messages",
+      "deepseek-v4-flash": "https://opencode.ai/zen/go/v1/chat/completions"
+    },
+    "route": "go",
+    "smoke_only": true,
+    "wire_models": [
+      "qwen3.8-flash",
+      "deepseek-v4-flash"
+    ],
+    "models": {
+      "qwen3.8-flash": {
+        "thinking": {
+          "type": "disabled"
+        }
+      },
+      "deepseek-v4-flash": {
+        "thinking": {
+          "type": "disabled"
+        },
+        "reasoning_effort": "none"
+      }
+    },
+    "purpose": "Internal model evaluation; Go documents coding-agent traffic, not a general translation service",
+    "transport": "Python http.client HTTP/1.1",
+    "one_request_at_a_time": true,
+    "local_cache": false,
+    "provider_caching": "uncontrolled; session stable for each input across rounds",
+    "retries": 0,
+    "seed": 42,
+    "go_minimum_start_interval_seconds": 2,
+    "max_tokens": 4096,
+    "temperature": 0,
+    "input_file": "docs/benchmarks/inputs-groq-paced-en-uk.json",
+    "input_sha256": "6754f9ede48659704044aa1fa2130a795df37a424b882eef30860df8c61e4181",
+    "harness_sha256": "fb5b6633322054f5a967fb8c641b8296d194925cb0c31f61f73da436b6d4db61",
+    "completed_at": "2026-10-02T21:36:32.006250+00:00",
+    "comparison_complete": false
+  },
+  "inputs": [
+    {
+      "id": "word-1",
+      "size": "word",
+      "text": "bank"
+    },
+    {
+      "id": "short-1",
+      "size": "short",
+      "text": "Open the settings."
+    },
+    {
+      "id": "sentence-1",
+      "size": "sentence",
+      "text": "You can select a different language from the menu. Your choice will be remembered the next time you open the browser."
+    },
+    {
+      "id": "paragraph-1",
+      "size": "paragraph",
+      "text": "When you select text on a web page, a small translation button appears beside it. Click the button to open a panel with the translation. You can change the target language in that panel, and the browser will remember your choice for the next session. Press Escape or click outside the panel to close it. The selected text should remain highlighted so that you can compare the original with the translated version. If the request fails, the panel should explain what happened and offer a retry without losing your selection."
+    },
+    {
+      "id": "long-1",
+      "size": "long",
+      "text": "A reliable translation panel starts with a clear connection between the selected text and the request that represents it. The browser can generate several selection events while a person drags across a paragraph. Sending a request for every event wastes time and makes the interface feel unstable. Wait until the selection is complete, keep the source text in memory, and send the request when the translation button is clicked.\n\nThe user should see the panel immediately after clicking. Its position depends on the visible selection rectangle and the available space around it. Near the right edge of the page, the panel may need to move to the left. Near the bottom, it may need to open above the selection. Scrolling should not leave the panel floating over unrelated content. These adjustments should happen locally and should not delay the translation request.\n\nA second selection may be made before the first translation finishes. Give each request a unique identifier and compare it with the current selection before displaying the result. Cancel a request when the transport supports cancellation. If cancellation is unavailable, discard the stale response. The important behavior is that the result always belongs to the text the person most recently asked to translate.\n\nPersist the target language after it changes. For a person who normally translates into Ukrainian, a remembered preference removes an extra action from every request. The source language can be detected by the provider in the same translation call. Very short words are sometimes ambiguous, so the panel may also need an optional way to choose a source language when automatic detection produces the wrong result."
+    },
+    {
+      "id": "large-1",
+      "size": "large",
+      "text": "A reliable translation panel starts with a clear connection between the selected text and the request that represents it. The browser can generate several selection events while a person drags across a paragraph. Sending a request for every event wastes time and makes the interface feel unstable. Wait until the selection is complete, keep the source text in memory, and send the request when the translation button is clicked.\n\nThe user should see the panel immediately after clicking. Its position depends on the visible selection rectangle and the available space around it. Near the right edge of the page, the panel may need to move to the left. Near the bottom, it may need to open above the selection. Scrolling should not leave the panel floating over unrelated content. These adjustments should happen locally and should not delay the translation request.\n\nA second selection may be made before the first translation finishes. Give each request a unique identifier and compare it with the current selection before displaying the result. Cancel a request when the transport supports cancellation. If cancellation is unavailable, discard the stale response. The important behavior is that the result always belongs to the text the person most recently asked to translate.\n\nPersist the target language after it changes. For a person who normally translates into Ukrainian, a remembered preference removes an extra action from every request. The source language can be detected by the provider in the same translation call. Very short words are sometimes ambiguous, so the panel may also need an optional way to choose a source language when automatic detection produces the wrong result.\n\nNetwork connections make a measurable difference. The first request can include DNS lookup, a TCP connection, and a TLS handshake before the service receives any text. Later requests may reuse that connection. A benchmark should show both cases and should record the time until the entire translation is available. For a streamed response, also record when the first translated characters arrive.\n\nTranslation quality depends on context. A river bank and a financial bank share the same English spelling but require different Ukrainian words. Idioms such as feeling blue and spilling the beans should preserve their intended meaning. A fast engine that translates these expressions literally can make a paragraph harder to understand. Evaluate complete passages as well as isolated labels.\n\nLong passages need enough space in the panel to remain readable. Set a maximum height and allow the text to scroll inside it. Preserve paragraph boundaries where possible, and keep the close button accessible while scrolling. Keyboard users should be able to move focus into the panel, copy the translation, and return to the original page without losing their place.\n\nFailures should leave the source selection intact. A temporary network error, an exhausted allowance, and an invalid key require different recovery actions. Show a concise message with the relevant action. A retry should use the same source text and target language. Avoid repeatedly retrying a rejected credential because another request will not fix the configuration.\n\nMeasurements should describe the environment in which they were collected. Browser version, hardware, network connection, input length, model identifier, and source-language settings can all affect the result. Keep the raw timings together with the actual translations so that a later run can be compared against the same inputs. A single unusually fast request does not establish the normal experience.\n\nThe first prototype can concentrate on selection, translation, language preference, and closing the panel. Additional actions should be added only when they remove a frequent obstacle. A small interface can still be dependable if it handles stale requests, keyboard focus, page boundaries, and clear errors. These details matter more to everyday speed than a long list of optional features."
+    }
+  ],
+  "samples": [
+    {
+      "started_at": "2026-10-02T21:36:26.187990+00:00",
+      "ok": true,
+      "first_text_ms": 1232.161,
+      "protocol": "HTTP/1.1",
+      "translation": "Коли ви виділяєте текст на веб-сторінці, поруч із ним з’являється невелика кнопка перекладу. Натисніть цю кнопку, щоб відкрити панель із перекладом. У цій панелі можна змінити мову перекладу, і браузер запам’ятає ваш вибір для наступного сеансу. Щоб закрити панель, натисніть клавішу Escape або клікніть поза її межами. Виділений текст має залишатися підсвіченим, щоб ви могли порівняти оригінал із перекладеною версією. Якщо запит не вдасться виконати, у панелі слід пояснити причину помилки та запропонувати повторити спробу без втрати виділеного тексту.",
+      "reasoning_characters": 0,
+      "finish_reason": "end_turn",
+      "usage": {
+        "input_tokens": 140,
+        "output_tokens": 192,
+        "cache_creation_input_tokens": 0,
+        "cache_read_input_tokens": 0
+      },
+      "status": 200,
+      "headers_ms": 1232.088,
+      "returned_model": "qwen3.8-flash",
+      "connection_reused": false,
+      "milliseconds": 4422.936,
+      "variant": "go-qwen3.8-flash",
+      "text": "When you select text on a web page, a small translation button appears beside it. Click the button to open a panel with the translation. You can change the target language in that panel, and the browser will remember your choice for the next session. Press Escape or click outside the panel to close it. The selected text should remain highlighted so that you can compare the original with the translated version. If the request fails, the panel should explain what happened and offer a retry without losing your selection.",
+      "characters": 523,
+      "input_id": "paragraph-1",
+      "size": "paragraph",
+      "phase": "cold-first",
+      "round": -1
+    },
+    {
+      "started_at": "2026-10-02T21:36:30.612210+00:00",
+      "ok": true,
+      "first_text_ms": 937.017,
+      "protocol": "HTTP/1.1",
+      "translation": "Коли ви виділяєте текст на веб-сторінці, поруч із ним з’являється невелика кнопка перекладу. Натисніть кнопку, щоб відкрити панель із перекладом. Ви можете змінити цільову мову в цій панелі, і браузер запам’ятає ваш вибір для наступного сеансу. Натисніть Escape або клацніть поза панеллю, щоб закрити її. Виділений текст має залишатися підсвіченим, щоб ви могли порівняти оригінал із перекладеною версією. Якщо запит не вдасться, панель має пояснити, що сталося, і запропонувати повторну спробу, не втрачаючи вашого виділення.",
+      "reasoning_characters": 0,
+      "finish_reason": "stop",
+      "usage": {
+        "prompt_tokens": 119,
+        "completion_tokens": 223,
+        "total_tokens": 342,
+        "prompt_tokens_details": {}
+      },
+      "status": 200,
+      "headers_ms": 936.946,
+      "returned_model": "deepseek-v4-flash",
+      "connection_reused": false,
+      "milliseconds": 1392.823,
+      "variant": "go-deepseek-v4-flash",
+      "text": "When you select text on a web page, a small translation button appears beside it. Click the button to open a panel with the translation. You can change the target language in that panel, and the browser will remember your choice for the next session. Press Escape or click outside the panel to close it. The selected text should remain highlighted so that you can compare the original with the translated version. If the request fails, the panel should explain what happened and offer a retry without losing your selection.",
+      "characters": 523,
+      "input_id": "paragraph-1",
+      "size": "paragraph",
+      "phase": "cold-first",
+      "round": -1
+    }
+  ],
+  "summary": {
+    "go-qwen3.8-flash": {
+      "cold-first": {
+        "attempted": 1,
+        "successful": 1,
+        "failed": 0,
+        "median_ms": 4422.94,
+        "p95_ms": 4422.94,
+        "min_ms": 4422.94,
+        "max_ms": 4422.94,
+        "reused_connections": 0,
+        "first_text_median_ms": 1232.16,
+        "first_text_p95_ms": 1232.16
+      }
+    },
+    "go-deepseek-v4-flash": {
+      "cold-first": {
+        "attempted": 1,
+        "successful": 1,
+        "failed": 0,
+        "median_ms": 1392.82,
+        "p95_ms": 1392.82,
+        "min_ms": 1392.82,
+        "max_ms": 1392.82,
+        "reused_connections": 0,
+        "first_text_median_ms": 937.02,
+        "first_text_p95_ms": 937.02
+      }
+    }
+  },
+  "blocked": []
+}

@@ -62,7 +62,7 @@ References: [project setup and billing](https://docs.cloud.google.com/translate/
 
 ## Run or repeat the cloud comparison
 
-Additional candidates, setup links, and the quota-limited OpenCode Go experiment are documented in [additional-providers.md](additional-providers.md). Their reserved key fields are in `.env` and `.env.example`. The four new cloud providers require adapters before the main runner can benchmark them; Go has a separate experimental runner.
+Setup for Groq, Cloudflare Workers AI, Gemini through AI Studio, and Cerebras is documented in [additional-providers.md](additional-providers.md). Their key fields and public model defaults are in `.env` and `.env.example`. All four have direct HTTPS adapters in the main runner. The earlier quota-limited OpenCode API experiment remains archived separately. OpenCode CLI inference is outside this comparison.
 
 ```sh
 python3 scripts/benchmark-cloud.py --check

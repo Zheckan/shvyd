@@ -17,18 +17,55 @@ cloud = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(cloud)
 MODELS = {
     "mimo-v2.6-flash": {"thinking": {"type": "disabled"}},
-    "glm-5.3-flash": {"thinking": {"type": "enabled"}, "reasoning_effort": "low"},
+    # Go's current GLM upstream rejects Z.ai's native `thinking` field.
+    "glm-5.3-flash": {"reasoning_effort": "low"},
+    "deepseek-v4-flash": {"thinking": {"type": "disabled"}, "reasoning_effort": "none"},
+    "deepseek-v4.1-flash": {"thinking": {"type": "disabled"}},
+    "qwen3.8-flash": {"thinking": {"type": "disabled"}},
 }
 ENDPOINT = "https://opencode.ai/zen/go/v1/chat/completions"
+
+
+def request_spec(model, text, key, session_id, route="go"):
+    wire_model = model + "-free" if route == "zen-free" else model
+    request = {"path": "/zen/v1/chat/completions" if route == "zen-free" else "/zen/go/v1/chat/completions",
+            "headers": {"Content-Type": "application/json", "Authorization": "Bearer " + key,
+                        "User-Agent": "shvyd-translation-benchmark/1.0", "x-opencode-session": session_id},
+            "body": {"model": wire_model, "stream": True, "stream_options": {"include_usage": True},
+                     "temperature": 0, "max_tokens": 4096,
+                     "messages": [{"role": "user", "content":
+                         "Translate everything that follows into Ukrainian. Return only the translation, without commentary:\n\n" + text}],
+                     **MODELS[model]}}
+    if model == "qwen3.8-flash":
+        request["path"] = "/zen/go/v1/messages"
+        request["body"].pop("stream_options")
+        request["headers"].pop("Authorization")
+        request["headers"].update({"x-api-key": key, "anthropic-version": "2023-06-01"})
+    return request
 
 
 def accept_event(state, event):
     if event.get("error"):
         state["stream_error"] = event["error"]
-    if event.get("usage"):
+    if event.get("usage") and event.get("type") != "message_delta":
         state["usage"] = event["usage"]
     if event.get("model"):
         state["returned_model"] = event["model"]
+    if event.get("type") == "message_start":
+        message = event.get("message", {})
+        state["returned_model"] = message.get("model")
+        state["usage"] = message.get("usage", {})
+    if event.get("type") == "content_block_delta":
+        delta = event.get("delta", {})
+        if delta.get("type") == "thinking_delta":
+            state["reasoning_characters"] += len(delta.get("thinking", ""))
+        if delta.get("type") == "text_delta":
+            text = delta.get("text", "")
+            state["translation"] += text
+            return text
+    if event.get("type") == "message_delta":
+        state["finish_reason"] = event.get("delta", {}).get("stop_reason")
+        state["usage"] = {**(state["usage"] or {}), **event.get("usage", {})}
     visible = ""
     for choice in event.get("choices", []):
         delta = choice.get("delta", {})
@@ -74,18 +111,10 @@ class GoTransport:
         if self.connection is None:
             self.connection = http.client.HTTPSConnection("opencode.ai", timeout=30)
         previous_socket = self.connection.sock
-        wire_model = model + "-free" if self.route == "zen-free" else model
-        body = {"model": wire_model, "stream": True, "stream_options": {"include_usage": True},
-                "temperature": 0, "max_tokens": 4096,
-                "messages": [{"role": "user", "content":
-                    "Translate everything that follows into Ukrainian. Return only the translation, without commentary:\n\n" + text}],
-                **MODELS[model]}
+        request = request_spec(model, text, key, session_id, self.route)
         try:
-            path = "/zen/v1/chat/completions" if self.route == "zen-free" else "/zen/go/v1/chat/completions"
-            self.connection.request("POST", path,
-                json.dumps(body, ensure_ascii=False).encode("utf-8"),
-                {"Content-Type": "application/json", "Authorization": "Bearer " + key,
-                 "User-Agent": "shvyd-translation-benchmark/1.0", "x-opencode-session": session_id})
+            self.connection.request("POST", request["path"],
+                json.dumps(request["body"], ensure_ascii=False).encode("utf-8"), request["headers"])
             response = self.connection.getresponse()
             output.update(status=response.status, headers_ms=round((time.perf_counter()-start)*1000, 3))
             if response.status == 200:
@@ -98,7 +127,7 @@ class GoTransport:
                         if visible and output["first_text_ms"] is None:
                             output["first_text_ms"] = round((time.perf_counter()-start)*1000, 3)
                 output["ok"] = (bool(output["translation"].strip())
-                                and output["finish_reason"] == "stop"
+                                and output["finish_reason"] == ("end_turn" if model == "qwen3.8-flash" else "stop")
                                 and not output.get("stream_error"))
                 if not output["ok"]:
                     output["error"] = "Generation was empty, truncated, or failed"
@@ -132,7 +161,10 @@ def run(args, config, models):
     destination.parent.mkdir(parents=True, exist_ok=True)
     data = {"metadata": {"started_at": stamp.isoformat(), "pair": "en->uk", "rounds": args.rounds,
               "endpoint": ENDPOINT if args.route == "go" else "https://opencode.ai/zen/v1/chat/completions",
+              "model_endpoints": {model: "https://opencode.ai" + request_spec(model, "", "", "", args.route)["path"]
+                                  for model in models},
               "route": args.route,
+              "smoke_only": args.smoke_only,
               "wire_models": [model + "-free" if args.route == "zen-free" else model for model in models],
               "models": {model: MODELS[model] for model in models},
               "purpose": "Internal model evaluation; Go documents coding-agent traffic, not a general translation service",
@@ -189,7 +221,7 @@ def run(args, config, models):
             active = []
         rng = random.Random(42)
         blocked = set()
-        for round_number in range(args.rounds):
+        for round_number in range(0 if args.smoke_only else args.rounds):
             tasks = [(variant, item) for variant in active if variant not in blocked for item in inputs]
             rng.shuffle(tasks)
             failures = {}
@@ -208,7 +240,7 @@ def run(args, config, models):
                                   "milliseconds": sample["milliseconds"]}), flush=True)
         data["metadata"]["completed_at"] = datetime.now(timezone.utc).isoformat()
         data["metadata"]["comparison_complete"] = (
-            not data["blocked"] and bool(models)
+            not args.smoke_only and not data["blocked"] and bool(models)
             and all(sum(s["phase"] == "warm" and s["variant"] == prefix+model
                         and s["ok"] for s in data["samples"]) == len(inputs)*args.rounds for model in models))
     finally:
@@ -224,6 +256,8 @@ def main():
     parser.add_argument("--env", type=Path, default=ROOT / ".env")
     parser.add_argument("--auth-file", type=Path, help="Optional OpenCode auth.json; only its opencode-go API key is read")
     parser.add_argument("--check", action="store_true")
+    parser.add_argument("--dry-run", action="store_true", help="Preview redacted requests without network access")
+    parser.add_argument("--smoke-only", action="store_true", help="One initial request per model without repeated measurements")
     parser.add_argument("--inputs", type=Path, default=ROOT / "docs/benchmarks/inputs-realistic-en-uk.json")
     parser.add_argument("--route", choices=("go", "zen-free"), default="go")
     parser.add_argument("--models", help="Comma-separated model IDs")
@@ -250,7 +284,14 @@ def main():
         print(json.dumps({"go_configured": bool(config.get("OPENCODE_GO_API_KEY")),
                           "azure_configured": bool(config.get("AZURE_TRANSLATOR_KEY")),
                           "endpoint": ENDPOINT if args.route == "go" else "https://opencode.ai/zen/v1/chat/completions",
+                          "model_endpoints": {model: "https://opencode.ai" + request_spec(model, "", "", "", args.route)["path"]
+                                              for model in models},
                           "models": [model+"-free" if args.route == "zen-free" else model for model in models]}))
+        return
+    if args.dry_run:
+        rows = [request_spec(model, "Open the settings.", config.get("OPENCODE_GO_API_KEY", ""),
+                             "request-preview", args.route) for model in models]
+        print(json.dumps(cloud.redact(rows, config), ensure_ascii=False, indent=2))
         return
     run(args, config, models)
 

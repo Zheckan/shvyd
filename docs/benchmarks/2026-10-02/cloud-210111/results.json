@@ -1,0 +1,304 @@
+{
+  "metadata": {
+    "started_at": "2026-10-02T21:01:11.875286+00:00",
+    "pair": "en->uk",
+    "transport": "Python http.client HTTP/1.1",
+    "rounds": 3,
+    "seed": 42,
+    "local_cache": false,
+    "measurement_mode": "repeated",
+    "input_file": "docs/benchmarks/inputs-groq-supported-en-uk.json",
+    "llm_output_limit": "max(512, source characters), capped at 4000 tokens",
+    "timing": "request start to entire response body; network included",
+    "cohere_minimum_start_interval_seconds": 3.2,
+    "deepl_minimum_start_interval_seconds": 2.0,
+    "new_provider_pacing": {
+      "groq": "30 RPM and conservative 8000 TPM reservation",
+      "groq_output_tokens_per_minute": 1000,
+      "gemini_minimum_seconds": 15.0,
+      "cerebras_minimum_seconds": 2.1,
+      "azure_characters_per_second": 500
+    },
+    "harness_sha256": "2606161cf83487f880c18739ccb2607ef5c8d7a730c1680c400e722e6e05a6f5",
+    "input_sha256": "e1e03bb4aa33b69ac0593ba26ebc261bdc6f915924884776c7e2fc96c10eac03",
+    "configuration": {
+      "providers": {
+        "azure": {
+          "configured": true,
+          "region": "",
+          "endpoint": "https://api.cognitive.microsofttranslator.com",
+          "api_version": "2026-06-06"
+        },
+        "deepl": {
+          "configured": true,
+          "endpoint": "https://api-free.deepl.com"
+        },
+        "cohere": {
+          "configured": true,
+          "endpoint": "https://api.cohere.com",
+          "model": "north-small-translate-09-2026"
+        },
+        "google": {
+          "configured": false,
+          "endpoint": "https://translation.googleapis.com"
+        },
+        "groq": {
+          "configured": true,
+          "endpoint": "https://api.groq.com",
+          "model": "qwen/qwen3.8-27b"
+        },
+        "gemini": {
+          "configured": true,
+          "endpoint": "https://generativelanguage.googleapis.com",
+          "model": "gemini-3.1-flash-lite"
+        },
+        "cerebras": {
+          "configured": false,
+          "endpoint": "https://api.cerebras.ai",
+          "model": "qwen-3.8-27b"
+        },
+        "cloudflare": {
+          "configured": true,
+          "endpoint": "https://api.cloudflare.com",
+          "model": "@cf/meta/m2m100-1.2b",
+          "token_present": true,
+          "account_id_present": true
+        }
+      }
+    },
+    "finished_at": "2026-10-02T21:01:45.055283+00:00"
+  },
+  "inputs": [
+    {
+      "id": "word-1",
+      "size": "word",
+      "text": "bank"
+    },
+    {
+      "id": "short-1",
+      "size": "short",
+      "text": "Open the settings."
+    },
+    {
+      "id": "sentence-1",
+      "size": "sentence",
+      "text": "You can select a different language from the menu. Your choice will be remembered the next time you open the browser."
+    },
+    {
+      "id": "paragraph-1",
+      "size": "paragraph",
+      "text": "When you select text on a web page, a small translation button appears beside it. Click the button to open a panel with the translation. You can change the target language in that panel, and the browser will remember your choice for the next session. Press Escape or click outside the panel to close it. The selected text should remain highlighted so that you can compare the original with the translated version. If the request fails, the panel should explain what happened and offer a retry without losing your selection."
+    },
+    {
+      "id": "long-1",
+      "size": "long",
+      "text": "A reliable translation panel starts with a clear connection between the selected text and the request that represents it. The browser can generate several selection events while a person drags across a paragraph. Sending a request for every event wastes time and makes the interface feel unstable. Wait until the selection is complete, keep the source text in memory, and send the request when the translation button is clicked.\n\nThe user should see the panel immediately after clicking. Its position depends on the visible selection rectangle and the available space around it. Near the right edge of the page, the panel may need to move to the left. Near the bottom, it may need to open above the selection. Scrolling should not leave the panel floating over unrelated content. These adjustments should happen locally and should not delay the translation request.\n\nA second selection may be made before the first translation finishes. Give each request a unique identifier and compare it with the current selection before displaying the result. Cancel a request when the transport supports cancellation. If cancellation is unavailable, discard the stale response. The important behavior is that the result always belongs to the text the person most recently asked to translate.\n\nPersist the target language after it changes. For a person who normally translates into Ukrainian, a remembered preference removes an extra action from every request. The source language can be detected by the provider in the same translation call. Very short words are sometimes ambiguous, so the panel may also need an optional way to choose a source language when automatic detection produces the wrong result."
+    }
+  ],
+  "variants": [
+    {
+      "id": "groq-qwen-stream",
+      "provider": "groq",
+      "endpoint": "https://api.groq.com",
+      "model": "qwen/qwen3.8-27b",
+      "stream": true,
+      "detect": true
+    }
+  ],
+  "preflight": [],
+  "samples": [
+    {
+      "started_at": "2026-10-02T21:01:11.875413+00:00",
+      "ok": true,
+      "protocol": "HTTP/1.1",
+      "first_text_ms": 624.691,
+      "status": 200,
+      "headers_ms": 623.418,
+      "retry_after": null,
+      "returned_model": "qwen/qwen3.8-27b",
+      "reasoning_characters": 0,
+      "stream_events": 11,
+      "connection_reused": false,
+      "milliseconds": 641.105,
+      "variant": "groq-qwen-stream",
+      "text": "Open the settings.",
+      "characters": 18,
+      "translation": "Відкрийте налаштування.",
+      "finish_reason": "stop",
+      "usage": {
+        "queue_time": 0.534126333,
+        "prompt_tokens": 32,
+        "prompt_time": 0.002477614,
+        "completion_tokens": 9,
+        "completion_time": 0.01789395,
+        "total_tokens": 41,
+        "total_time": 0.020371564
+      },
+      "phase": "cold-first",
+      "round": -1
+    },
+    {
+      "started_at": "2026-10-02T21:01:17.762359+00:00",
+      "ok": true,
+      "protocol": "HTTP/1.1",
+      "first_text_ms": 68.36,
+      "status": 200,
+      "headers_ms": 58.656,
+      "retry_after": null,
+      "returned_model": "qwen/qwen3.8-27b",
+      "reasoning_characters": 0,
+      "stream_events": 186,
+      "connection_reused": true,
+      "milliseconds": 458.588,
+      "variant": "groq-qwen-stream",
+      "text": "When you select text on a web page, a small translation button appears beside it. Click the button to open a panel with the translation. You can change the target language in that panel, and the browser will remember your choice for the next session. Press Escape or click outside the panel to close it. The selected text should remain highlighted so that you can compare the original with the translated version. If the request fails, the panel should explain what happened and offer a retry without losing your selection.",
+      "characters": 523,
+      "translation": "Коли ви виділяєте текст на веб-сторінці, поруч із ним з’являється невелика кнопка перекладу. Натисніть кнопку, щоб відкрити панель із перекладом. Ви можете змінити мову перекладу в цій панелі, і браузер запам’ятає ваш вибір для наступної сесії. Натисніть Escape або клацніть поза панеллю, щоб закрити її. Виділений текст має залишатися підсвіченим, щоб ви могли порівняти оригінал із перекладеною версією. Якщо запит не вдасться виконати, панель має пояснити, що сталося, і запропонувати повторну спробу без втрати виділення.",
+      "finish_reason": "stop",
+      "usage": {
+        "queue_time": 0.016943606,
+        "prompt_tokens": 127,
+        "prompt_time": 0.011039468,
+        "completion_tokens": 184,
+        "completion_time": 0.389196302,
+        "total_tokens": 311,
+        "total_time": 0.40023577
+      },
+      "phase": "warm",
+      "round": 0,
+      "input_index": 3,
+      "input_id": "paragraph-1",
+      "size": "paragraph"
+    },
+    {
+      "started_at": "2026-10-02T21:01:21.669787+00:00",
+      "ok": true,
+      "protocol": "HTTP/1.1",
+      "first_text_ms": 54.616,
+      "status": 200,
+      "headers_ms": 50.757,
+      "retry_after": null,
+      "returned_model": "qwen/qwen3.8-27b",
+      "reasoning_characters": 0,
+      "stream_events": 11,
+      "connection_reused": true,
+      "milliseconds": 68.388,
+      "variant": "groq-qwen-stream",
+      "text": "Open the settings.",
+      "characters": 18,
+      "translation": "Відкрийте налаштування.",
+      "finish_reason": "stop",
+      "usage": {
+        "queue_time": 0.016765769,
+        "prompt_tokens": 32,
+        "prompt_time": 0.002367461,
+        "completion_tokens": 9,
+        "completion_time": 0.017223773,
+        "total_tokens": 41,
+        "total_time": 0.019591234
+      },
+      "phase": "warm",
+      "round": 0,
+      "input_index": 1,
+      "input_id": "short-1",
+      "size": "short"
+    },
+    {
+      "started_at": "2026-10-02T21:01:25.953413+00:00",
+      "ok": true,
+      "protocol": "HTTP/1.1",
+      "first_text_ms": 91.215,
+      "status": 200,
+      "headers_ms": 87.818,
+      "retry_after": null,
+      "returned_model": "qwen/qwen3.8-27b",
+      "reasoning_characters": 0,
+      "stream_events": 34,
+      "connection_reused": true,
+      "milliseconds": 153.05,
+      "variant": "groq-qwen-stream",
+      "text": "You can select a different language from the menu. Your choice will be remembered the next time you open the browser.",
+      "characters": 117,
+      "translation": "Ви можете вибрати іншу мову з меню. Ваш вибір буде збережено під час наступного відкриття браузера.",
+      "finish_reason": "stop",
+      "usage": {
+        "queue_time": 0.048266473,
+        "prompt_tokens": 51,
+        "prompt_time": 0.003919896,
+        "completion_tokens": 32,
+        "completion_time": 0.06286473,
+        "total_tokens": 83,
+        "total_time": 0.066784626
+      },
+      "phase": "warm",
+      "round": 0,
+      "input_index": 2,
+      "input_id": "sentence-1",
+      "size": "sentence"
+    },
+    {
+      "started_at": "2026-10-02T21:01:45.012650+00:00",
+      "ok": false,
+      "protocol": "HTTP/1.1",
+      "first_text_ms": null,
+      "status": 429,
+      "headers_ms": 40.273,
+      "retry_after": null,
+      "connection_reused": true,
+      "milliseconds": 40.352,
+      "variant": "groq-qwen-stream",
+      "text": "A reliable translation panel starts with a clear connection between the selected text and the request that represents it. The browser can generate several selection events while a person drags across a paragraph. Sending a request for every event wastes time and makes the interface feel unstable. Wait until the selection is complete, keep the source text in memory, and send the request when the translation button is clicked.\n\nThe user should see the panel immediately after clicking. Its position depends on the visible selection rectangle and the available space around it. Near the right edge of the page, the panel may need to move to the left. Near the bottom, it may need to open above the selection. Scrolling should not leave the panel floating over unrelated content. These adjustments should happen locally and should not delay the translation request.\n\nA second selection may be made before the first translation finishes. Give each request a unique identifier and compare it with the current selection before displaying the result. Cancel a request when the transport supports cancellation. If cancellation is unavailable, discard the stale response. The important behavior is that the result always belongs to the text the person most recently asked to translate.\n\nPersist the target language after it changes. For a person who normally translates into Ukrainian, a remembered preference removes an extra action from every request. The source language can be detected by the provider in the same translation call. Very short words are sometimes ambiguous, so the panel may also need an optional way to choose a source language when automatic detection produces the wrong result.",
+      "characters": 1694,
+      "provider_error": {
+        "error": {
+          "message": "Request too large for model `qwen/qwen3.8-27b` in organization `org_01m3z4nzsgex0sk4cqw4m3n3dp` service tier `on_demand` on output tokens per minute (OTPM): Limit 1000, Requested 1383. The request's expected output tokens exceed the enforced limit; reduce max_tokens (or the request's expected output) and try again. Need more tokens? Upgrade to Dev Tier today at https://console.groq.com/settings/billing",
+          "type": "tokens",
+          "code": "rate_limit_exceeded"
+        }
+      },
+      "phase": "warm",
+      "round": 0,
+      "input_index": 4,
+      "input_id": "long-1",
+      "size": "long"
+    }
+  ],
+  "blocked": [
+    {
+      "provider": "google",
+      "reason": "No Google Cloud Translation API key configured"
+    },
+    {
+      "provider": "groq",
+      "reason": "Authentication, billing, or quota rejection; further requests stopped"
+    }
+  ],
+  "summary": {
+    "groq-qwen-stream": {
+      "cold-first": {
+        "attempted": 1,
+        "successful": 1,
+        "failed": 0,
+        "median_ms": 641.11,
+        "p95_ms": 641.11,
+        "min_ms": 641.11,
+        "max_ms": 641.11,
+        "reused_connections": 0,
+        "first_text_median_ms": 624.69,
+        "first_text_p95_ms": 624.69
+      },
+      "warm": {
+        "attempted": 4,
+        "successful": 3,
+        "failed": 1,
+        "median_ms": 153.05,
+        "p95_ms": 458.59,
+        "min_ms": 68.39,
+        "max_ms": 458.59,
+        "reused_connections": 3,
+        "first_text_median_ms": 68.36,
+        "first_text_p95_ms": 91.22
+      }
+    }
+  }
+}

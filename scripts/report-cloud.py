@@ -22,6 +22,11 @@ NAMES = {
     "cohere-r7b-complete": "Command R7B, complete",
     "cohere-r7b-stream": "Command R7B, streamed",
     "google-en": "Google NMT, English source", "google-auto": "Google NMT, automatic source",
+    "groq-qwen-complete": "Groq Qwen3.8, complete", "groq-qwen-stream": "Groq Qwen3.8, streamed",
+    "cloudflare-m2m100-en": "Cloudflare M2M100, English source",
+    "gemini-flash-lite-complete": "Gemini 3.1 Flash-Lite, complete",
+    "gemini-flash-lite-stream": "Gemini 3.1 Flash-Lite, streamed",
+    "cerebras-qwen-complete": "Cerebras Qwen3.8, complete", "cerebras-qwen-stream": "Cerebras Qwen3.8, streamed",
 }
 SIZES = ["word", "short", "sentence", "paragraph", "long", "large"]
 
@@ -47,7 +52,15 @@ def main():
         runs.append((path, data))
         if not data["metadata"].get("finished_at"):
             continue
-        cohort = "realistic" if len(data["inputs"]) == 18 else "core"
+        sizes = {item.get("size") if isinstance(item, dict) else "core" for item in data["inputs"]}
+        if len(data["inputs"]) == 18 and sizes == set(SIZES):
+            cohort = "realistic"
+        elif sizes == {"core"}:
+            cohort = "core"
+        else:
+            # Smaller paced subsets have a different content mix and belong in
+            # their own matched-input comparison, rather than the core table.
+            continue
         for variant in data["summary"]:
             rows = [item for item in data["samples"] if item["variant"] == variant and item["phase"] == "warm"]
             if any(item["ok"] for item in rows):
@@ -76,7 +89,7 @@ def main():
         if any(row.get("status") == 429 for row in data["samples"]):
             reasons.append("Contains HTTP 429 failures; inspect recorded attempts and pacing")
         if any(not row.get("ok") and row.get("status") == 200 for row in data["samples"]):
-            reasons.append("Contains the early streaming-parser failure; successful complete-response measurements remain usable")
+            reasons.append("Contains HTTP 200 responses that failed parsing or generation checks; inspect raw failures")
         if reasons:
             summary["run_notes"].append({"source": str(path.relative_to(directory)), "notes": reasons})
     summary["selected_warm_attempts"] = sum(len(entry["rows"]) for variants in selected.values() for entry in variants.values())
@@ -98,7 +111,7 @@ def main():
         "- Warm requests reuse the variant's connection. Connection reuse is recorded for each request. First and representative fresh-connection requests are retained separately in the raw JSON.",
         "- Provider caching cannot be disabled. First-round numbers are included separately; warmed model state and repeated-text caches may affect later rounds. The first-round seed text also appears in the initial readiness request.",
         "- DeepL's initial burst run was rate limited. Later runs space DeepL requests at least two seconds apart. Cohere starts are spaced at least 3.2 seconds apart. These deliberate waits are outside the measured request latency.",
-        "- Failed requests, incomplete generations, and parser failures are counted as failures and excluded from successful latency percentiles.",
+        "- Failed requests, incomplete LLM generations, and parser failures are counted as failures and excluded from successful latency percentiles. Cloudflare M2M100 has no completion reason: its nonempty API responses can still be incomplete translations. Review the additional cloud report before interpreting that model's timings.",
         "- LLMs use temperature 0, a translation-only prompt, and an output-token ceiling that grows with source length, capped at 4,000 tokens. Streaming captures the first nonempty text delta and the full completed message.",
         "- P95 uses nearest rank. Each realistic size has nine planned warm requests, so its P95 is the slowest successful request in that small group. Treat tail numbers as observations from this run.",
         "- Size groups contain different content. Their timing differences combine input length, content, provider state, and network variability; the results are not guaranteed to increase monotonically with text length.",
@@ -136,8 +149,8 @@ def main():
         lines.append(f"| {NAMES.get(variant, variant)} | {successful} / {len(entry['rows'])} | [Raw]({entry['source']}) |")
     lines += ["", "## Translation examples", "",
         "These are actual outputs from the core run, selected to expose ambiguity and idioms. They are a small qualitative sample, not an independent accuracy score. Repeated outputs and complete long translations remain in the raw JSON.", ""]
-    quality_variants = [variant for variant in ["azure-auto", "deepl-latency_optimized-auto", "deepl-quality_optimized-auto", "cohere-north-complete", "cohere-r7b-complete"] if variant in selected["core"]]
-    lines += ["| Source | " + " | ".join(NAMES[variant] for variant in quality_variants) + " |", "|---|" + "---|" * len(quality_variants)]
+    quality_variants = list(selected["core"])
+    lines += ["| Source | " + " | ".join(NAMES.get(variant, variant) for variant in quality_variants) + " |", "|---|" + "---|" * len(quality_variants)]
     for text in ["bank", "I am feeling blue.", "He eventually spilled the beans.", "It costs an arm and a leg.", "The river bank is steep."]:
         cells = []
         for variant in quality_variants:
@@ -158,7 +171,7 @@ def main():
         usage = summary["usage_audit"]["usage"]
         lines += ["", f"The [DeepL usage audit](cloud-usage.json) reports {usage['character_count']:,} characters used from a {usage['character_limit']:,}-character allowance, with {usage['remaining_characters']:,} remaining. The successful recorded responses' billed-character total matches that usage."]
     lines += ["", "## Interpretation for the prototype", "",
-        "The measured English-to-Ukrainian results support trying Azure as the first provider for a fast Helium prototype. The extension can store the target language locally and ask Azure to detect the source in the same translation request. This is a provider choice to verify in the extension, not a measured click-to-visible result.",
+        "The original Azure/DeepL/Cohere comparison supported trying Azure as the first provider for a fast Helium prototype. Additional provider rows need review before updating that recommendation. The extension can store the target language locally and ask Azure to detect the source in the same translation request. This is a provider choice to verify in the extension, not a measured click-to-visible result.",
         "", "DeepL handled the tested idioms more naturally than Azure, and its speed and quality modes produced the same idiom outputs in this small sample. Use the size tables to judge its latency cost. The burst test also shows that the free endpoint needs sensible pacing and explicit rate-limit handling.",
         "", "North Small Translate starts streaming text quickly, but generating a complete long passage takes substantially longer than a dedicated translation request. Command R7B was slower on long passages and made observable errors, including a literal river-bank translation and untranslated English words such as `deserve` and `repeatedly` in a long passage. These observations do not constitute a formal accuracy benchmark."]
     lines += ["", "## Google and local engines", "",
