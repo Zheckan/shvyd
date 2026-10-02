@@ -4,7 +4,7 @@ Updated 2026-10-03. Measurements were collected on 2026-10-02, translating Engli
 
 ## Working recommendation
 
-**Use a dedicated translation API for the first prototype: Azure as the default, with DeepL as a selectable alternative.** This is a recommendation based on the recorded tests, not an implemented provider choice.
+**Use a dedicated translation API for the first prototype: Azure as the default, with DeepL as a selectable alternative.** The prototype now implements this choice. See the [setup and development guide](../README.md).
 
 Azure best fits the priorities of fast complete translations, lightweight client code, and a useful recurring free allowance. DeepL is worth keeping because it handled our sampled idioms more naturally. Start its alternative route with `latency_optimized`; the tested speed and quality modes produced identical outputs on those idioms, while quality mode took longer on the realistic passages.
 
@@ -65,7 +65,7 @@ Provider credentials and setup instructions are in [api-keys.md](api-keys.md). K
 
 Build the Chromium extension around the requested interaction: select text, click the small translation button, and read the result in a larger popup. Default the target to Ukrainian and remember the last chosen target language. Use Azure automatic source detection in the same request, and expose DeepL as an alternative provider.
 
-Open the popup immediately and populate it when the translation arrives. A small session cache can make repeat selections immediate, keyed by source text, target language, and provider. This is proposed behavior; the benchmark deliberately used no local cache.
+The popup opens immediately and populates when the translation arrives. A bounded in-memory cache reuses repeat selections, keyed by source text, target language, and provider. It clears when the background worker restarts. The benchmark deliberately used no local cache.
 
 The next useful validation is the real Helium extension: measure click to visible translation, including worker startup, messaging, network, and rendering. Review Ukrainian outputs on actual reading selections as well. Those results should decide whether the default needs changing.
 
