@@ -1,0 +1,2967 @@
+{
+  "metadata": {
+    "recorded_at_utc": "2026-10-02T17:03:12.724789+00:00",
+    "source_language": "en",
+    "target_language": "uk",
+    "hardware": {
+      "cpu": "Apple M4 Pro",
+      "ram_gib": 48,
+      "architecture": "arm64",
+      "macos": "27.0.1"
+    },
+    "browser_versions": {
+      "helium": "0.18.1.1 / Chromium 154.0.8037.57",
+      "chrome": "150.0.7871.182"
+    },
+    "rounds": 5,
+    "distinct_inputs": 12,
+    "warm_samples_per_successful_engine": 60,
+    "measure": "performance.now before translate call to completed translated text",
+    "includes_ui": false,
+    "includes_source_detection": false,
+    "wasm_cache_size": 0,
+    "native_internal_cache_controlled": false,
+    "wasm_runtime": "@browsermt/bergamot-translator 0.4.9",
+    "current_mozilla_wasm_0_6_tested": false,
+    "cold_wasm_models_already_downloaded": true,
+    "headless": true,
+    "scratch_path": "/var/folders/h7/cs6lckd56zxczbhf1925zyd80000gn/T/shvyd-speed-_zuhwty7",
+    "helium_startup_page_reload_retries": 1
+  },
+  "results": {
+    "helium": {
+      "info": {
+        "state": "ready",
+        "samples": [],
+        "errors": [],
+        "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/154.0.0.0 Safari/537.36",
+        "cores": 14,
+        "translatorApi": "function"
+      },
+      "baselineRssBytes": 989036544,
+      "modes": {
+        "modern": {
+          "state": "done",
+          "samples": [
+            {
+              "text": "bank",
+              "characters": 4,
+              "words": 1,
+              "milliseconds": 5.600000023841858,
+              "translation": "банк",
+              "round": 0
+            },
+            {
+              "text": "Open the settings.",
+              "characters": 18,
+              "words": 3,
+              "milliseconds": 6.5,
+              "translation": "Відкрийте налаштування.",
+              "round": 0
+            },
+            {
+              "text": "Your changes have been saved.",
+              "characters": 29,
+              "words": 5,
+              "milliseconds": 10,
+              "translation": "Ваші зміни були збережені.",
+              "round": 0
+            },
+            {
+              "text": "I am feeling blue.",
+              "characters": 18,
+              "words": 4,
+              "milliseconds": 8.800000011920929,
+              "translation": "Я відчуваю себе блакитним.",
+              "round": 0
+            },
+            {
+              "text": "He eventually spilled the beans.",
+              "characters": 32,
+              "words": 5,
+              "milliseconds": 14.800000011920929,
+              "translation": "Врешті-решт він розлив боби.",
+              "round": 0
+            },
+            {
+              "text": "It costs an arm and a leg.",
+              "characters": 26,
+              "words": 7,
+              "milliseconds": 10.300000011920929,
+              "translation": "Це коштує руки і ноги.",
+              "round": 0
+            },
+            {
+              "text": "The river bank is steep.",
+              "characters": 24,
+              "words": 5,
+              "milliseconds": 9.200000047683716,
+              "translation": "Річковий берег крутий.",
+              "round": 0
+            },
+            {
+              "text": "Please restart your browser after the installation is complete.",
+              "characters": 63,
+              "words": 9,
+              "milliseconds": 14.800000011920929,
+              "translation": "Будь ласка, перезавантажте браузер після завершення встановлення.",
+              "round": 0
+            },
+            {
+              "text": "The patch addresses a race condition in the background worker.",
+              "characters": 62,
+              "words": 10,
+              "milliseconds": 17.399999976158142,
+              "translation": "Патч стосується умови перегонів у фоновому робочому стані.",
+              "round": 0
+            },
+            {
+              "text": "You can select a different language from the menu. Your choice will be remembered the next time you open the browser.",
+              "characters": 117,
+              "words": 21,
+              "milliseconds": 31.80000001192093,
+              "translation": "Ви можете вибрати іншу мову з меню. Ваш вибір запам'ятається наступного разу, коли ви відкриєте браузер.",
+              "round": 0
+            },
+            {
+              "text": "The update improves performance and fixes several bugs. Please restart your browser after the installation is complete. Your saved settings and bookmarks will remain available.",
+              "characters": 176,
+              "words": 25,
+              "milliseconds": 38.89999997615814,
+              "translation": "Оновлення покращує продуктивність і виправляє кілька помилок. Будь ласка, перезавантажте браузер після завершення встановлення. Ваші збережені налаштування та закладки залишаться доступними.",
+              "round": 0
+            },
+            {
+              "text": "When you select text on a web page, a small translation button appears beside it. Click the button to see the translation without leaving the page. The tool remembers your last chosen language and keeps the interface simple.",
+              "characters": 224,
+              "words": 38,
+              "milliseconds": 63.69999998807907,
+              "translation": "Коли ви вибираєте текст на веб-сторінці, поруч з ним з'явиться невелика кнопка перекладу. Натисніть кнопку, щоб побачити переклад, не виходячи зі сторінки. Інструмент запам'ятовує вашу останню обрану мову і зберігає інтерфейс простим.",
+              "round": 0
+            },
+            {
+              "text": "bank",
+              "characters": 4,
+              "words": 1,
+              "milliseconds": 3.900000035762787,
+              "translation": "банк",
+              "round": 1
+            },
+            {
+              "text": "Open the settings.",
+              "characters": 18,
+              "words": 3,
+              "milliseconds": 5.5,
+              "translation": "Відкрийте налаштування.",
+              "round": 1
+            },
+            {
+              "text": "Your changes have been saved.",
+              "characters": 29,
+              "words": 5,
+              "milliseconds": 8.600000023841858,
+              "translation": "Ваші зміни були збережені.",
+              "round": 1
+            },
+            {
+              "text": "I am feeling blue.",
+              "characters": 18,
+              "words": 4,
+              "milliseconds": 8.100000023841858,
+              "translation": "Я відчуваю себе блакитним.",
+              "round": 1
+            },
+            {
+              "text": "He eventually spilled the beans.",
+              "characters": 32,
+              "words": 5,
+              "milliseconds": 12.599999964237213,
+              "translation": "Врешті-решт він розлив боби.",
+              "round": 1
+            },
+            {
+              "text": "It costs an arm and a leg.",
+              "characters": 26,
+              "words": 7,
+              "milliseconds": 10.100000023841858,
+              "translation": "Це коштує руки і ноги.",
+              "round": 1
+            },
+            {
+              "text": "The river bank is steep.",
+              "characters": 24,
+              "words": 5,
+              "milliseconds": 8.699999988079071,
+              "translation": "Річковий берег крутий.",
+              "round": 1
+            },
+            {
+              "text": "Please restart your browser after the installation is complete.",
+              "characters": 63,
+              "words": 9,
+              "milliseconds": 15.900000035762787,
+              "translation": "Будь ласка, перезавантажте браузер після завершення встановлення.",
+              "round": 1
+            },
+            {
+              "text": "The patch addresses a race condition in the background worker.",
+              "characters": 62,
+              "words": 10,
+              "milliseconds": 18,
+              "translation": "Патч стосується умови перегонів у фоновому робочому стані.",
+              "round": 1
+            },
+            {
+              "text": "You can select a different language from the menu. Your choice will be remembered the next time you open the browser.",
+              "characters": 117,
+              "words": 21,
+              "milliseconds": 34.200000047683716,
+              "translation": "Ви можете вибрати іншу мову з меню. Ваш вибір запам'ятається наступного разу, коли ви відкриєте браузер.",
+              "round": 1
+            },
+            {
+              "text": "The update improves performance and fixes several bugs. Please restart your browser after the installation is complete. Your saved settings and bookmarks will remain available.",
+              "characters": 176,
+              "words": 25,
+              "milliseconds": 41.39999997615814,
+              "translation": "Оновлення покращує продуктивність і виправляє кілька помилок. Будь ласка, перезавантажте браузер після завершення встановлення. Ваші збережені налаштування та закладки залишаться доступними.",
+              "round": 1
+            },
+            {
+              "text": "When you select text on a web page, a small translation button appears beside it. Click the button to see the translation without leaving the page. The tool remembers your last chosen language and keeps the interface simple.",
+              "characters": 224,
+              "words": 38,
+              "milliseconds": 64.39999997615814,
+              "translation": "Коли ви вибираєте текст на веб-сторінці, поруч з ним з'явиться невелика кнопка перекладу. Натисніть кнопку, щоб побачити переклад, не виходячи зі сторінки. Інструмент запам'ятовує вашу останню обрану мову і зберігає інтерфейс простим.",
+              "round": 1
+            },
+            {
+              "text": "bank",
+              "characters": 4,
+              "words": 1,
+              "milliseconds": 3.899999976158142,
+              "translation": "банк",
+              "round": 2
+            },
+            {
+              "text": "Open the settings.",
+              "characters": 18,
+              "words": 3,
+              "milliseconds": 5.300000011920929,
+              "translation": "Відкрийте налаштування.",
+              "round": 2
+            },
+            {
+              "text": "Your changes have been saved.",
+              "characters": 29,
+              "words": 5,
+              "milliseconds": 8.599999964237213,
+              "translation": "Ваші зміни були збережені.",
+              "round": 2
+            },
+            {
+              "text": "I am feeling blue.",
+              "characters": 18,
+              "words": 4,
+              "milliseconds": 7.900000035762787,
+              "translation": "Я відчуваю себе блакитним.",
+              "round": 2
+            },
+            {
+              "text": "He eventually spilled the beans.",
+              "characters": 32,
+              "words": 5,
+              "milliseconds": 12.399999976158142,
+              "translation": "Врешті-решт він розлив боби.",
+              "round": 2
+            },
+            {
+              "text": "It costs an arm and a leg.",
+              "characters": 26,
+              "words": 7,
+              "milliseconds": 9.699999988079071,
+              "translation": "Це коштує руки і ноги.",
+              "round": 2
+            },
+            {
+              "text": "The river bank is steep.",
+              "characters": 24,
+              "words": 5,
+              "milliseconds": 9.200000047683716,
+              "translation": "Річковий берег крутий.",
+              "round": 2
+            },
+            {
+              "text": "Please restart your browser after the installation is complete.",
+              "characters": 63,
+              "words": 9,
+              "milliseconds": 14.199999988079071,
+              "translation": "Будь ласка, перезавантажте браузер після завершення встановлення.",
+              "round": 2
+            },
+            {
+              "text": "The patch addresses a race condition in the background worker.",
+              "characters": 62,
+              "words": 10,
+              "milliseconds": 16.900000035762787,
+              "translation": "Патч стосується умови перегонів у фоновому робочому стані.",
+              "round": 2
+            },
+            {
+              "text": "You can select a different language from the menu. Your choice will be remembered the next time you open the browser.",
+              "characters": 117,
+              "words": 21,
+              "milliseconds": 29.19999998807907,
+              "translation": "Ви можете вибрати іншу мову з меню. Ваш вибір запам'ятається наступного разу, коли ви відкриєте браузер.",
+              "round": 2
+            },
+            {
+              "text": "The update improves performance and fixes several bugs. Please restart your browser after the installation is complete. Your saved settings and bookmarks will remain available.",
+              "characters": 176,
+              "words": 25,
+              "milliseconds": 37.89999997615814,
+              "translation": "Оновлення покращує продуктивність і виправляє кілька помилок. Будь ласка, перезавантажте браузер після завершення встановлення. Ваші збережені налаштування та закладки залишаться доступними.",
+              "round": 2
+            },
+            {
+              "text": "When you select text on a web page, a small translation button appears beside it. Click the button to see the translation without leaving the page. The tool remembers your last chosen language and keeps the interface simple.",
+              "characters": 224,
+              "words": 38,
+              "milliseconds": 62.200000047683716,
+              "translation": "Коли ви вибираєте текст на веб-сторінці, поруч з ним з'явиться невелика кнопка перекладу. Натисніть кнопку, щоб побачити переклад, не виходячи зі сторінки. Інструмент запам'ятовує вашу останню обрану мову і зберігає інтерфейс простим.",
+              "round": 2
+            },
+            {
+              "text": "bank",
+              "characters": 4,
+              "words": 1,
+              "milliseconds": 3.300000011920929,
+              "translation": "банк",
+              "round": 3
+            },
+            {
+              "text": "Open the settings.",
+              "characters": 18,
+              "words": 3,
+              "milliseconds": 5.399999976158142,
+              "translation": "Відкрийте налаштування.",
+              "round": 3
+            },
+            {
+              "text": "Your changes have been saved.",
+              "characters": 29,
+              "words": 5,
+              "milliseconds": 8.599999964237213,
+              "translation": "Ваші зміни були збережені.",
+              "round": 3
+            },
+            {
+              "text": "I am feeling blue.",
+              "characters": 18,
+              "words": 4,
+              "milliseconds": 8,
+              "translation": "Я відчуваю себе блакитним.",
+              "round": 3
+            },
+            {
+              "text": "He eventually spilled the beans.",
+              "characters": 32,
+              "words": 5,
+              "milliseconds": 13.099999964237213,
+              "translation": "Врешті-решт він розлив боби.",
+              "round": 3
+            },
+            {
+              "text": "It costs an arm and a leg.",
+              "characters": 26,
+              "words": 7,
+              "milliseconds": 10.399999976158142,
+              "translation": "Це коштує руки і ноги.",
+              "round": 3
+            },
+            {
+              "text": "The river bank is steep.",
+              "characters": 24,
+              "words": 5,
+              "milliseconds": 8.399999976158142,
+              "translation": "Річковий берег крутий.",
+              "round": 3
+            },
+            {
+              "text": "Please restart your browser after the installation is complete.",
+              "characters": 63,
+              "words": 9,
+              "milliseconds": 15.300000011920929,
+              "translation": "Будь ласка, перезавантажте браузер після завершення встановлення.",
+              "round": 3
+            },
+            {
+              "text": "The patch addresses a race condition in the background worker.",
+              "characters": 62,
+              "words": 10,
+              "milliseconds": 16.80000001192093,
+              "translation": "Патч стосується умови перегонів у фоновому робочому стані.",
+              "round": 3
+            },
+            {
+              "text": "You can select a different language from the menu. Your choice will be remembered the next time you open the browser.",
+              "characters": 117,
+              "words": 21,
+              "milliseconds": 28.5,
+              "translation": "Ви можете вибрати іншу мову з меню. Ваш вибір запам'ятається наступного разу, коли ви відкриєте браузер.",
+              "round": 3
+            },
+            {
+              "text": "The update improves performance and fixes several bugs. Please restart your browser after the installation is complete. Your saved settings and bookmarks will remain available.",
+              "characters": 176,
+              "words": 25,
+              "milliseconds": 37.69999998807907,
+              "translation": "Оновлення покращує продуктивність і виправляє кілька помилок. Будь ласка, перезавантажте браузер після завершення встановлення. Ваші збережені налаштування та закладки залишаться доступними.",
+              "round": 3
+            },
+            {
+              "text": "When you select text on a web page, a small translation button appears beside it. Click the button to see the translation without leaving the page. The tool remembers your last chosen language and keeps the interface simple.",
+              "characters": 224,
+              "words": 38,
+              "milliseconds": 60.89999997615814,
+              "translation": "Коли ви вибираєте текст на веб-сторінці, поруч з ним з'явиться невелика кнопка перекладу. Натисніть кнопку, щоб побачити переклад, не виходячи зі сторінки. Інструмент запам'ятовує вашу останню обрану мову і зберігає інтерфейс простим.",
+              "round": 3
+            },
+            {
+              "text": "bank",
+              "characters": 4,
+              "words": 1,
+              "milliseconds": 4.399999976158142,
+              "translation": "банк",
+              "round": 4
+            },
+            {
+              "text": "Open the settings.",
+              "characters": 18,
+              "words": 3,
+              "milliseconds": 5.300000011920929,
+              "translation": "Відкрийте налаштування.",
+              "round": 4
+            },
+            {
+              "text": "Your changes have been saved.",
+              "characters": 29,
+              "words": 5,
+              "milliseconds": 8.300000011920929,
+              "translation": "Ваші зміни були збережені.",
+              "round": 4
+            },
+            {
+              "text": "I am feeling blue.",
+              "characters": 18,
+              "words": 4,
+              "milliseconds": 7.400000035762787,
+              "translation": "Я відчуваю себе блакитним.",
+              "round": 4
+            },
+            {
+              "text": "He eventually spilled the beans.",
+              "characters": 32,
+              "words": 5,
+              "milliseconds": 12.699999988079071,
+              "translation": "Врешті-решт він розлив боби.",
+              "round": 4
+            },
+            {
+              "text": "It costs an arm and a leg.",
+              "characters": 26,
+              "words": 7,
+              "milliseconds": 9.300000011920929,
+              "translation": "Це коштує руки і ноги.",
+              "round": 4
+            },
+            {
+              "text": "The river bank is steep.",
+              "characters": 24,
+              "words": 5,
+              "milliseconds": 8.5,
+              "translation": "Річковий берег крутий.",
+              "round": 4
+            },
+            {
+              "text": "Please restart your browser after the installation is complete.",
+              "characters": 63,
+              "words": 9,
+              "milliseconds": 14.600000023841858,
+              "translation": "Будь ласка, перезавантажте браузер після завершення встановлення.",
+              "round": 4
+            },
+            {
+              "text": "The patch addresses a race condition in the background worker.",
+              "characters": 62,
+              "words": 10,
+              "milliseconds": 18.5,
+              "translation": "Патч стосується умови перегонів у фоновому робочому стані.",
+              "round": 4
+            },
+            {
+              "text": "You can select a different language from the menu. Your choice will be remembered the next time you open the browser.",
+              "characters": 117,
+              "words": 21,
+              "milliseconds": 32.10000002384186,
+              "translation": "Ви можете вибрати іншу мову з меню. Ваш вибір запам'ятається наступного разу, коли ви відкриєте браузер.",
+              "round": 4
+            },
+            {
+              "text": "The update improves performance and fixes several bugs. Please restart your browser after the installation is complete. Your saved settings and bookmarks will remain available.",
+              "characters": 176,
+              "words": 25,
+              "milliseconds": 42.10000002384186,
+              "translation": "Оновлення покращує продуктивність і виправляє кілька помилок. Будь ласка, перезавантажте браузер після завершення встановлення. Ваші збережені налаштування та закладки залишаться доступними.",
+              "round": 4
+            },
+            {
+              "text": "When you select text on a web page, a small translation button appears beside it. Click the button to see the translation without leaving the page. The tool remembers your last chosen language and keeps the interface simple.",
+              "characters": 224,
+              "words": 38,
+              "milliseconds": 63.10000002384186,
+              "translation": "Коли ви вибираєте текст на веб-сторінці, поруч з ним з'явиться невелика кнопка перекладу. Натисніть кнопку, щоб побачити переклад, не виходячи зі сторінки. Інструмент запам'ятовує вашу останню обрану мову і зберігає інтерфейс простим.",
+              "round": 4
+            }
+          ],
+          "errors": [],
+          "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/154.0.0.0 Safari/537.36",
+          "cores": 14,
+          "translatorApi": "function",
+          "mode": "modern",
+          "cold": {
+            "text": "Open the settings.",
+            "characters": 18,
+            "words": 3,
+            "milliseconds": 358.5,
+            "translation": "Відкрийте налаштування."
+          },
+          "readyMilliseconds": 359.10000002384186,
+          "memory": {
+            "linearMemoryBytes": 548012032,
+            "models": 1
+          },
+          "peakRssBytes": 1682063360,
+          "peakIncreaseRssBytes": 693026816
+        },
+        "old": {
+          "state": "done",
+          "samples": [
+            {
+              "text": "bank",
+              "characters": 4,
+              "words": 1,
+              "milliseconds": 3.199999988079071,
+              "translation": "банк",
+              "round": 0
+            },
+            {
+              "text": "Open the settings.",
+              "characters": 18,
+              "words": 3,
+              "milliseconds": 4.100000023841858,
+              "translation": "Відкрити параметри.",
+              "round": 0
+            },
+            {
+              "text": "Your changes have been saved.",
+              "characters": 29,
+              "words": 5,
+              "milliseconds": 5.399999976158142,
+              "translation": "Ваші зміни збережено.",
+              "round": 0
+            },
+            {
+              "text": "I am feeling blue.",
+              "characters": 18,
+              "words": 4,
+              "milliseconds": 5.699999988079071,
+              "translation": "Я відчуваю себе блакитним.",
+              "round": 0
+            },
+            {
+              "text": "He eventually spilled the beans.",
+              "characters": 32,
+              "words": 5,
+              "milliseconds": 6.399999976158142,
+              "translation": "Зрештою він розлив боби.",
+              "round": 0
+            },
+            {
+              "text": "It costs an arm and a leg.",
+              "characters": 26,
+              "words": 7,
+              "milliseconds": 7,
+              "translation": "Кошить руку і ногу.",
+              "round": 0
+            },
+            {
+              "text": "The river bank is steep.",
+              "characters": 24,
+              "words": 5,
+              "milliseconds": 5.800000011920929,
+              "translation": "Річковий берег стрімкий.",
+              "round": 0
+            },
+            {
+              "text": "Please restart your browser after the installation is complete.",
+              "characters": 63,
+              "words": 9,
+              "milliseconds": 11.100000023841858,
+              "translation": "Будь ласка, перезапустіть ваш переглядач після завершення встановлення.",
+              "round": 0
+            },
+            {
+              "text": "The patch addresses a race condition in the background worker.",
+              "characters": 62,
+              "words": 10,
+              "milliseconds": 10.199999988079071,
+              "translation": "Пластик звертається до стану гонки у фоновому працівникі.",
+              "round": 0
+            },
+            {
+              "text": "You can select a different language from the menu. Your choice will be remembered the next time you open the browser.",
+              "characters": 117,
+              "words": 21,
+              "milliseconds": 21,
+              "translation": "З меню можна вибрати іншу мову. Ваш вибір буде запам’ ятатися наступного разу, коли ви відкриєте переглядач.",
+              "round": 0
+            },
+            {
+              "text": "The update improves performance and fixes several bugs. Please restart your browser after the installation is complete. Your saved settings and bookmarks will remain available.",
+              "characters": 176,
+              "words": 25,
+              "milliseconds": 24.100000023841858,
+              "translation": "Оновлення покращує швидкодію і фіксує декілька вад. Будь ласка, перезапустіть ваш переглядач після завершення встановлення. Ваші збережені параметри і закладки залишаться доступними.",
+              "round": 0
+            },
+            {
+              "text": "When you select text on a web page, a small translation button appears beside it. Click the button to see the translation without leaving the page. The tool remembers your last chosen language and keeps the interface simple.",
+              "characters": 224,
+              "words": 38,
+              "milliseconds": 33.89999997615814,
+              "translation": "При виборі тексту на веб-сторінці поряд з'являється невелика кнопка перекладу. Натисніть кнопку, щоб побачити переклад без виходу сторінки. Інструмент запам’ ятає вашу останню обрану мову і зберігає інтерфейс простим.",
+              "round": 0
+            },
+            {
+              "text": "bank",
+              "characters": 4,
+              "words": 1,
+              "milliseconds": 4.199999988079071,
+              "translation": "банк",
+              "round": 1
+            },
+            {
+              "text": "Open the settings.",
+              "characters": 18,
+              "words": 3,
+              "milliseconds": 3.599999964237213,
+              "translation": "Відкрити параметри.",
+              "round": 1
+            },
+            {
+              "text": "Your changes have been saved.",
+              "characters": 29,
+              "words": 5,
+              "milliseconds": 5,
+              "translation": "Ваші зміни збережено.",
+              "round": 1
+            },
+            {
+              "text": "I am feeling blue.",
+              "characters": 18,
+              "words": 4,
+              "milliseconds": 5.300000011920929,
+              "translation": "Я відчуваю себе блакитним.",
+              "round": 1
+            },
+            {
+              "text": "He eventually spilled the beans.",
+              "characters": 32,
+              "words": 5,
+              "milliseconds": 7.099999964237213,
+              "translation": "Зрештою він розлив боби.",
+              "round": 1
+            },
+            {
+              "text": "It costs an arm and a leg.",
+              "characters": 26,
+              "words": 7,
+              "milliseconds": 7.199999988079071,
+              "translation": "Кошить руку і ногу.",
+              "round": 1
+            },
+            {
+              "text": "The river bank is steep.",
+              "characters": 24,
+              "words": 5,
+              "milliseconds": 6.099999964237213,
+              "translation": "Річковий берег стрімкий.",
+              "round": 1
+            },
+            {
+              "text": "Please restart your browser after the installation is complete.",
+              "characters": 63,
+              "words": 9,
+              "milliseconds": 9.5,
+              "translation": "Будь ласка, перезапустіть ваш переглядач після завершення встановлення.",
+              "round": 1
+            },
+            {
+              "text": "The patch addresses a race condition in the background worker.",
+              "characters": 62,
+              "words": 10,
+              "milliseconds": 10.300000011920929,
+              "translation": "Пластик звертається до стану гонки у фоновому працівникі.",
+              "round": 1
+            },
+            {
+              "text": "You can select a different language from the menu. Your choice will be remembered the next time you open the browser.",
+              "characters": 117,
+              "words": 21,
+              "milliseconds": 19.400000035762787,
+              "translation": "З меню можна вибрати іншу мову. Ваш вибір буде запам’ ятатися наступного разу, коли ви відкриєте переглядач.",
+              "round": 1
+            },
+            {
+              "text": "The update improves performance and fixes several bugs. Please restart your browser after the installation is complete. Your saved settings and bookmarks will remain available.",
+              "characters": 176,
+              "words": 25,
+              "milliseconds": 22.100000023841858,
+              "translation": "Оновлення покращує швидкодію і фіксує декілька вад. Будь ласка, перезапустіть ваш переглядач після завершення встановлення. Ваші збережені параметри і закладки залишаться доступними.",
+              "round": 1
+            },
+            {
+              "text": "When you select text on a web page, a small translation button appears beside it. Click the button to see the translation without leaving the page. The tool remembers your last chosen language and keeps the interface simple.",
+              "characters": 224,
+              "words": 38,
+              "milliseconds": 32.30000001192093,
+              "translation": "При виборі тексту на веб-сторінці поряд з'являється невелика кнопка перекладу. Натисніть кнопку, щоб побачити переклад без виходу сторінки. Інструмент запам’ ятає вашу останню обрану мову і зберігає інтерфейс простим.",
+              "round": 1
+            },
+            {
+              "text": "bank",
+              "characters": 4,
+              "words": 1,
+              "milliseconds": 3.400000035762787,
+              "translation": "банк",
+              "round": 2
+            },
+            {
+              "text": "Open the settings.",
+              "characters": 18,
+              "words": 3,
+              "milliseconds": 4.100000023841858,
+              "translation": "Відкрити параметри.",
+              "round": 2
+            },
+            {
+              "text": "Your changes have been saved.",
+              "characters": 29,
+              "words": 5,
+              "milliseconds": 5.599999964237213,
+              "translation": "Ваші зміни збережено.",
+              "round": 2
+            },
+            {
+              "text": "I am feeling blue.",
+              "characters": 18,
+              "words": 4,
+              "milliseconds": 5.100000023841858,
+              "translation": "Я відчуваю себе блакитним.",
+              "round": 2
+            },
+            {
+              "text": "He eventually spilled the beans.",
+              "characters": 32,
+              "words": 5,
+              "milliseconds": 7,
+              "translation": "Зрештою він розлив боби.",
+              "round": 2
+            },
+            {
+              "text": "It costs an arm and a leg.",
+              "characters": 26,
+              "words": 7,
+              "milliseconds": 7,
+              "translation": "Кошить руку і ногу.",
+              "round": 2
+            },
+            {
+              "text": "The river bank is steep.",
+              "characters": 24,
+              "words": 5,
+              "milliseconds": 6.299999952316284,
+              "translation": "Річковий берег стрімкий.",
+              "round": 2
+            },
+            {
+              "text": "Please restart your browser after the installation is complete.",
+              "characters": 63,
+              "words": 9,
+              "milliseconds": 9.600000023841858,
+              "translation": "Будь ласка, перезапустіть ваш переглядач після завершення встановлення.",
+              "round": 2
+            },
+            {
+              "text": "The patch addresses a race condition in the background worker.",
+              "characters": 62,
+              "words": 10,
+              "milliseconds": 10.699999988079071,
+              "translation": "Пластик звертається до стану гонки у фоновому працівникі.",
+              "round": 2
+            },
+            {
+              "text": "You can select a different language from the menu. Your choice will be remembered the next time you open the browser.",
+              "characters": 117,
+              "words": 21,
+              "milliseconds": 19.19999998807907,
+              "translation": "З меню можна вибрати іншу мову. Ваш вибір буде запам’ ятатися наступного разу, коли ви відкриєте переглядач.",
+              "round": 2
+            },
+            {
+              "text": "The update improves performance and fixes several bugs. Please restart your browser after the installation is complete. Your saved settings and bookmarks will remain available.",
+              "characters": 176,
+              "words": 25,
+              "milliseconds": 23.799999952316284,
+              "translation": "Оновлення покращує швидкодію і фіксує декілька вад. Будь ласка, перезапустіть ваш переглядач після завершення встановлення. Ваші збережені параметри і закладки залишаться доступними.",
+              "round": 2
+            },
+            {
+              "text": "When you select text on a web page, a small translation button appears beside it. Click the button to see the translation without leaving the page. The tool remembers your last chosen language and keeps the interface simple.",
+              "characters": 224,
+              "words": 38,
+              "milliseconds": 34.90000003576279,
+              "translation": "При виборі тексту на веб-сторінці поряд з'являється невелика кнопка перекладу. Натисніть кнопку, щоб побачити переклад без виходу сторінки. Інструмент запам’ ятає вашу останню обрану мову і зберігає інтерфейс простим.",
+              "round": 2
+            },
+            {
+              "text": "bank",
+              "characters": 4,
+              "words": 1,
+              "milliseconds": 3.899999976158142,
+              "translation": "банк",
+              "round": 3
+            },
+            {
+              "text": "Open the settings.",
+              "characters": 18,
+              "words": 3,
+              "milliseconds": 4.5,
+              "translation": "Відкрити параметри.",
+              "round": 3
+            },
+            {
+              "text": "Your changes have been saved.",
+              "characters": 29,
+              "words": 5,
+              "milliseconds": 5.800000011920929,
+              "translation": "Ваші зміни збережено.",
+              "round": 3
+            },
+            {
+              "text": "I am feeling blue.",
+              "characters": 18,
+              "words": 4,
+              "milliseconds": 6.300000011920929,
+              "translation": "Я відчуваю себе блакитним.",
+              "round": 3
+            },
+            {
+              "text": "He eventually spilled the beans.",
+              "characters": 32,
+              "words": 5,
+              "milliseconds": 8,
+              "translation": "Зрештою він розлив боби.",
+              "round": 3
+            },
+            {
+              "text": "It costs an arm and a leg.",
+              "characters": 26,
+              "words": 7,
+              "milliseconds": 7.399999976158142,
+              "translation": "Кошить руку і ногу.",
+              "round": 3
+            },
+            {
+              "text": "The river bank is steep.",
+              "characters": 24,
+              "words": 5,
+              "milliseconds": 6.100000023841858,
+              "translation": "Річковий берег стрімкий.",
+              "round": 3
+            },
+            {
+              "text": "Please restart your browser after the installation is complete.",
+              "characters": 63,
+              "words": 9,
+              "milliseconds": 10.300000011920929,
+              "translation": "Будь ласка, перезапустіть ваш переглядач після завершення встановлення.",
+              "round": 3
+            },
+            {
+              "text": "The patch addresses a race condition in the background worker.",
+              "characters": 62,
+              "words": 10,
+              "milliseconds": 9.599999964237213,
+              "translation": "Пластик звертається до стану гонки у фоновому працівникі.",
+              "round": 3
+            },
+            {
+              "text": "You can select a different language from the menu. Your choice will be remembered the next time you open the browser.",
+              "characters": 117,
+              "words": 21,
+              "milliseconds": 20.19999998807907,
+              "translation": "З меню можна вибрати іншу мову. Ваш вибір буде запам’ ятатися наступного разу, коли ви відкриєте переглядач.",
+              "round": 3
+            },
+            {
+              "text": "The update improves performance and fixes several bugs. Please restart your browser after the installation is complete. Your saved settings and bookmarks will remain available.",
+              "characters": 176,
+              "words": 25,
+              "milliseconds": 25.19999998807907,
+              "translation": "Оновлення покращує швидкодію і фіксує декілька вад. Будь ласка, перезапустіть ваш переглядач після завершення встановлення. Ваші збережені параметри і закладки залишаться доступними.",
+              "round": 3
+            },
+            {
+              "text": "When you select text on a web page, a small translation button appears beside it. Click the button to see the translation without leaving the page. The tool remembers your last chosen language and keeps the interface simple.",
+              "characters": 224,
+              "words": 38,
+              "milliseconds": 76.69999998807907,
+              "translation": "При виборі тексту на веб-сторінці поряд з'являється невелика кнопка перекладу. Натисніть кнопку, щоб побачити переклад без виходу сторінки. Інструмент запам’ ятає вашу останню обрану мову і зберігає інтерфейс простим.",
+              "round": 3
+            },
+            {
+              "text": "bank",
+              "characters": 4,
+              "words": 1,
+              "milliseconds": 7,
+              "translation": "банк",
+              "round": 4
+            },
+            {
+              "text": "Open the settings.",
+              "characters": 18,
+              "words": 3,
+              "milliseconds": 6,
+              "translation": "Відкрити параметри.",
+              "round": 4
+            },
+            {
+              "text": "Your changes have been saved.",
+              "characters": 29,
+              "words": 5,
+              "milliseconds": 8.399999976158142,
+              "translation": "Ваші зміни збережено.",
+              "round": 4
+            },
+            {
+              "text": "I am feeling blue.",
+              "characters": 18,
+              "words": 4,
+              "milliseconds": 7.199999988079071,
+              "translation": "Я відчуваю себе блакитним.",
+              "round": 4
+            },
+            {
+              "text": "He eventually spilled the beans.",
+              "characters": 32,
+              "words": 5,
+              "milliseconds": 8.899999976158142,
+              "translation": "Зрештою він розлив боби.",
+              "round": 4
+            },
+            {
+              "text": "It costs an arm and a leg.",
+              "characters": 26,
+              "words": 7,
+              "milliseconds": 8.300000011920929,
+              "translation": "Кошить руку і ногу.",
+              "round": 4
+            },
+            {
+              "text": "The river bank is steep.",
+              "characters": 24,
+              "words": 5,
+              "milliseconds": 7.199999988079071,
+              "translation": "Річковий берег стрімкий.",
+              "round": 4
+            },
+            {
+              "text": "Please restart your browser after the installation is complete.",
+              "characters": 63,
+              "words": 9,
+              "milliseconds": 12.300000011920929,
+              "translation": "Будь ласка, перезапустіть ваш переглядач після завершення встановлення.",
+              "round": 4
+            },
+            {
+              "text": "The patch addresses a race condition in the background worker.",
+              "characters": 62,
+              "words": 10,
+              "milliseconds": 13.199999988079071,
+              "translation": "Пластик звертається до стану гонки у фоновому працівникі.",
+              "round": 4
+            },
+            {
+              "text": "You can select a different language from the menu. Your choice will be remembered the next time you open the browser.",
+              "characters": 117,
+              "words": 21,
+              "milliseconds": 23.099999964237213,
+              "translation": "З меню можна вибрати іншу мову. Ваш вибір буде запам’ ятатися наступного разу, коли ви відкриєте переглядач.",
+              "round": 4
+            },
+            {
+              "text": "The update improves performance and fixes several bugs. Please restart your browser after the installation is complete. Your saved settings and bookmarks will remain available.",
+              "characters": 176,
+              "words": 25,
+              "milliseconds": 26.5,
+              "translation": "Оновлення покращує швидкодію і фіксує декілька вад. Будь ласка, перезапустіть ваш переглядач після завершення встановлення. Ваші збережені параметри і закладки залишаться доступними.",
+              "round": 4
+            },
+            {
+              "text": "When you select text on a web page, a small translation button appears beside it. Click the button to see the translation without leaving the page. The tool remembers your last chosen language and keeps the interface simple.",
+              "characters": 224,
+              "words": 38,
+              "milliseconds": 41.69999998807907,
+              "translation": "При виборі тексту на веб-сторінці поряд з'являється невелика кнопка перекладу. Натисніть кнопку, щоб побачити переклад без виходу сторінки. Інструмент запам’ ятає вашу останню обрану мову і зберігає інтерфейс простим.",
+              "round": 4
+            }
+          ],
+          "errors": [],
+          "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/154.0.0.0 Safari/537.36",
+          "cores": 14,
+          "translatorApi": "function",
+          "mode": "old",
+          "cold": {
+            "text": "Open the settings.",
+            "characters": 18,
+            "words": 3,
+            "milliseconds": 301.69999998807907,
+            "translation": "Відкрити параметри."
+          },
+          "readyMilliseconds": 302.0999999642372,
+          "memory": {
+            "linearMemoryBytes": 674758656,
+            "models": 1
+          },
+          "peakRssBytes": 1682227200,
+          "peakIncreaseRssBytes": 693190656
+        }
+      },
+      "nativeAvailability": {
+        "state": "done",
+        "value": "downloadable"
+      },
+      "nativeBenchmark": {
+        "state": "failed",
+        "samples": [],
+        "progress": [],
+        "error": "Error: Translator.create did not finish within 30 seconds"
+      },
+      "nativeFiles": []
+    },
+    "chrome": {
+      "info": {
+        "state": "ready",
+        "samples": [],
+        "errors": [],
+        "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/150.0.0.0 Safari/537.36",
+        "cores": 14,
+        "translatorApi": "function"
+      },
+      "baselineRssBytes": 1215725568,
+      "modes": {
+        "modern": {
+          "state": "done",
+          "samples": [
+            {
+              "text": "bank",
+              "characters": 4,
+              "words": 1,
+              "milliseconds": 4.300000011920929,
+              "translation": "банк",
+              "round": 0
+            },
+            {
+              "text": "Open the settings.",
+              "characters": 18,
+              "words": 3,
+              "milliseconds": 7.300000011920929,
+              "translation": "Відкрийте налаштування.",
+              "round": 0
+            },
+            {
+              "text": "Your changes have been saved.",
+              "characters": 29,
+              "words": 5,
+              "milliseconds": 10.5,
+              "translation": "Ваші зміни були збережені.",
+              "round": 0
+            },
+            {
+              "text": "I am feeling blue.",
+              "characters": 18,
+              "words": 4,
+              "milliseconds": 9,
+              "translation": "Я відчуваю себе блакитним.",
+              "round": 0
+            },
+            {
+              "text": "He eventually spilled the beans.",
+              "characters": 32,
+              "words": 5,
+              "milliseconds": 15.699999988079071,
+              "translation": "Врешті-решт він розлив боби.",
+              "round": 0
+            },
+            {
+              "text": "It costs an arm and a leg.",
+              "characters": 26,
+              "words": 7,
+              "milliseconds": 12.100000023841858,
+              "translation": "Це коштує руки і ноги.",
+              "round": 0
+            },
+            {
+              "text": "The river bank is steep.",
+              "characters": 24,
+              "words": 5,
+              "milliseconds": 9.300000011920929,
+              "translation": "Річковий берег крутий.",
+              "round": 0
+            },
+            {
+              "text": "Please restart your browser after the installation is complete.",
+              "characters": 63,
+              "words": 9,
+              "milliseconds": 15.300000011920929,
+              "translation": "Будь ласка, перезавантажте браузер після завершення встановлення.",
+              "round": 0
+            },
+            {
+              "text": "The patch addresses a race condition in the background worker.",
+              "characters": 62,
+              "words": 10,
+              "milliseconds": 18.5,
+              "translation": "Патч стосується умови перегонів у фоновому робочому стані.",
+              "round": 0
+            },
+            {
+              "text": "You can select a different language from the menu. Your choice will be remembered the next time you open the browser.",
+              "characters": 117,
+              "words": 21,
+              "milliseconds": 31.799999952316284,
+              "translation": "Ви можете вибрати іншу мову з меню. Ваш вибір запам'ятається наступного разу, коли ви відкриєте браузер.",
+              "round": 0
+            },
+            {
+              "text": "The update improves performance and fixes several bugs. Please restart your browser after the installation is complete. Your saved settings and bookmarks will remain available.",
+              "characters": 176,
+              "words": 25,
+              "milliseconds": 39.10000002384186,
+              "translation": "Оновлення покращує продуктивність і виправляє кілька помилок. Будь ласка, перезавантажте браузер після завершення встановлення. Ваші збережені налаштування та закладки залишаться доступними.",
+              "round": 0
+            },
+            {
+              "text": "When you select text on a web page, a small translation button appears beside it. Click the button to see the translation without leaving the page. The tool remembers your last chosen language and keeps the interface simple.",
+              "characters": 224,
+              "words": 38,
+              "milliseconds": 61.39999997615814,
+              "translation": "Коли ви вибираєте текст на веб-сторінці, поруч з ним з'явиться невелика кнопка перекладу. Натисніть кнопку, щоб побачити переклад, не виходячи зі сторінки. Інструмент запам'ятовує вашу останню обрану мову і зберігає інтерфейс простим.",
+              "round": 0
+            },
+            {
+              "text": "bank",
+              "characters": 4,
+              "words": 1,
+              "milliseconds": 4.100000023841858,
+              "translation": "банк",
+              "round": 1
+            },
+            {
+              "text": "Open the settings.",
+              "characters": 18,
+              "words": 3,
+              "milliseconds": 6.800000011920929,
+              "translation": "Відкрийте налаштування.",
+              "round": 1
+            },
+            {
+              "text": "Your changes have been saved.",
+              "characters": 29,
+              "words": 5,
+              "milliseconds": 8.800000011920929,
+              "translation": "Ваші зміни були збережені.",
+              "round": 1
+            },
+            {
+              "text": "I am feeling blue.",
+              "characters": 18,
+              "words": 4,
+              "milliseconds": 8.600000023841858,
+              "translation": "Я відчуваю себе блакитним.",
+              "round": 1
+            },
+            {
+              "text": "He eventually spilled the beans.",
+              "characters": 32,
+              "words": 5,
+              "milliseconds": 13.400000035762787,
+              "translation": "Врешті-решт він розлив боби.",
+              "round": 1
+            },
+            {
+              "text": "It costs an arm and a leg.",
+              "characters": 26,
+              "words": 7,
+              "milliseconds": 10.299999952316284,
+              "translation": "Це коштує руки і ноги.",
+              "round": 1
+            },
+            {
+              "text": "The river bank is steep.",
+              "characters": 24,
+              "words": 5,
+              "milliseconds": 9.900000035762787,
+              "translation": "Річковий берег крутий.",
+              "round": 1
+            },
+            {
+              "text": "Please restart your browser after the installation is complete.",
+              "characters": 63,
+              "words": 9,
+              "milliseconds": 15.900000035762787,
+              "translation": "Будь ласка, перезавантажте браузер після завершення встановлення.",
+              "round": 1
+            },
+            {
+              "text": "The patch addresses a race condition in the background worker.",
+              "characters": 62,
+              "words": 10,
+              "milliseconds": 19.80000001192093,
+              "translation": "Патч стосується умови перегонів у фоновому робочому стані.",
+              "round": 1
+            },
+            {
+              "text": "You can select a different language from the menu. Your choice will be remembered the next time you open the browser.",
+              "characters": 117,
+              "words": 21,
+              "milliseconds": 30.80000001192093,
+              "translation": "Ви можете вибрати іншу мову з меню. Ваш вибір запам'ятається наступного разу, коли ви відкриєте браузер.",
+              "round": 1
+            },
+            {
+              "text": "The update improves performance and fixes several bugs. Please restart your browser after the installation is complete. Your saved settings and bookmarks will remain available.",
+              "characters": 176,
+              "words": 25,
+              "milliseconds": 37.5,
+              "translation": "Оновлення покращує продуктивність і виправляє кілька помилок. Будь ласка, перезавантажте браузер після завершення встановлення. Ваші збережені налаштування та закладки залишаться доступними.",
+              "round": 1
+            },
+            {
+              "text": "When you select text on a web page, a small translation button appears beside it. Click the button to see the translation without leaving the page. The tool remembers your last chosen language and keeps the interface simple.",
+              "characters": 224,
+              "words": 38,
+              "milliseconds": 62.39999997615814,
+              "translation": "Коли ви вибираєте текст на веб-сторінці, поруч з ним з'явиться невелика кнопка перекладу. Натисніть кнопку, щоб побачити переклад, не виходячи зі сторінки. Інструмент запам'ятовує вашу останню обрану мову і зберігає інтерфейс простим.",
+              "round": 1
+            },
+            {
+              "text": "bank",
+              "characters": 4,
+              "words": 1,
+              "milliseconds": 3.399999976158142,
+              "translation": "банк",
+              "round": 2
+            },
+            {
+              "text": "Open the settings.",
+              "characters": 18,
+              "words": 3,
+              "milliseconds": 5.899999976158142,
+              "translation": "Відкрийте налаштування.",
+              "round": 2
+            },
+            {
+              "text": "Your changes have been saved.",
+              "characters": 29,
+              "words": 5,
+              "milliseconds": 8.300000011920929,
+              "translation": "Ваші зміни були збережені.",
+              "round": 2
+            },
+            {
+              "text": "I am feeling blue.",
+              "characters": 18,
+              "words": 4,
+              "milliseconds": 7.800000011920929,
+              "translation": "Я відчуваю себе блакитним.",
+              "round": 2
+            },
+            {
+              "text": "He eventually spilled the beans.",
+              "characters": 32,
+              "words": 5,
+              "milliseconds": 12.300000011920929,
+              "translation": "Врешті-решт він розлив боби.",
+              "round": 2
+            },
+            {
+              "text": "It costs an arm and a leg.",
+              "characters": 26,
+              "words": 7,
+              "milliseconds": 9.600000023841858,
+              "translation": "Це коштує руки і ноги.",
+              "round": 2
+            },
+            {
+              "text": "The river bank is steep.",
+              "characters": 24,
+              "words": 5,
+              "milliseconds": 9.299999952316284,
+              "translation": "Річковий берег крутий.",
+              "round": 2
+            },
+            {
+              "text": "Please restart your browser after the installation is complete.",
+              "characters": 63,
+              "words": 9,
+              "milliseconds": 14.800000011920929,
+              "translation": "Будь ласка, перезавантажте браузер після завершення встановлення.",
+              "round": 2
+            },
+            {
+              "text": "The patch addresses a race condition in the background worker.",
+              "characters": 62,
+              "words": 10,
+              "milliseconds": 18.30000001192093,
+              "translation": "Патч стосується умови перегонів у фоновому робочому стані.",
+              "round": 2
+            },
+            {
+              "text": "You can select a different language from the menu. Your choice will be remembered the next time you open the browser.",
+              "characters": 117,
+              "words": 21,
+              "milliseconds": 29.899999976158142,
+              "translation": "Ви можете вибрати іншу мову з меню. Ваш вибір запам'ятається наступного разу, коли ви відкриєте браузер.",
+              "round": 2
+            },
+            {
+              "text": "The update improves performance and fixes several bugs. Please restart your browser after the installation is complete. Your saved settings and bookmarks will remain available.",
+              "characters": 176,
+              "words": 25,
+              "milliseconds": 37.10000002384186,
+              "translation": "Оновлення покращує продуктивність і виправляє кілька помилок. Будь ласка, перезавантажте браузер після завершення встановлення. Ваші збережені налаштування та закладки залишаться доступними.",
+              "round": 2
+            },
+            {
+              "text": "When you select text on a web page, a small translation button appears beside it. Click the button to see the translation without leaving the page. The tool remembers your last chosen language and keeps the interface simple.",
+              "characters": 224,
+              "words": 38,
+              "milliseconds": 61.89999997615814,
+              "translation": "Коли ви вибираєте текст на веб-сторінці, поруч з ним з'явиться невелика кнопка перекладу. Натисніть кнопку, щоб побачити переклад, не виходячи зі сторінки. Інструмент запам'ятовує вашу останню обрану мову і зберігає інтерфейс простим.",
+              "round": 2
+            },
+            {
+              "text": "bank",
+              "characters": 4,
+              "words": 1,
+              "milliseconds": 3,
+              "translation": "банк",
+              "round": 3
+            },
+            {
+              "text": "Open the settings.",
+              "characters": 18,
+              "words": 3,
+              "milliseconds": 6.600000023841858,
+              "translation": "Відкрийте налаштування.",
+              "round": 3
+            },
+            {
+              "text": "Your changes have been saved.",
+              "characters": 29,
+              "words": 5,
+              "milliseconds": 8.5,
+              "translation": "Ваші зміни були збережені.",
+              "round": 3
+            },
+            {
+              "text": "I am feeling blue.",
+              "characters": 18,
+              "words": 4,
+              "milliseconds": 8.099999964237213,
+              "translation": "Я відчуваю себе блакитним.",
+              "round": 3
+            },
+            {
+              "text": "He eventually spilled the beans.",
+              "characters": 32,
+              "words": 5,
+              "milliseconds": 12,
+              "translation": "Врешті-решт він розлив боби.",
+              "round": 3
+            },
+            {
+              "text": "It costs an arm and a leg.",
+              "characters": 26,
+              "words": 7,
+              "milliseconds": 10.600000023841858,
+              "translation": "Це коштує руки і ноги.",
+              "round": 3
+            },
+            {
+              "text": "The river bank is steep.",
+              "characters": 24,
+              "words": 5,
+              "milliseconds": 9.399999976158142,
+              "translation": "Річковий берег крутий.",
+              "round": 3
+            },
+            {
+              "text": "Please restart your browser after the installation is complete.",
+              "characters": 63,
+              "words": 9,
+              "milliseconds": 14.899999976158142,
+              "translation": "Будь ласка, перезавантажте браузер після завершення встановлення.",
+              "round": 3
+            },
+            {
+              "text": "The patch addresses a race condition in the background worker.",
+              "characters": 62,
+              "words": 10,
+              "milliseconds": 16.399999976158142,
+              "translation": "Патч стосується умови перегонів у фоновому робочому стані.",
+              "round": 3
+            },
+            {
+              "text": "You can select a different language from the menu. Your choice will be remembered the next time you open the browser.",
+              "characters": 117,
+              "words": 21,
+              "milliseconds": 29.100000023841858,
+              "translation": "Ви можете вибрати іншу мову з меню. Ваш вибір запам'ятається наступного разу, коли ви відкриєте браузер.",
+              "round": 3
+            },
+            {
+              "text": "The update improves performance and fixes several bugs. Please restart your browser after the installation is complete. Your saved settings and bookmarks will remain available.",
+              "characters": 176,
+              "words": 25,
+              "milliseconds": 37.5,
+              "translation": "Оновлення покращує продуктивність і виправляє кілька помилок. Будь ласка, перезавантажте браузер після завершення встановлення. Ваші збережені налаштування та закладки залишаться доступними.",
+              "round": 3
+            },
+            {
+              "text": "When you select text on a web page, a small translation button appears beside it. Click the button to see the translation without leaving the page. The tool remembers your last chosen language and keeps the interface simple.",
+              "characters": 224,
+              "words": 38,
+              "milliseconds": 60.5,
+              "translation": "Коли ви вибираєте текст на веб-сторінці, поруч з ним з'явиться невелика кнопка перекладу. Натисніть кнопку, щоб побачити переклад, не виходячи зі сторінки. Інструмент запам'ятовує вашу останню обрану мову і зберігає інтерфейс простим.",
+              "round": 3
+            },
+            {
+              "text": "bank",
+              "characters": 4,
+              "words": 1,
+              "milliseconds": 4.800000011920929,
+              "translation": "банк",
+              "round": 4
+            },
+            {
+              "text": "Open the settings.",
+              "characters": 18,
+              "words": 3,
+              "milliseconds": 7.199999988079071,
+              "translation": "Відкрийте налаштування.",
+              "round": 4
+            },
+            {
+              "text": "Your changes have been saved.",
+              "characters": 29,
+              "words": 5,
+              "milliseconds": 9.700000047683716,
+              "translation": "Ваші зміни були збережені.",
+              "round": 4
+            },
+            {
+              "text": "I am feeling blue.",
+              "characters": 18,
+              "words": 4,
+              "milliseconds": 9.199999988079071,
+              "translation": "Я відчуваю себе блакитним.",
+              "round": 4
+            },
+            {
+              "text": "He eventually spilled the beans.",
+              "characters": 32,
+              "words": 5,
+              "milliseconds": 13.699999988079071,
+              "translation": "Врешті-решт він розлив боби.",
+              "round": 4
+            },
+            {
+              "text": "It costs an arm and a leg.",
+              "characters": 26,
+              "words": 7,
+              "milliseconds": 9.699999988079071,
+              "translation": "Це коштує руки і ноги.",
+              "round": 4
+            },
+            {
+              "text": "The river bank is steep.",
+              "characters": 24,
+              "words": 5,
+              "milliseconds": 8.900000035762787,
+              "translation": "Річковий берег крутий.",
+              "round": 4
+            },
+            {
+              "text": "Please restart your browser after the installation is complete.",
+              "characters": 63,
+              "words": 9,
+              "milliseconds": 14.300000011920929,
+              "translation": "Будь ласка, перезавантажте браузер після завершення встановлення.",
+              "round": 4
+            },
+            {
+              "text": "The patch addresses a race condition in the background worker.",
+              "characters": 62,
+              "words": 10,
+              "milliseconds": 17.5,
+              "translation": "Патч стосується умови перегонів у фоновому робочому стані.",
+              "round": 4
+            },
+            {
+              "text": "You can select a different language from the menu. Your choice will be remembered the next time you open the browser.",
+              "characters": 117,
+              "words": 21,
+              "milliseconds": 28.5,
+              "translation": "Ви можете вибрати іншу мову з меню. Ваш вибір запам'ятається наступного разу, коли ви відкриєте браузер.",
+              "round": 4
+            },
+            {
+              "text": "The update improves performance and fixes several bugs. Please restart your browser after the installation is complete. Your saved settings and bookmarks will remain available.",
+              "characters": 176,
+              "words": 25,
+              "milliseconds": 36.80000001192093,
+              "translation": "Оновлення покращує продуктивність і виправляє кілька помилок. Будь ласка, перезавантажте браузер після завершення встановлення. Ваші збережені налаштування та закладки залишаться доступними.",
+              "round": 4
+            },
+            {
+              "text": "When you select text on a web page, a small translation button appears beside it. Click the button to see the translation without leaving the page. The tool remembers your last chosen language and keeps the interface simple.",
+              "characters": 224,
+              "words": 38,
+              "milliseconds": 60.5,
+              "translation": "Коли ви вибираєте текст на веб-сторінці, поруч з ним з'явиться невелика кнопка перекладу. Натисніть кнопку, щоб побачити переклад, не виходячи зі сторінки. Інструмент запам'ятовує вашу останню обрану мову і зберігає інтерфейс простим.",
+              "round": 4
+            }
+          ],
+          "errors": [],
+          "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/150.0.0.0 Safari/537.36",
+          "cores": 14,
+          "translatorApi": "function",
+          "mode": "modern",
+          "cold": {
+            "text": "Open the settings.",
+            "characters": 18,
+            "words": 3,
+            "milliseconds": 420.19999998807907,
+            "translation": "Відкрийте налаштування."
+          },
+          "readyMilliseconds": 421.80000001192093,
+          "memory": {
+            "linearMemoryBytes": 548012032,
+            "models": 1
+          },
+          "peakRssBytes": 1705328640,
+          "peakIncreaseRssBytes": 489603072
+        },
+        "old": {
+          "state": "done",
+          "samples": [
+            {
+              "text": "bank",
+              "characters": 4,
+              "words": 1,
+              "milliseconds": 2.699999988079071,
+              "translation": "банк",
+              "round": 0
+            },
+            {
+              "text": "Open the settings.",
+              "characters": 18,
+              "words": 3,
+              "milliseconds": 4.100000023841858,
+              "translation": "Відкрити параметри.",
+              "round": 0
+            },
+            {
+              "text": "Your changes have been saved.",
+              "characters": 29,
+              "words": 5,
+              "milliseconds": 6,
+              "translation": "Ваші зміни збережено.",
+              "round": 0
+            },
+            {
+              "text": "I am feeling blue.",
+              "characters": 18,
+              "words": 4,
+              "milliseconds": 6.100000023841858,
+              "translation": "Я відчуваю себе блакитним.",
+              "round": 0
+            },
+            {
+              "text": "He eventually spilled the beans.",
+              "characters": 32,
+              "words": 5,
+              "milliseconds": 7.300000011920929,
+              "translation": "Зрештою він розлив боби.",
+              "round": 0
+            },
+            {
+              "text": "It costs an arm and a leg.",
+              "characters": 26,
+              "words": 7,
+              "milliseconds": 7.300000011920929,
+              "translation": "Кошить руку і ногу.",
+              "round": 0
+            },
+            {
+              "text": "The river bank is steep.",
+              "characters": 24,
+              "words": 5,
+              "milliseconds": 6.899999976158142,
+              "translation": "Річковий берег стрімкий.",
+              "round": 0
+            },
+            {
+              "text": "Please restart your browser after the installation is complete.",
+              "characters": 63,
+              "words": 9,
+              "milliseconds": 12,
+              "translation": "Будь ласка, перезапустіть ваш переглядач після завершення встановлення.",
+              "round": 0
+            },
+            {
+              "text": "The patch addresses a race condition in the background worker.",
+              "characters": 62,
+              "words": 10,
+              "milliseconds": 11,
+              "translation": "Пластик звертається до стану гонки у фоновому працівникі.",
+              "round": 0
+            },
+            {
+              "text": "You can select a different language from the menu. Your choice will be remembered the next time you open the browser.",
+              "characters": 117,
+              "words": 21,
+              "milliseconds": 20.600000023841858,
+              "translation": "З меню можна вибрати іншу мову. Ваш вибір буде запам’ ятатися наступного разу, коли ви відкриєте переглядач.",
+              "round": 0
+            },
+            {
+              "text": "The update improves performance and fixes several bugs. Please restart your browser after the installation is complete. Your saved settings and bookmarks will remain available.",
+              "characters": 176,
+              "words": 25,
+              "milliseconds": 22.600000023841858,
+              "translation": "Оновлення покращує швидкодію і фіксує декілька вад. Будь ласка, перезапустіть ваш переглядач після завершення встановлення. Ваші збережені параметри і закладки залишаться доступними.",
+              "round": 0
+            },
+            {
+              "text": "When you select text on a web page, a small translation button appears beside it. Click the button to see the translation without leaving the page. The tool remembers your last chosen language and keeps the interface simple.",
+              "characters": 224,
+              "words": 38,
+              "milliseconds": 32.19999998807907,
+              "translation": "При виборі тексту на веб-сторінці поряд з'являється невелика кнопка перекладу. Натисніть кнопку, щоб побачити переклад без виходу сторінки. Інструмент запам’ ятає вашу останню обрану мову і зберігає інтерфейс простим.",
+              "round": 0
+            },
+            {
+              "text": "bank",
+              "characters": 4,
+              "words": 1,
+              "milliseconds": 3,
+              "translation": "банк",
+              "round": 1
+            },
+            {
+              "text": "Open the settings.",
+              "characters": 18,
+              "words": 3,
+              "milliseconds": 4.5,
+              "translation": "Відкрити параметри.",
+              "round": 1
+            },
+            {
+              "text": "Your changes have been saved.",
+              "characters": 29,
+              "words": 5,
+              "milliseconds": 4.900000035762787,
+              "translation": "Ваші зміни збережено.",
+              "round": 1
+            },
+            {
+              "text": "I am feeling blue.",
+              "characters": 18,
+              "words": 4,
+              "milliseconds": 5.100000023841858,
+              "translation": "Я відчуваю себе блакитним.",
+              "round": 1
+            },
+            {
+              "text": "He eventually spilled the beans.",
+              "characters": 32,
+              "words": 5,
+              "milliseconds": 6.699999988079071,
+              "translation": "Зрештою він розлив боби.",
+              "round": 1
+            },
+            {
+              "text": "It costs an arm and a leg.",
+              "characters": 26,
+              "words": 7,
+              "milliseconds": 7.600000023841858,
+              "translation": "Кошить руку і ногу.",
+              "round": 1
+            },
+            {
+              "text": "The river bank is steep.",
+              "characters": 24,
+              "words": 5,
+              "milliseconds": 5.800000011920929,
+              "translation": "Річковий берег стрімкий.",
+              "round": 1
+            },
+            {
+              "text": "Please restart your browser after the installation is complete.",
+              "characters": 63,
+              "words": 9,
+              "milliseconds": 8.899999976158142,
+              "translation": "Будь ласка, перезапустіть ваш переглядач після завершення встановлення.",
+              "round": 1
+            },
+            {
+              "text": "The patch addresses a race condition in the background worker.",
+              "characters": 62,
+              "words": 10,
+              "milliseconds": 9.300000011920929,
+              "translation": "Пластик звертається до стану гонки у фоновому працівникі.",
+              "round": 1
+            },
+            {
+              "text": "You can select a different language from the menu. Your choice will be remembered the next time you open the browser.",
+              "characters": 117,
+              "words": 21,
+              "milliseconds": 18.599999964237213,
+              "translation": "З меню можна вибрати іншу мову. Ваш вибір буде запам’ ятатися наступного разу, коли ви відкриєте переглядач.",
+              "round": 1
+            },
+            {
+              "text": "The update improves performance and fixes several bugs. Please restart your browser after the installation is complete. Your saved settings and bookmarks will remain available.",
+              "characters": 176,
+              "words": 25,
+              "milliseconds": 22,
+              "translation": "Оновлення покращує швидкодію і фіксує декілька вад. Будь ласка, перезапустіть ваш переглядач після завершення встановлення. Ваші збережені параметри і закладки залишаться доступними.",
+              "round": 1
+            },
+            {
+              "text": "When you select text on a web page, a small translation button appears beside it. Click the button to see the translation without leaving the page. The tool remembers your last chosen language and keeps the interface simple.",
+              "characters": 224,
+              "words": 38,
+              "milliseconds": 31.900000035762787,
+              "translation": "При виборі тексту на веб-сторінці поряд з'являється невелика кнопка перекладу. Натисніть кнопку, щоб побачити переклад без виходу сторінки. Інструмент запам’ ятає вашу останню обрану мову і зберігає інтерфейс простим.",
+              "round": 1
+            },
+            {
+              "text": "bank",
+              "characters": 4,
+              "words": 1,
+              "milliseconds": 3,
+              "translation": "банк",
+              "round": 2
+            },
+            {
+              "text": "Open the settings.",
+              "characters": 18,
+              "words": 3,
+              "milliseconds": 3.800000011920929,
+              "translation": "Відкрити параметри.",
+              "round": 2
+            },
+            {
+              "text": "Your changes have been saved.",
+              "characters": 29,
+              "words": 5,
+              "milliseconds": 4.600000023841858,
+              "translation": "Ваші зміни збережено.",
+              "round": 2
+            },
+            {
+              "text": "I am feeling blue.",
+              "characters": 18,
+              "words": 4,
+              "milliseconds": 5.199999988079071,
+              "translation": "Я відчуваю себе блакитним.",
+              "round": 2
+            },
+            {
+              "text": "He eventually spilled the beans.",
+              "characters": 32,
+              "words": 5,
+              "milliseconds": 6.600000023841858,
+              "translation": "Зрештою він розлив боби.",
+              "round": 2
+            },
+            {
+              "text": "It costs an arm and a leg.",
+              "characters": 26,
+              "words": 7,
+              "milliseconds": 7.100000023841858,
+              "translation": "Кошить руку і ногу.",
+              "round": 2
+            },
+            {
+              "text": "The river bank is steep.",
+              "characters": 24,
+              "words": 5,
+              "milliseconds": 5.699999988079071,
+              "translation": "Річковий берег стрімкий.",
+              "round": 2
+            },
+            {
+              "text": "Please restart your browser after the installation is complete.",
+              "characters": 63,
+              "words": 9,
+              "milliseconds": 8.800000011920929,
+              "translation": "Будь ласка, перезапустіть ваш переглядач після завершення встановлення.",
+              "round": 2
+            },
+            {
+              "text": "The patch addresses a race condition in the background worker.",
+              "characters": 62,
+              "words": 10,
+              "milliseconds": 9.199999988079071,
+              "translation": "Пластик звертається до стану гонки у фоновому працівникі.",
+              "round": 2
+            },
+            {
+              "text": "You can select a different language from the menu. Your choice will be remembered the next time you open the browser.",
+              "characters": 117,
+              "words": 21,
+              "milliseconds": 17.900000035762787,
+              "translation": "З меню можна вибрати іншу мову. Ваш вибір буде запам’ ятатися наступного разу, коли ви відкриєте переглядач.",
+              "round": 2
+            },
+            {
+              "text": "The update improves performance and fixes several bugs. Please restart your browser after the installation is complete. Your saved settings and bookmarks will remain available.",
+              "characters": 176,
+              "words": 25,
+              "milliseconds": 22,
+              "translation": "Оновлення покращує швидкодію і фіксує декілька вад. Будь ласка, перезапустіть ваш переглядач після завершення встановлення. Ваші збережені параметри і закладки залишаться доступними.",
+              "round": 2
+            },
+            {
+              "text": "When you select text on a web page, a small translation button appears beside it. Click the button to see the translation without leaving the page. The tool remembers your last chosen language and keeps the interface simple.",
+              "characters": 224,
+              "words": 38,
+              "milliseconds": 31.600000023841858,
+              "translation": "При виборі тексту на веб-сторінці поряд з'являється невелика кнопка перекладу. Натисніть кнопку, щоб побачити переклад без виходу сторінки. Інструмент запам’ ятає вашу останню обрану мову і зберігає інтерфейс простим.",
+              "round": 2
+            },
+            {
+              "text": "bank",
+              "characters": 4,
+              "words": 1,
+              "milliseconds": 3.5,
+              "translation": "банк",
+              "round": 3
+            },
+            {
+              "text": "Open the settings.",
+              "characters": 18,
+              "words": 3,
+              "milliseconds": 4.199999988079071,
+              "translation": "Відкрити параметри.",
+              "round": 3
+            },
+            {
+              "text": "Your changes have been saved.",
+              "characters": 29,
+              "words": 5,
+              "milliseconds": 5.099999964237213,
+              "translation": "Ваші зміни збережено.",
+              "round": 3
+            },
+            {
+              "text": "I am feeling blue.",
+              "characters": 18,
+              "words": 4,
+              "milliseconds": 5,
+              "translation": "Я відчуваю себе блакитним.",
+              "round": 3
+            },
+            {
+              "text": "He eventually spilled the beans.",
+              "characters": 32,
+              "words": 5,
+              "milliseconds": 6.5,
+              "translation": "Зрештою він розлив боби.",
+              "round": 3
+            },
+            {
+              "text": "It costs an arm and a leg.",
+              "characters": 26,
+              "words": 7,
+              "milliseconds": 6.600000023841858,
+              "translation": "Кошить руку і ногу.",
+              "round": 3
+            },
+            {
+              "text": "The river bank is steep.",
+              "characters": 24,
+              "words": 5,
+              "milliseconds": 5.799999952316284,
+              "translation": "Річковий берег стрімкий.",
+              "round": 3
+            },
+            {
+              "text": "Please restart your browser after the installation is complete.",
+              "characters": 63,
+              "words": 9,
+              "milliseconds": 9.200000047683716,
+              "translation": "Будь ласка, перезапустіть ваш переглядач після завершення встановлення.",
+              "round": 3
+            },
+            {
+              "text": "The patch addresses a race condition in the background worker.",
+              "characters": 62,
+              "words": 10,
+              "milliseconds": 9.399999976158142,
+              "translation": "Пластик звертається до стану гонки у фоновому працівникі.",
+              "round": 3
+            },
+            {
+              "text": "You can select a different language from the menu. Your choice will be remembered the next time you open the browser.",
+              "characters": 117,
+              "words": 21,
+              "milliseconds": 18.5,
+              "translation": "З меню можна вибрати іншу мову. Ваш вибір буде запам’ ятатися наступного разу, коли ви відкриєте переглядач.",
+              "round": 3
+            },
+            {
+              "text": "The update improves performance and fixes several bugs. Please restart your browser after the installation is complete. Your saved settings and bookmarks will remain available.",
+              "characters": 176,
+              "words": 25,
+              "milliseconds": 21.399999976158142,
+              "translation": "Оновлення покращує швидкодію і фіксує декілька вад. Будь ласка, перезапустіть ваш переглядач після завершення встановлення. Ваші збережені параметри і закладки залишаться доступними.",
+              "round": 3
+            },
+            {
+              "text": "When you select text on a web page, a small translation button appears beside it. Click the button to see the translation without leaving the page. The tool remembers your last chosen language and keeps the interface simple.",
+              "characters": 224,
+              "words": 38,
+              "milliseconds": 32.60000002384186,
+              "translation": "При виборі тексту на веб-сторінці поряд з'являється невелика кнопка перекладу. Натисніть кнопку, щоб побачити переклад без виходу сторінки. Інструмент запам’ ятає вашу останню обрану мову і зберігає інтерфейс простим.",
+              "round": 3
+            },
+            {
+              "text": "bank",
+              "characters": 4,
+              "words": 1,
+              "milliseconds": 9.5,
+              "translation": "банк",
+              "round": 4
+            },
+            {
+              "text": "Open the settings.",
+              "characters": 18,
+              "words": 3,
+              "milliseconds": 8.899999976158142,
+              "translation": "Відкрити параметри.",
+              "round": 4
+            },
+            {
+              "text": "Your changes have been saved.",
+              "characters": 29,
+              "words": 5,
+              "milliseconds": 4.899999976158142,
+              "translation": "Ваші зміни збережено.",
+              "round": 4
+            },
+            {
+              "text": "I am feeling blue.",
+              "characters": 18,
+              "words": 4,
+              "milliseconds": 4.599999964237213,
+              "translation": "Я відчуваю себе блакитним.",
+              "round": 4
+            },
+            {
+              "text": "He eventually spilled the beans.",
+              "characters": 32,
+              "words": 5,
+              "milliseconds": 6.100000023841858,
+              "translation": "Зрештою він розлив боби.",
+              "round": 4
+            },
+            {
+              "text": "It costs an arm and a leg.",
+              "characters": 26,
+              "words": 7,
+              "milliseconds": 6.599999964237213,
+              "translation": "Кошить руку і ногу.",
+              "round": 4
+            },
+            {
+              "text": "The river bank is steep.",
+              "characters": 24,
+              "words": 5,
+              "milliseconds": 5.199999988079071,
+              "translation": "Річковий берег стрімкий.",
+              "round": 4
+            },
+            {
+              "text": "Please restart your browser after the installation is complete.",
+              "characters": 63,
+              "words": 9,
+              "milliseconds": 8.800000011920929,
+              "translation": "Будь ласка, перезапустіть ваш переглядач після завершення встановлення.",
+              "round": 4
+            },
+            {
+              "text": "The patch addresses a race condition in the background worker.",
+              "characters": 62,
+              "words": 10,
+              "milliseconds": 9.400000035762787,
+              "translation": "Пластик звертається до стану гонки у фоновому працівникі.",
+              "round": 4
+            },
+            {
+              "text": "You can select a different language from the menu. Your choice will be remembered the next time you open the browser.",
+              "characters": 117,
+              "words": 21,
+              "milliseconds": 18.69999998807907,
+              "translation": "З меню можна вибрати іншу мову. Ваш вибір буде запам’ ятатися наступного разу, коли ви відкриєте переглядач.",
+              "round": 4
+            },
+            {
+              "text": "The update improves performance and fixes several bugs. Please restart your browser after the installation is complete. Your saved settings and bookmarks will remain available.",
+              "characters": 176,
+              "words": 25,
+              "milliseconds": 23.600000023841858,
+              "translation": "Оновлення покращує швидкодію і фіксує декілька вад. Будь ласка, перезапустіть ваш переглядач після завершення встановлення. Ваші збережені параметри і закладки залишаться доступними.",
+              "round": 4
+            },
+            {
+              "text": "When you select text on a web page, a small translation button appears beside it. Click the button to see the translation without leaving the page. The tool remembers your last chosen language and keeps the interface simple.",
+              "characters": 224,
+              "words": 38,
+              "milliseconds": 34.59999996423721,
+              "translation": "При виборі тексту на веб-сторінці поряд з'являється невелика кнопка перекладу. Натисніть кнопку, щоб побачити переклад без виходу сторінки. Інструмент запам’ ятає вашу останню обрану мову і зберігає інтерфейс простим.",
+              "round": 4
+            }
+          ],
+          "errors": [],
+          "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/150.0.0.0 Safari/537.36",
+          "cores": 14,
+          "translatorApi": "function",
+          "mode": "old",
+          "cold": {
+            "text": "Open the settings.",
+            "characters": 18,
+            "words": 3,
+            "milliseconds": 284.69999998807907,
+            "translation": "Відкрити параметри."
+          },
+          "readyMilliseconds": 285,
+          "memory": {
+            "linearMemoryBytes": 674758656,
+            "models": 1
+          },
+          "peakRssBytes": 1878179840,
+          "peakIncreaseRssBytes": 662454272
+        }
+      },
+      "nativeAvailability": {
+        "state": "done",
+        "value": "downloadable"
+      },
+      "nativeBenchmark": {
+        "state": "done",
+        "samples": [
+          {
+            "text": "bank",
+            "characters": 4,
+            "words": 1,
+            "milliseconds": 13.899999976158142,
+            "translation": "берег",
+            "round": 0
+          },
+          {
+            "text": "Open the settings.",
+            "characters": 18,
+            "words": 3,
+            "milliseconds": 2.700000047683716,
+            "translation": "Відкрийте налаштування.",
+            "round": 0
+          },
+          {
+            "text": "Your changes have been saved.",
+            "characters": 29,
+            "words": 5,
+            "milliseconds": 2.299999952316284,
+            "translation": "Ваші зміни збережено.",
+            "round": 0
+          },
+          {
+            "text": "I am feeling blue.",
+            "characters": 18,
+            "words": 4,
+            "milliseconds": 2.600000023841858,
+            "translation": "Я відчуваю себе блакитним.",
+            "round": 0
+          },
+          {
+            "text": "He eventually spilled the beans.",
+            "characters": 32,
+            "words": 5,
+            "milliseconds": 3.300000011920929,
+            "translation": "Зрештою він пролив квасолю.",
+            "round": 0
+          },
+          {
+            "text": "It costs an arm and a leg.",
+            "characters": 26,
+            "words": 7,
+            "milliseconds": 2.199999988079071,
+            "translation": "Це коштує руки і ноги.",
+            "round": 0
+          },
+          {
+            "text": "The river bank is steep.",
+            "characters": 24,
+            "words": 5,
+            "milliseconds": 2.199999988079071,
+            "translation": "Берег річки крутий.",
+            "round": 0
+          },
+          {
+            "text": "Please restart your browser after the installation is complete.",
+            "characters": 63,
+            "words": 9,
+            "milliseconds": 3.600000023841858,
+            "translation": "Після завершення інсталяції перезапустіть веб-переглядач.",
+            "round": 0
+          },
+          {
+            "text": "The patch addresses a race condition in the background worker.",
+            "characters": 62,
+            "words": 10,
+            "milliseconds": 4.199999988079071,
+            "translation": "Патч вирішує стан гонки у фоновому працівникі.",
+            "round": 0
+          },
+          {
+            "text": "You can select a different language from the menu. Your choice will be remembered the next time you open the browser.",
+            "characters": 117,
+            "words": 21,
+            "milliseconds": 7.100000023841858,
+            "translation": "З меню можна вибрати іншу мову. Ваш вибір запам’ятається наступного разу, коли ви відкриєте браузер.",
+            "round": 0
+          },
+          {
+            "text": "The update improves performance and fixes several bugs. Please restart your browser after the installation is complete. Your saved settings and bookmarks will remain available.",
+            "characters": 176,
+            "words": 25,
+            "milliseconds": 7.5,
+            "translation": "Оновлення покращує продуктивність і виправляє кілька помилок. Після завершення інсталяції перезапустіть веб-переглядач. Збережені налаштування та закладки залишаться доступними.",
+            "round": 0
+          },
+          {
+            "text": "When you select text on a web page, a small translation button appears beside it. Click the button to see the translation without leaving the page. The tool remembers your last chosen language and keeps the interface simple.",
+            "characters": 224,
+            "words": 38,
+            "milliseconds": 11.899999976158142,
+            "translation": "Коли ви вибираєте текст на веб-сторінці, поруч з’являється невелика кнопка перекладу. Натисніть кнопку, щоб побачити переклад, не виходячи зі сторінки. Інструмент запам’ятовує останню вибрану мову та робить інтерфейс простим.",
+            "round": 0
+          },
+          {
+            "text": "bank",
+            "characters": 4,
+            "words": 1,
+            "milliseconds": 1.699999988079071,
+            "translation": "берег",
+            "round": 1
+          },
+          {
+            "text": "Open the settings.",
+            "characters": 18,
+            "words": 3,
+            "milliseconds": 2.199999988079071,
+            "translation": "Відкрийте налаштування.",
+            "round": 1
+          },
+          {
+            "text": "Your changes have been saved.",
+            "characters": 29,
+            "words": 5,
+            "milliseconds": 2.400000035762787,
+            "translation": "Ваші зміни збережено.",
+            "round": 1
+          },
+          {
+            "text": "I am feeling blue.",
+            "characters": 18,
+            "words": 4,
+            "milliseconds": 2.800000011920929,
+            "translation": "Я відчуваю себе блакитним.",
+            "round": 1
+          },
+          {
+            "text": "He eventually spilled the beans.",
+            "characters": 32,
+            "words": 5,
+            "milliseconds": 3.299999952316284,
+            "translation": "Зрештою він пролив квасолю.",
+            "round": 1
+          },
+          {
+            "text": "It costs an arm and a leg.",
+            "characters": 26,
+            "words": 7,
+            "milliseconds": 2.400000035762787,
+            "translation": "Це коштує руки і ноги.",
+            "round": 1
+          },
+          {
+            "text": "The river bank is steep.",
+            "characters": 24,
+            "words": 5,
+            "milliseconds": 2.300000011920929,
+            "translation": "Берег річки крутий.",
+            "round": 1
+          },
+          {
+            "text": "Please restart your browser after the installation is complete.",
+            "characters": 63,
+            "words": 9,
+            "milliseconds": 3.799999952316284,
+            "translation": "Після завершення інсталяції перезапустіть веб-переглядач.",
+            "round": 1
+          },
+          {
+            "text": "The patch addresses a race condition in the background worker.",
+            "characters": 62,
+            "words": 10,
+            "milliseconds": 3.800000011920929,
+            "translation": "Патч вирішує стан гонки у фоновому працівникі.",
+            "round": 1
+          },
+          {
+            "text": "You can select a different language from the menu. Your choice will be remembered the next time you open the browser.",
+            "characters": 117,
+            "words": 21,
+            "milliseconds": 6.800000011920929,
+            "translation": "З меню можна вибрати іншу мову. Ваш вибір запам’ятається наступного разу, коли ви відкриєте браузер.",
+            "round": 1
+          },
+          {
+            "text": "The update improves performance and fixes several bugs. Please restart your browser after the installation is complete. Your saved settings and bookmarks will remain available.",
+            "characters": 176,
+            "words": 25,
+            "milliseconds": 6.899999976158142,
+            "translation": "Оновлення покращує продуктивність і виправляє кілька помилок. Після завершення інсталяції перезапустіть веб-переглядач. Збережені налаштування та закладки залишаться доступними.",
+            "round": 1
+          },
+          {
+            "text": "When you select text on a web page, a small translation button appears beside it. Click the button to see the translation without leaving the page. The tool remembers your last chosen language and keeps the interface simple.",
+            "characters": 224,
+            "words": 38,
+            "milliseconds": 12.400000035762787,
+            "translation": "Коли ви вибираєте текст на веб-сторінці, поруч з’являється невелика кнопка перекладу. Натисніть кнопку, щоб побачити переклад, не виходячи зі сторінки. Інструмент запам’ятовує останню вибрану мову та робить інтерфейс простим.",
+            "round": 1
+          },
+          {
+            "text": "bank",
+            "characters": 4,
+            "words": 1,
+            "milliseconds": 1.699999988079071,
+            "translation": "берег",
+            "round": 2
+          },
+          {
+            "text": "Open the settings.",
+            "characters": 18,
+            "words": 3,
+            "milliseconds": 2.399999976158142,
+            "translation": "Відкрийте налаштування.",
+            "round": 2
+          },
+          {
+            "text": "Your changes have been saved.",
+            "characters": 29,
+            "words": 5,
+            "milliseconds": 2.200000047683716,
+            "translation": "Ваші зміни збережено.",
+            "round": 2
+          },
+          {
+            "text": "I am feeling blue.",
+            "characters": 18,
+            "words": 4,
+            "milliseconds": 2.899999976158142,
+            "translation": "Я відчуваю себе блакитним.",
+            "round": 2
+          },
+          {
+            "text": "He eventually spilled the beans.",
+            "characters": 32,
+            "words": 5,
+            "milliseconds": 3.399999976158142,
+            "translation": "Зрештою він пролив квасолю.",
+            "round": 2
+          },
+          {
+            "text": "It costs an arm and a leg.",
+            "characters": 26,
+            "words": 7,
+            "milliseconds": 2.5,
+            "translation": "Це коштує руки і ноги.",
+            "round": 2
+          },
+          {
+            "text": "The river bank is steep.",
+            "characters": 24,
+            "words": 5,
+            "milliseconds": 2.5,
+            "translation": "Берег річки крутий.",
+            "round": 2
+          },
+          {
+            "text": "Please restart your browser after the installation is complete.",
+            "characters": 63,
+            "words": 9,
+            "milliseconds": 3.700000047683716,
+            "translation": "Після завершення інсталяції перезапустіть веб-переглядач.",
+            "round": 2
+          },
+          {
+            "text": "The patch addresses a race condition in the background worker.",
+            "characters": 62,
+            "words": 10,
+            "milliseconds": 4.099999964237213,
+            "translation": "Патч вирішує стан гонки у фоновому працівникі.",
+            "round": 2
+          },
+          {
+            "text": "You can select a different language from the menu. Your choice will be remembered the next time you open the browser.",
+            "characters": 117,
+            "words": 21,
+            "milliseconds": 7.100000023841858,
+            "translation": "З меню можна вибрати іншу мову. Ваш вибір запам’ятається наступного разу, коли ви відкриєте браузер.",
+            "round": 2
+          },
+          {
+            "text": "The update improves performance and fixes several bugs. Please restart your browser after the installation is complete. Your saved settings and bookmarks will remain available.",
+            "characters": 176,
+            "words": 25,
+            "milliseconds": 7,
+            "translation": "Оновлення покращує продуктивність і виправляє кілька помилок. Після завершення інсталяції перезапустіть веб-переглядач. Збережені налаштування та закладки залишаться доступними.",
+            "round": 2
+          },
+          {
+            "text": "When you select text on a web page, a small translation button appears beside it. Click the button to see the translation without leaving the page. The tool remembers your last chosen language and keeps the interface simple.",
+            "characters": 224,
+            "words": 38,
+            "milliseconds": 11.699999988079071,
+            "translation": "Коли ви вибираєте текст на веб-сторінці, поруч з’являється невелика кнопка перекладу. Натисніть кнопку, щоб побачити переклад, не виходячи зі сторінки. Інструмент запам’ятовує останню вибрану мову та робить інтерфейс простим.",
+            "round": 2
+          },
+          {
+            "text": "bank",
+            "characters": 4,
+            "words": 1,
+            "milliseconds": 1.600000023841858,
+            "translation": "берег",
+            "round": 3
+          },
+          {
+            "text": "Open the settings.",
+            "characters": 18,
+            "words": 3,
+            "milliseconds": 2.299999952316284,
+            "translation": "Відкрийте налаштування.",
+            "round": 3
+          },
+          {
+            "text": "Your changes have been saved.",
+            "characters": 29,
+            "words": 5,
+            "milliseconds": 2.300000011920929,
+            "translation": "Ваші зміни збережено.",
+            "round": 3
+          },
+          {
+            "text": "I am feeling blue.",
+            "characters": 18,
+            "words": 4,
+            "milliseconds": 2.800000011920929,
+            "translation": "Я відчуваю себе блакитним.",
+            "round": 3
+          },
+          {
+            "text": "He eventually spilled the beans.",
+            "characters": 32,
+            "words": 5,
+            "milliseconds": 3.100000023841858,
+            "translation": "Зрештою він пролив квасолю.",
+            "round": 3
+          },
+          {
+            "text": "It costs an arm and a leg.",
+            "characters": 26,
+            "words": 7,
+            "milliseconds": 2.199999988079071,
+            "translation": "Це коштує руки і ноги.",
+            "round": 3
+          },
+          {
+            "text": "The river bank is steep.",
+            "characters": 24,
+            "words": 5,
+            "milliseconds": 2.399999976158142,
+            "translation": "Берег річки крутий.",
+            "round": 3
+          },
+          {
+            "text": "Please restart your browser after the installation is complete.",
+            "characters": 63,
+            "words": 9,
+            "milliseconds": 3.699999988079071,
+            "translation": "Після завершення інсталяції перезапустіть веб-переглядач.",
+            "round": 3
+          },
+          {
+            "text": "The patch addresses a race condition in the background worker.",
+            "characters": 62,
+            "words": 10,
+            "milliseconds": 4.100000023841858,
+            "translation": "Патч вирішує стан гонки у фоновому працівникі.",
+            "round": 3
+          },
+          {
+            "text": "You can select a different language from the menu. Your choice will be remembered the next time you open the browser.",
+            "characters": 117,
+            "words": 21,
+            "milliseconds": 7.199999988079071,
+            "translation": "З меню можна вибрати іншу мову. Ваш вибір запам’ятається наступного разу, коли ви відкриєте браузер.",
+            "round": 3
+          },
+          {
+            "text": "The update improves performance and fixes several bugs. Please restart your browser after the installation is complete. Your saved settings and bookmarks will remain available.",
+            "characters": 176,
+            "words": 25,
+            "milliseconds": 6.900000035762787,
+            "translation": "Оновлення покращує продуктивність і виправляє кілька помилок. Після завершення інсталяції перезапустіть веб-переглядач. Збережені налаштування та закладки залишаться доступними.",
+            "round": 3
+          },
+          {
+            "text": "When you select text on a web page, a small translation button appears beside it. Click the button to see the translation without leaving the page. The tool remembers your last chosen language and keeps the interface simple.",
+            "characters": 224,
+            "words": 38,
+            "milliseconds": 11.5,
+            "translation": "Коли ви вибираєте текст на веб-сторінці, поруч з’являється невелика кнопка перекладу. Натисніть кнопку, щоб побачити переклад, не виходячи зі сторінки. Інструмент запам’ятовує останню вибрану мову та робить інтерфейс простим.",
+            "round": 3
+          },
+          {
+            "text": "bank",
+            "characters": 4,
+            "words": 1,
+            "milliseconds": 1.5,
+            "translation": "берег",
+            "round": 4
+          },
+          {
+            "text": "Open the settings.",
+            "characters": 18,
+            "words": 3,
+            "milliseconds": 2.199999988079071,
+            "translation": "Відкрийте налаштування.",
+            "round": 4
+          },
+          {
+            "text": "Your changes have been saved.",
+            "characters": 29,
+            "words": 5,
+            "milliseconds": 2.199999988079071,
+            "translation": "Ваші зміни збережено.",
+            "round": 4
+          },
+          {
+            "text": "I am feeling blue.",
+            "characters": 18,
+            "words": 4,
+            "milliseconds": 2.399999976158142,
+            "translation": "Я відчуваю себе блакитним.",
+            "round": 4
+          },
+          {
+            "text": "He eventually spilled the beans.",
+            "characters": 32,
+            "words": 5,
+            "milliseconds": 3.100000023841858,
+            "translation": "Зрештою він пролив квасолю.",
+            "round": 4
+          },
+          {
+            "text": "It costs an arm and a leg.",
+            "characters": 26,
+            "words": 7,
+            "milliseconds": 2.199999988079071,
+            "translation": "Це коштує руки і ноги.",
+            "round": 4
+          },
+          {
+            "text": "The river bank is steep.",
+            "characters": 24,
+            "words": 5,
+            "milliseconds": 2.300000011920929,
+            "translation": "Берег річки крутий.",
+            "round": 4
+          },
+          {
+            "text": "Please restart your browser after the installation is complete.",
+            "characters": 63,
+            "words": 9,
+            "milliseconds": 3.5,
+            "translation": "Після завершення інсталяції перезапустіть веб-переглядач.",
+            "round": 4
+          },
+          {
+            "text": "The patch addresses a race condition in the background worker.",
+            "characters": 62,
+            "words": 10,
+            "milliseconds": 4,
+            "translation": "Патч вирішує стан гонки у фоновому працівникі.",
+            "round": 4
+          },
+          {
+            "text": "You can select a different language from the menu. Your choice will be remembered the next time you open the browser.",
+            "characters": 117,
+            "words": 21,
+            "milliseconds": 6.600000023841858,
+            "translation": "З меню можна вибрати іншу мову. Ваш вибір запам’ятається наступного разу, коли ви відкриєте браузер.",
+            "round": 4
+          },
+          {
+            "text": "The update improves performance and fixes several bugs. Please restart your browser after the installation is complete. Your saved settings and bookmarks will remain available.",
+            "characters": 176,
+            "words": 25,
+            "milliseconds": 6.899999976158142,
+            "translation": "Оновлення покращує продуктивність і виправляє кілька помилок. Після завершення інсталяції перезапустіть веб-переглядач. Збережені налаштування та закладки залишаться доступними.",
+            "round": 4
+          },
+          {
+            "text": "When you select text on a web page, a small translation button appears beside it. Click the button to see the translation without leaving the page. The tool remembers your last chosen language and keeps the interface simple.",
+            "characters": 224,
+            "words": 38,
+            "milliseconds": 11.699999988079071,
+            "translation": "Коли ви вибираєте текст на веб-сторінці, поруч з’являється невелика кнопка перекладу. Натисніть кнопку, щоб побачити переклад, не виходячи зі сторінки. Інструмент запам’ятовує останню вибрану мову та робить інтерфейс простим.",
+            "round": 4
+          }
+        ],
+        "progress": [
+          {
+            "loaded": 0,
+            "total": 1,
+            "milliseconds": 1221.5
+          },
+          {
+            "loaded": 0.0340728759765625,
+            "total": 1,
+            "milliseconds": 1288.199999988079
+          },
+          {
+            "loaded": 0.0713958740234375,
+            "total": 1,
+            "milliseconds": 1346.5999999642372
+          },
+          {
+            "loaded": 0.108734130859375,
+            "total": 1,
+            "milliseconds": 1433.699999988079
+          },
+          {
+            "loaded": 0.14605712890625,
+            "total": 1,
+            "milliseconds": 1529.199999988079
+          },
+          {
+            "loaded": 0.1890716552734375,
+            "total": 1,
+            "milliseconds": 1579.699999988079
+          },
+          {
+            "loaded": 0.2259368896484375,
+            "total": 1,
+            "milliseconds": 1630.0999999642372
+          },
+          {
+            "loaded": 0.2577362060546875,
+            "total": 1,
+            "milliseconds": 1715.199999988079
+          },
+          {
+            "loaded": 0.2950439453125,
+            "total": 1,
+            "milliseconds": 1766.0999999642372
+          },
+          {
+            "loaded": 0.332366943359375,
+            "total": 1,
+            "milliseconds": 1818.300000011921
+          },
+          {
+            "loaded": 0.3691558837890625,
+            "total": 1,
+            "milliseconds": 1904
+          },
+          {
+            "loaded": 0.407379150390625,
+            "total": 1,
+            "milliseconds": 2068.899999976158
+          },
+          {
+            "loaded": 0.4447021484375,
+            "total": 1,
+            "milliseconds": 2153.399999976158
+          },
+          {
+            "loaded": 0.4993133544921875,
+            "total": 1,
+            "milliseconds": 2203.5
+          },
+          {
+            "loaded": 0.5193634033203125,
+            "total": 1,
+            "milliseconds": 2274.800000011921
+          },
+          {
+            "loaded": 0.55670166015625,
+            "total": 1,
+            "milliseconds": 2330.399999976158
+          },
+          {
+            "loaded": 0.594024658203125,
+            "total": 1,
+            "milliseconds": 2394.699999988079
+          },
+          {
+            "loaded": 0.6313629150390625,
+            "total": 1,
+            "milliseconds": 2512.300000011921
+          },
+          {
+            "loaded": 0.6686859130859375,
+            "total": 1,
+            "milliseconds": 2571.300000011921
+          },
+          {
+            "loaded": 0.706024169921875,
+            "total": 1,
+            "milliseconds": 2641.099999964237
+          },
+          {
+            "loaded": 0.75048828125,
+            "total": 1,
+            "milliseconds": 2691.599999964237
+          },
+          {
+            "loaded": 0.7806854248046875,
+            "total": 1,
+            "milliseconds": 2789.899999976158
+          },
+          {
+            "loaded": 0.8470306396484375,
+            "total": 1,
+            "milliseconds": 2841
+          },
+          {
+            "loaded": 0.8553466796875,
+            "total": 1,
+            "milliseconds": 2902.399999976158
+          },
+          {
+            "loaded": 0.892669677734375,
+            "total": 1,
+            "milliseconds": 2964.5
+          },
+          {
+            "loaded": 0.9300079345703125,
+            "total": 1,
+            "milliseconds": 3030.399999976158
+          },
+          {
+            "loaded": 0.9673309326171875,
+            "total": 1,
+            "milliseconds": 3151.800000011921
+          },
+          {
+            "loaded": 1,
+            "total": 1,
+            "milliseconds": 3167.699999988079
+          }
+        ],
+        "createMilliseconds": 4126.199999988079
+      },
+      "nativeFiles": [
+        {
+          "name": "TranslateKit/lib/2025.11.24.0/manifest.json",
+          "bytes": 154
+        },
+        {
+          "name": "TranslateKit/lib/2025.11.24.0/_metadata/verified_contents.json",
+          "bytes": 1929
+        },
+        {
+          "name": "TranslateKit/lib/2025.11.24.0/TranslateKitFiles/libtranslatekit.so",
+          "bytes": 21775264
+        },
+        {
+          "name": "TranslateKit/lib/2025.11.24.0/TranslateKitFiles/arch_arm64",
+          "bytes": 0
+        },
+        {
+          "name": "TranslateKit/models/en_uk/2024.10.16.1/manifest.json",
+          "bytes": 95
+        },
+        {
+          "name": "TranslateKit/models/en_uk/2024.10.16.1/en_uk_nmt/processor_spec.pb",
+          "bytes": 90
+        },
+        {
+          "name": "TranslateKit/models/en_uk/2024.10.16.1/en_uk_nmt/decoder_step_0.tflite",
+          "bytes": 14574968
+        },
+        {
+          "name": "TranslateKit/models/en_uk/2024.10.16.1/en_uk_nmt/decoder_init_0.tflite",
+          "bytes": 13048
+        },
+        {
+          "name": "TranslateKit/models/en_uk/2024.10.16.1/en_uk_nmt/tgt_spm_model.vocab",
+          "bytes": 175967
+        },
+        {
+          "name": "TranslateKit/models/en_uk/2024.10.16.1/en_uk_nmt/src_spm_model.model",
+          "bytes": 138803
+        },
+        {
+          "name": "TranslateKit/models/en_uk/2024.10.16.1/en_uk_nmt/tgt_spm_model.model",
+          "bytes": 172815
+        },
+        {
+          "name": "TranslateKit/models/en_uk/2024.10.16.1/en_uk_nmt/encoder_0.tflite",
+          "bytes": 23278704
+        },
+        {
+          "name": "TranslateKit/models/en_uk/2024.10.16.1/en_uk_nmt/src_spm_model.vocab",
+          "bytes": 141870
+        },
+        {
+          "name": "TranslateKit/models/en_uk/2024.10.16.1/en_uk_nmt/translation_model.pb",
+          "bytes": 320
+        },
+        {
+          "name": "TranslateKit/models/en_uk/2024.10.16.1/_metadata/verified_contents.json",
+          "bytes": 4168
+        },
+        {
+          "name": "TranslateKit/models/en_uk/2024.10.16.1/en_uk_dictionary/dictionary.bin",
+          "bytes": 2644384
+        },
+        {
+          "name": "TranslateKit/models/en_uk/2024.10.16.1/uk_en_nmt/processor_spec.pb",
+          "bytes": 215
+        },
+        {
+          "name": "TranslateKit/models/en_uk/2024.10.16.1/uk_en_nmt/decoder_step_0.tflite",
+          "bytes": 14574968
+        },
+        {
+          "name": "TranslateKit/models/en_uk/2024.10.16.1/uk_en_nmt/decoder_init_0.tflite",
+          "bytes": 13048
+        },
+        {
+          "name": "TranslateKit/models/en_uk/2024.10.16.1/uk_en_nmt/tgt_spm_model.vocab",
+          "bytes": 142291
+        },
+        {
+          "name": "TranslateKit/models/en_uk/2024.10.16.1/uk_en_nmt/src_spm_model.model",
+          "bytes": 178952
+        },
+        {
+          "name": "TranslateKit/models/en_uk/2024.10.16.1/uk_en_nmt/tgt_spm_model.model",
+          "bytes": 139177
+        },
+        {
+          "name": "TranslateKit/models/en_uk/2024.10.16.1/uk_en_nmt/encoder_0.tflite",
+          "bytes": 23278704
+        },
+        {
+          "name": "TranslateKit/models/en_uk/2024.10.16.1/uk_en_nmt/src_spm_model.vocab",
+          "bytes": 182147
+        },
+        {
+          "name": "TranslateKit/models/en_uk/2024.10.16.1/uk_en_nmt/translation_model.pb",
+          "bytes": 320
+        }
+      ]
+    }
+  },
+  "assets": {
+    "package_version": "0.4.9",
+    "downloads": [
+      {
+        "kind": "modern",
+        "part": "lex",
+        "bytes": 1140141,
+        "decoded_bytes": 3054364,
+        "seconds": 0.247,
+        "path": "/var/folders/h7/cs6lckd56zxczbhf1925zyd80000gn/T/shvyd-speed-_zuhwty7/modern/lex.50.50.enuk.s2t.bin"
+      },
+      {
+        "kind": "modern",
+        "part": "vocab",
+        "bytes": 363469,
+        "decoded_bytes": 922077,
+        "seconds": 0.189,
+        "path": "/var/folders/h7/cs6lckd56zxczbhf1925zyd80000gn/T/shvyd-speed-_zuhwty7/modern/vocab.enuk.spm"
+      },
+      {
+        "kind": "modern",
+        "part": "model",
+        "bytes": 22275099,
+        "decoded_bytes": 31561787,
+        "seconds": 0.563,
+        "path": "/var/folders/h7/cs6lckd56zxczbhf1925zyd80000gn/T/shvyd-speed-_zuhwty7/modern/model.enuk.intgemm.alphas.bin"
+      }
+    ],
+    "modern": [
+      {
+        "name": "lex.50.50.enuk.s2t.bin",
+        "schema": 1758911178075,
+        "version": "3.0",
+        "fileType": "lex",
+        "attachment": {
+          "hash": "0996c9dab7edb0ea89acd854dcc5346647945a220436b454c5cd477068ae7048",
+          "size": 1140141,
+          "filename": "lex.50.50.enuk.s2t.bin.zst",
+          "location": "main-workspace/translations-models-v2/dc8eb360-c8ce-48e0-adfa-76c3d202fe2b.zst",
+          "mimetype": "application/zstd"
+        },
+        "architecture": "base-memory",
+        "sourceLanguage": "en",
+        "targetLanguage": "uk",
+        "decompressedHash": "dbfd4f8dc95da9c575164f7fc95ef00a2fb5f7d9f51b656559f99eeebdb57c87",
+        "decompressedSize": 3054364,
+        "filter_expression": "",
+        "id": "4afc90cd-b016-42de-a813-6d2a0f365ce9",
+        "last_modified": 1758912286692
+      },
+      {
+        "name": "vocab.enuk.spm",
+        "schema": 1758911176639,
+        "version": "3.0",
+        "fileType": "vocab",
+        "attachment": {
+          "hash": "888881477ce96954928a993c7df7d942a712b668a701dea01a0b5e76a46773f8",
+          "size": 363469,
+          "filename": "vocab.enuk.spm.zst",
+          "location": "main-workspace/translations-models-v2/3220a17f-a05d-4a90-8b31-6be582725582.zst",
+          "mimetype": "application/zstd"
+        },
+        "architecture": "base-memory",
+        "sourceLanguage": "en",
+        "targetLanguage": "uk",
+        "decompressedHash": "4dd6a91feff71e745395dcc0d52f885848ca0d843d5f70628ca51b3be1b70b45",
+        "decompressedSize": 922077,
+        "filter_expression": "",
+        "id": "207f88f7-962a-47a8-9d50-dc232590aced",
+        "last_modified": 1758912286685
+      },
+      {
+        "name": "model.enuk.intgemm.alphas.bin",
+        "schema": 1758911167337,
+        "version": "3.0",
+        "fileType": "model",
+        "attachment": {
+          "hash": "ff694d02907bdb7036b291d24e32600ee3c415aca70ffde5346bd6e130ba110b",
+          "size": 22275099,
+          "filename": "model.enuk.intgemm.alphas.bin.zst",
+          "location": "main-workspace/translations-models-v2/ef729bdb-748a-4a9a-9587-7d4209abf966.zst",
+          "mimetype": "application/zstd"
+        },
+        "architecture": "base-memory",
+        "sourceLanguage": "en",
+        "targetLanguage": "uk",
+        "decompressedHash": "ed8bb4a811e1c45a259e91052080d25e5c8b4e2df0e59cb1521c04a57855ef97",
+        "decompressedSize": 31561787,
+        "filter_expression": "",
+        "id": "bb8d1c35-2803-4a29-bb23-2d679e83a86a",
+        "last_modified": 1758912286612
+      }
+    ],
+    "old": {
+      "config": {
+        "gemm-precision": "int8shiftAll"
+      },
+      "srcvocab": {
+        "name": "https://bergamot.s3.amazonaws.com/models/enuk/vocab.src.spm",
+        "expectedSha256Hash": "dd44ee771e3be2fce4986beb4f4386fa0a5b233dfb5602d3cb78461053a6a50e",
+        "size": 789110
+      },
+      "trgvocab": {
+        "name": "https://bergamot.s3.amazonaws.com/models/enuk/vocab.trg.spm",
+        "expectedSha256Hash": "04f3110c139f80a4e72aeb2b6802a0be50b94e36aa89647cab53318a0917e442",
+        "size": 1003426
+      },
+      "lex": {
+        "name": "https://bergamot.s3.amazonaws.com/models/enuk/lex.s2t.bin",
+        "expectedSha256Hash": "946f97fee6fb27834e493b1cd043f7acc2e55940407308dfa2831cd9907502bb",
+        "size": 9397780
+      },
+      "model": {
+        "name": "https://bergamot.s3.amazonaws.com/models/enuk/model.intgemm8.bin",
+        "expectedSha256Hash": "c32321866c35c09113c742e07eaa0811bbbb3b1e4c0dd6730324d69185231124",
+        "size": 25315747
+      }
+    },
+    "base_url": "https://firefox-settings-attachments.cdn.mozilla.net/"
+  },
+  "earlier_cloud_results": {
+    "provider": "MyMemory",
+    "same_day_prior_research": true,
+    "baseline_fresh_connections": {
+      "n": 24,
+      "median_ms": 689.5,
+      "min_ms": 449.2,
+      "max_ms": 1177.1,
+      "failures": 0
+    },
+    "paired_connection_test": {
+      "fresh": {
+        "n": 10,
+        "median_ms": 768.55,
+        "min_ms": 470.8,
+        "max_ms": 1028.3
+      },
+      "reused": {
+        "n": 20,
+        "median_ms": 294.35,
+        "min_ms": 241.4,
+        "max_ms": 802.5
+      },
+      "same_socket_verified": true
+    },
+    "raw_samples_not_included_here": true
+  }
+}

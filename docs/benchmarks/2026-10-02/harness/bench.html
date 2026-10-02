@@ -1,0 +1,68 @@
+<!doctype html>
+<meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' 'wasm-unsafe-eval'; connect-src 'self'; worker-src 'self'">
+<title>Shvyd local translation benchmark</title>
+<h1>Local translation benchmark</h1>
+<pre id="status">Loading benchmark...</pre>
+<script type="module">
+import {LatencyOptimisedTranslator} from './package/translator.js';
+const texts = [
+  'bank',
+  'Open the settings.',
+  'Your changes have been saved.',
+  'I am feeling blue.',
+  'He eventually spilled the beans.',
+  'It costs an arm and a leg.',
+  'The river bank is steep.',
+  'Please restart your browser after the installation is complete.',
+  'The patch addresses a race condition in the background worker.',
+  'You can select a different language from the menu. Your choice will be remembered the next time you open the browser.',
+  'The update improves performance and fixes several bugs. Please restart your browser after the installation is complete. Your saved settings and bookmarks will remain available.',
+  'When you select text on a web page, a small translation button appears beside it. Click the button to see the translation without leaving the page. The tool remembers your last chosen language and keeps the interface simple.'
+];
+const display = value => {document.getElementById('status').textContent=JSON.stringify(value,null,2)};
+window.bench = {state:'ready',samples:[],errors:[],userAgent:navigator.userAgent,cores:navigator.hardwareConcurrency,translatorApi:typeof globalThis.Translator};
+display(window.bench);
+window.runLocal = async mode => {
+  const state=window.bench={...window.bench,state:'initializing',mode,samples:[],errors:[]};
+  const start=performance.now();
+  const translator=new LatencyOptimisedTranslator({registryUrl:mode==='modern'?'/modern-registry.json':'/registry.json',cacheSize:0,useNativeIntGemm:false});
+  translator.backing.onerror=e=>{state.errors.push(String(e));display(state)};
+  const timed=async text=>{
+    const t=performance.now();
+    const result=await Promise.race([translator.translate({from:'en',to:'uk',text,html:false}),new Promise((_,reject)=>setTimeout(()=>reject(new Error('Translation timed out after 30 seconds')),30000))]);
+    return {text,characters:text.length,words:text.split(/\s+/).length,milliseconds:performance.now()-t,translation:result.target.text};
+  };
+  try {
+    state.cold=await timed(texts[1]);
+    state.readyMilliseconds=performance.now()-start;
+    state.state='running';display(state);
+    for(let round=0;round<5;round++) for(const text of texts) {
+      state.samples.push({...await timed(text),round});display(state);
+    }
+    state.state='done';
+  } catch(e) {state.state='failed';state.errors.push(String(e));}
+  finally {
+    if(state.state==='done') state.memory=await (await translator.worker).exports.memoryStats();
+    await translator.delete();display(state);
+  }
+  return state;
+};
+window.runNative=async()=>{
+  const state=window.nativeBench={state:'creating',samples:[],progress:[]};
+  const start=performance.now();
+  let translator;
+  try {
+    translator=await Promise.race([Translator.create({sourceLanguage:'en',targetLanguage:'uk',monitor(m){m.addEventListener('downloadprogress',e=>state.progress.push({loaded:e.loaded,total:e.total,milliseconds:performance.now()-start}));}}),new Promise((_,reject)=>setTimeout(()=>reject(new Error('Translator.create did not finish within 30 seconds')),30000))]);
+    state.createMilliseconds=performance.now()-start;
+    state.state='running';
+    for(let round=0;round<5;round++) for(const text of texts) {
+      const t=performance.now();const translation=await translator.translate(text);
+      state.samples.push({text,characters:text.length,words:text.split(/\s+/).length,milliseconds:performance.now()-t,translation,round});
+    }
+    state.state='done';
+  }catch(e){state.state='failed';state.error=String(e);}
+  finally{translator?.destroy();}
+  return state;
+};
+</script>
