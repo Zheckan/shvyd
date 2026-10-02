@@ -1,0 +1,33 @@
+# Future ideas
+
+Updated 2026-10-03. These are ideas we discussed, not committed features. The first prototype stays focused on fast cloud translation of selected text. The current provider recommendation is in [translation-options.md](translation-options.md).
+
+## Offline mode? Maybe useful, maybe unnecessary
+
+**Status: speculative, outside the first prototype. Its usefulness is unproven. It may be dropped entirely.**
+
+Local translation is extremely fast once ready. In the earlier short-text engine tests, Chrome's native Translator had a 3.10 ms warm median and portable Bergamot in Helium had an 11.40 ms median. Those tests used a different, shorter corpus than the realistic cloud comparison and excluded the extension UI.
+
+The trade-offs are unresolved. Helium's native Translator did not finish initialization within 30 seconds. The tested Bergamot wrapper allocated a 522.625 MiB Wasm heap, which is allocated linear memory rather than a measurement of physical RAM. Its compressed model assets plus runtime were about 29 MB to download. Both tested local engines translated several idioms literally.
+
+Questions before treating offline support as a feature:
+
+- Would we actually use it enough to justify the download and maintenance?
+- Is offline availability or keeping selected text on the device valuable for this use case?
+- Can Helium reliably initialize a native engine for the required language pairs?
+- Can a portable engine produce Ukrainian wording good enough for everyday reading, including idioms and long passages?
+- What memory, battery, and startup cost is acceptable for a lightweight extension?
+- Can model loading and browser worker eviction be handled without making the first translation feel slow?
+- Would a small dedicated translation model be a better fit than a tiny general LLM?
+
+See the [local engine benchmark](benchmarks/2026-10-02/report.md) for the measurements and actual translation outputs.
+
+## Tiny open-weight LLM in the browser?
+
+**Status: speculative implementation option for local translation. Opinion only; no browser LLM was downloaded or tested.**
+
+Roughly 0.5 to 1 billion parameters at four bits imply about 250 to 500 MB of raw weights before runtime buffers and caches. Ukrainian quality, actual download size, and responsiveness would depend on the chosen model and implementation.
+
+Could a model this small translate Ukrainian well enough? Would it improve on a dedicated local translation engine? Would its first-use download and startup cost fit the lightweight extension we want? Those questions remain unanswered.
+
+See the [model research and browser-LLM opinion](benchmarks/2026-10-02/model-research.md) for the earlier discussion and sources.
