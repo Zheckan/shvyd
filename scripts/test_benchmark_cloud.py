@@ -11,6 +11,39 @@ SCRIPT = Path(__file__).with_name("benchmark-cloud.py")
 
 
 class BenchmarkCliTests(unittest.TestCase):
+    def test_openai_stream_excludes_reasoning_and_accepts_final_usage_event(self):
+        with tempfile.TemporaryDirectory() as directory:
+            fixture = Path(directory) / "events.txt"
+            events = [
+                {"choices": [{"delta": {"reasoning_content": "Internal reasoning"}}]},
+                {"choices": [{"delta": {"content": "Відкрийте "}}]},
+                {"choices": [{"delta": {"content": "налаштування."}, "finish_reason": "stop"}]},
+                {"choices": [], "usage": {"completion_tokens": 8}},
+            ]
+            fixture.write_text("\n\n".join("data: "+json.dumps(e) for e in events)+"\n\ndata: [DONE]\n")
+            result = subprocess.run([sys.executable, str(SCRIPT), "--parse-stream", str(fixture),
+                                     "--stream-format", "openai"], capture_output=True, text=True)
+            self.assertEqual(result.returncode, 0, result.stderr)
+            output = json.loads(result.stdout)
+            self.assertEqual(output["translation"], "Відкрийте налаштування.")
+            self.assertEqual(output["finish_reason"], "stop")
+            self.assertEqual(output["usage"]["completion_tokens"], 8)
+
+    def test_new_providers_report_readiness_without_credentials(self):
+        secret = "synthetic-cloud-provider-key"
+        with tempfile.TemporaryDirectory() as directory:
+            env = Path(directory) / ".env"
+            env.write_text(f"GROQ_API_KEY={secret}\nCLOUDFLARE_API_TOKEN={secret}\n"
+                           f"CLOUDFLARE_ACCOUNT_ID={'a'*32}\nGEMINI_API_KEY={secret}\n"
+                           f"CEREBRAS_API_KEY={secret}\n")
+            result = subprocess.run([sys.executable, str(SCRIPT), "--env", str(env), "--check"],
+                                    capture_output=True, text=True)
+            self.assertEqual(result.returncode, 0, result.stderr)
+            self.assertNotIn(secret, result.stdout + result.stderr)
+            state = json.loads(result.stdout)["providers"]
+            for provider in ("groq", "cloudflare", "gemini", "cerebras"):
+                self.assertTrue(state[provider]["configured"])
+
     def test_check_reports_configuration_without_disclosing_keys(self):
         with tempfile.TemporaryDirectory() as directory:
             env = Path(directory) / ".env"

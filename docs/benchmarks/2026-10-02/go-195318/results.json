@@ -1,0 +1,1117 @@
+{
+  "metadata": {
+    "started_at": "2026-10-02T19:53:18.038914+00:00",
+    "pair": "en->uk",
+    "rounds": 3,
+    "endpoint": "https://opencode.ai/zen/go/v1/chat/completions",
+    "models": {
+      "mimo-v2.6-flash": {
+        "thinking": {
+          "type": "disabled"
+        }
+      },
+      "glm-5.3-flash": {
+        "thinking": {
+          "type": "enabled"
+        },
+        "reasoning_effort": "low"
+      }
+    },
+    "purpose": "Internal model evaluation; Go documents coding-agent traffic, not a general translation service",
+    "transport": "Python http.client HTTP/1.1",
+    "one_request_at_a_time": true,
+    "local_cache": false,
+    "provider_caching": "uncontrolled; session stable for each input across rounds",
+    "retries": 0,
+    "seed": 42,
+    "go_minimum_start_interval_seconds": 2,
+    "max_tokens": 4096,
+    "temperature": 0,
+    "input_file": "docs/benchmarks/inputs-realistic-en-uk.json",
+    "input_sha256": "d769c3f6865f8ac6867627f4c5758b0e59ae64889557e2057c4cc29920834673",
+    "harness_sha256": "ca13443ea827365128f2d977edcb63e06ef36cad6abd2592f9c83eb2d65384a5",
+    "completed_at": "2026-10-02T19:53:31.949313+00:00"
+  },
+  "inputs": [
+    {
+      "id": "word-1",
+      "size": "word",
+      "text": "bank"
+    },
+    {
+      "id": "word-2",
+      "size": "word",
+      "text": "Save"
+    },
+    {
+      "id": "word-3",
+      "size": "word",
+      "text": "Close"
+    },
+    {
+      "id": "short-1",
+      "size": "short",
+      "text": "Open the settings."
+    },
+    {
+      "id": "short-2",
+      "size": "short",
+      "text": "Your changes have been saved."
+    },
+    {
+      "id": "short-3",
+      "size": "short",
+      "text": "Please restart your browser after the installation is complete."
+    },
+    {
+      "id": "sentence-1",
+      "size": "sentence",
+      "text": "You can select a different language from the menu. Your choice will be remembered the next time you open the browser."
+    },
+    {
+      "id": "sentence-2",
+      "size": "sentence",
+      "text": "The package should arrive by Friday, but the tracking page has not been updated since yesterday. Please contact support if the delivery address needs to be changed."
+    },
+    {
+      "id": "sentence-3",
+      "size": "sentence",
+      "text": "I was feeling blue after the meeting, but a walk by the river helped. The new laptop costs an arm and a leg, so I will wait until the end of the month before buying it."
+    },
+    {
+      "id": "paragraph-1",
+      "size": "paragraph",
+      "text": "When you select text on a web page, a small translation button appears beside it. Click the button to open a panel with the translation. You can change the target language in that panel, and the browser will remember your choice for the next session. Press Escape or click outside the panel to close it. The selected text should remain highlighted so that you can compare the original with the translated version. If the request fails, the panel should explain what happened and offer a retry without losing your selection."
+    },
+    {
+      "id": "paragraph-2",
+      "size": "paragraph",
+      "text": "The update improves performance and fixes several bugs in the background worker. In earlier versions, two requests could finish in the wrong order, allowing an older result to replace a newer one. Each request now carries an identifier, and the interface accepts a result only when its identifier matches the current selection. Please restart your browser after the installation is complete. Your saved settings and bookmarks will remain available. The release also improves keyboard navigation and keeps the panel inside the visible area of the page."
+    },
+    {
+      "id": "paragraph-3",
+      "size": "paragraph",
+      "text": "Our team works across several time zones, so a message that looks urgent in the morning may arrive late at night for someone else. Include the date, the deadline, and the action you need in the first paragraph. If a task can wait until the following day, say so directly. For discussions that require a decision, summarize the available options and explain which one you recommend. Keep related files in the shared project folder so that a teammate can continue the work without searching through a long conversation. A short, clear handoff usually saves more time than another meeting."
+    },
+    {
+      "id": "long-1",
+      "size": "long",
+      "text": "A reliable translation panel starts with a clear connection between the selected text and the request that represents it. The browser can generate several selection events while a person drags across a paragraph. Sending a request for every event wastes time and makes the interface feel unstable. Wait until the selection is complete, keep the source text in memory, and send the request when the translation button is clicked.\n\nThe user should see the panel immediately after clicking. Its position depends on the visible selection rectangle and the available space around it. Near the right edge of the page, the panel may need to move to the left. Near the bottom, it may need to open above the selection. Scrolling should not leave the panel floating over unrelated content. These adjustments should happen locally and should not delay the translation request.\n\nA second selection may be made before the first translation finishes. Give each request a unique identifier and compare it with the current selection before displaying the result. Cancel a request when the transport supports cancellation. If cancellation is unavailable, discard the stale response. The important behavior is that the result always belongs to the text the person most recently asked to translate.\n\nPersist the target language after it changes. For a person who normally translates into Ukrainian, a remembered preference removes an extra action from every request. The source language can be detected by the provider in the same translation call. Very short words are sometimes ambiguous, so the panel may also need an optional way to choose a source language when automatic detection produces the wrong result."
+    },
+    {
+      "id": "long-2",
+      "size": "long",
+      "text": "Planning a short trip with a group is easier when everyone can see the same schedule. Start by recording the arrival time, the address of the accommodation, and the first activity that requires a reservation. Leave enough time between transport connections to collect luggage and find the correct platform. A connection that is technically possible may still be stressful when the station is unfamiliar.\n\nAsk each person about the parts of the trip that matter most to them. Some people want to visit museums, while others prefer walking through neighborhoods or spending time outdoors. Make space for these different preferences instead of filling every hour with a shared activity. One or two planned events each day can provide structure while leaving room for weather, fatigue, and unexpected discoveries.\n\nWrite down the full cost of each reservation, including fees that appear only at checkout. A hotel with a lower nightly price may become more expensive after transport and luggage storage are included. Compare the total for the whole stay rather than a single headline number. Keep cancellation deadlines beside the booking details so that a change of plans does not become an avoidable expense.\n\nIf the group uses several languages, keep practical messages short and specific. An address, a date, and a meeting point should be easy to copy into another application. Expressions that sound friendly in one language may confuse someone reading a literal translation. For important details, prefer direct instructions and verify the translated meaning before sending the message."
+    },
+    {
+      "id": "long-3",
+      "size": "long",
+      "text": "The team introduced a shared release checklist after several updates required last-minute fixes. The purpose of the checklist is to make the final state of a release visible to everyone. It should record the version, the changes that users will notice, the checks that actually ran, and any remaining limitations. A checked box is useful only when it points to evidence.\n\nStart each release note with the behavior that changed. A person reading the note should understand when the change applies and what they can expect afterward. Technical terms can be included when they help explain a limitation or a migration. Details about internal file movement usually belong in the review rather than in the message shown to users.\n\nBefore publishing, test the workflows that the change affects. A build can succeed while a runtime interaction still fails. For a browser extension, selecting text, opening the panel, changing the target language, and closing the panel are separate actions that need observation. Record the browser version and distinguish an isolated test page from behavior on a real website.\n\nKeep configuration separate from the packaged application. A development key can be stored locally for a personal prototype, but a distributed package should not contain a shared secret. The release process should verify which files are included in the final archive. Documentation and benchmark reports can be useful in the repository while remaining outside the installed extension."
+    },
+    {
+      "id": "large-1",
+      "size": "large",
+      "text": "A reliable translation panel starts with a clear connection between the selected text and the request that represents it. The browser can generate several selection events while a person drags across a paragraph. Sending a request for every event wastes time and makes the interface feel unstable. Wait until the selection is complete, keep the source text in memory, and send the request when the translation button is clicked.\n\nThe user should see the panel immediately after clicking. Its position depends on the visible selection rectangle and the available space around it. Near the right edge of the page, the panel may need to move to the left. Near the bottom, it may need to open above the selection. Scrolling should not leave the panel floating over unrelated content. These adjustments should happen locally and should not delay the translation request.\n\nA second selection may be made before the first translation finishes. Give each request a unique identifier and compare it with the current selection before displaying the result. Cancel a request when the transport supports cancellation. If cancellation is unavailable, discard the stale response. The important behavior is that the result always belongs to the text the person most recently asked to translate.\n\nPersist the target language after it changes. For a person who normally translates into Ukrainian, a remembered preference removes an extra action from every request. The source language can be detected by the provider in the same translation call. Very short words are sometimes ambiguous, so the panel may also need an optional way to choose a source language when automatic detection produces the wrong result.\n\nNetwork connections make a measurable difference. The first request can include DNS lookup, a TCP connection, and a TLS handshake before the service receives any text. Later requests may reuse that connection. A benchmark should show both cases and should record the time until the entire translation is available. For a streamed response, also record when the first translated characters arrive.\n\nTranslation quality depends on context. A river bank and a financial bank share the same English spelling but require different Ukrainian words. Idioms such as feeling blue and spilling the beans should preserve their intended meaning. A fast engine that translates these expressions literally can make a paragraph harder to understand. Evaluate complete passages as well as isolated labels.\n\nLong passages need enough space in the panel to remain readable. Set a maximum height and allow the text to scroll inside it. Preserve paragraph boundaries where possible, and keep the close button accessible while scrolling. Keyboard users should be able to move focus into the panel, copy the translation, and return to the original page without losing their place.\n\nFailures should leave the source selection intact. A temporary network error, an exhausted allowance, and an invalid key require different recovery actions. Show a concise message with the relevant action. A retry should use the same source text and target language. Avoid repeatedly retrying a rejected credential because another request will not fix the configuration.\n\nMeasurements should describe the environment in which they were collected. Browser version, hardware, network connection, input length, model identifier, and source-language settings can all affect the result. Keep the raw timings together with the actual translations so that a later run can be compared against the same inputs. A single unusually fast request does not establish the normal experience.\n\nThe first prototype can concentrate on selection, translation, language preference, and closing the panel. Additional actions should be added only when they remove a frequent obstacle. A small interface can still be dependable if it handles stale requests, keyboard focus, page boundaries, and clear errors. These details matter more to everyday speed than a long list of optional features."
+    },
+    {
+      "id": "large-2",
+      "size": "large",
+      "text": "Planning a short trip with a group is easier when everyone can see the same schedule. Start by recording the arrival time, the address of the accommodation, and the first activity that requires a reservation. Leave enough time between transport connections to collect luggage and find the correct platform. A connection that is technically possible may still be stressful when the station is unfamiliar.\n\nAsk each person about the parts of the trip that matter most to them. Some people want to visit museums, while others prefer walking through neighborhoods or spending time outdoors. Make space for these different preferences instead of filling every hour with a shared activity. One or two planned events each day can provide structure while leaving room for weather, fatigue, and unexpected discoveries.\n\nWrite down the full cost of each reservation, including fees that appear only at checkout. A hotel with a lower nightly price may become more expensive after transport and luggage storage are included. Compare the total for the whole stay rather than a single headline number. Keep cancellation deadlines beside the booking details so that a change of plans does not become an avoidable expense.\n\nIf the group uses several languages, keep practical messages short and specific. An address, a date, and a meeting point should be easy to copy into another application. Expressions that sound friendly in one language may confuse someone reading a literal translation. For important details, prefer direct instructions and verify the translated meaning before sending the message.\n\nPrepare a simple fallback for a delayed train or flight. Identify the next available connection and explain who should be contacted if the group is separated. The fallback does not need to cover every possible disruption. It should answer the first questions people will have when the original plan stops working, such as where to wait and whether a reservation can be moved.\n\nKeep documents available when the network is unreliable. Download tickets, booking confirmations, and a map of the area before leaving. Share a copy with another member of the group so that a flat phone battery does not block the next step. Store personal documents carefully and avoid placing private information in a public group message.\n\nChoose meeting points that are easy to recognize. A large square may contain several entrances and landmarks, so naming the square alone is often insufficient. Use the entrance, the side of the building, or a nearby sign that everyone can identify. Include the planned departure time and say whether the group will wait if someone is late.\n\nA good schedule allows people to rest. Long walks, queues, and early departures can become tiring even when every activity looks enjoyable on its own. Put a flexible break after the busiest part of the day and avoid treating every free hour as a gap that must be filled. A calmer pace often makes the trip more memorable than another rushed stop.\n\nAfter each day, review the next morning together. Confirm which reservations remain fixed and which activities can change. If a place was closed or a journey took longer than expected, adjust the following plan while the details are still fresh. A short conversation can prevent several people from following different versions of the schedule.\n\nAt the end of the trip, record what worked and what you would change. Keep useful addresses and explain why a particular transport route was convenient. Future plans benefit from concrete observations, such as the actual travel time or the need to book in advance. General statements that a place was wonderful are pleasant to read but harder to use when making the next decision."
+    },
+    {
+      "id": "large-3",
+      "size": "large",
+      "text": "The team introduced a shared release checklist after several updates required last-minute fixes. The purpose of the checklist is to make the final state of a release visible to everyone. It should record the version, the changes that users will notice, the checks that actually ran, and any remaining limitations. A checked box is useful only when it points to evidence.\n\nStart each release note with the behavior that changed. A person reading the note should understand when the change applies and what they can expect afterward. Technical terms can be included when they help explain a limitation or a migration. Details about internal file movement usually belong in the review rather than in the message shown to users.\n\nBefore publishing, test the workflows that the change affects. A build can succeed while a runtime interaction still fails. For a browser extension, selecting text, opening the panel, changing the target language, and closing the panel are separate actions that need observation. Record the browser version and distinguish an isolated test page from behavior on a real website.\n\nKeep configuration separate from the packaged application. A development key can be stored locally for a personal prototype, but a distributed package should not contain a shared secret. The release process should verify which files are included in the final archive. Documentation and benchmark reports can be useful in the repository while remaining outside the installed extension.\n\nReview failures before repeating a test. If a request was rejected because its credential was invalid, changing the input text will not improve the result. If a streamed response was parsed incorrectly, preserve the failed run and correct the parser before comparing its timing with successful requests. A fast error response is not a fast translation.\n\nUse the same input set when comparing providers. Include short labels, ordinary sentences, ambiguous words, technical passages, and longer paragraphs. Repeat each text several times, but report the first round separately because a provider may cache repeated requests. Show the number of successful requests and failures together with the median and slower tail of the distribution.\n\nA release can remain small without omitting necessary behavior. The first version may provide a translation panel and one remembered preference. It still needs to handle requests that finish out of order, pages with unusual layouts, and errors that require user action. Narrowing the feature list should make these common paths easier to test and maintain.\n\nAssign one person to prepare the release and another to inspect the final artifact when the team has enough people. The inspection should use the packaged version rather than the development server. Verify that the version shown to users matches the release note and that installation instructions describe the current file. This catches problems that source review alone cannot reveal.\n\nAfter publication, collect concrete reports. Ask which browser was used, what text was selected, and whether the issue occurred on the first request or after several successful translations. Keep private text out of public reports unless the person explicitly chooses to share it. A small synthetic example can often reproduce the same failure without exposing personal information.\n\nUse the results of the release to choose the next change. Frequent friction in a common action deserves attention before another optional feature is added. If people repeatedly change the target language, improve that interaction. If most complaints concern long translations, investigate provider latency and rendering separately. Clear evidence makes the next version easier to prioritize."
+    }
+  ],
+  "samples": [
+    {
+      "started_at": "2026-10-02T19:53:18.039413+00:00",
+      "ok": false,
+      "first_text_ms": null,
+      "protocol": "HTTP/1.1",
+      "translation": "",
+      "reasoning_characters": 0,
+      "finish_reason": null,
+      "usage": null,
+      "status": 429,
+      "headers_ms": 597.196,
+      "provider_error": {
+        "type": "error",
+        "error": {
+          "type": "GoUsageLimitError",
+          "message": "Go usage limit exceeded"
+        },
+        "metadata": {
+          "workspace": "wrk_01KEM0YPTS49HY4CE0A140FC2B",
+          "limitName": "5 hour"
+        }
+      },
+      "connection_reused": false,
+      "milliseconds": 597.288,
+      "variant": "go-mimo-v2.6-flash",
+      "text": "Open the settings.",
+      "characters": 18,
+      "input_id": "short-1",
+      "size": "short",
+      "phase": "cold-first",
+      "round": -1
+    },
+    {
+      "started_at": "2026-10-02T19:53:20.048613+00:00",
+      "ok": false,
+      "first_text_ms": null,
+      "protocol": "HTTP/1.1",
+      "translation": "",
+      "reasoning_characters": 0,
+      "finish_reason": null,
+      "usage": null,
+      "status": 429,
+      "headers_ms": 576.246,
+      "provider_error": {
+        "type": "error",
+        "error": {
+          "type": "GoUsageLimitError",
+          "message": "Go usage limit exceeded"
+        },
+        "metadata": {
+          "workspace": "wrk_01KEM0YPTS49HY4CE0A140FC2B",
+          "limitName": "5 hour"
+        }
+      },
+      "connection_reused": false,
+      "milliseconds": 576.352,
+      "variant": "go-glm-5.3-flash",
+      "text": "Open the settings.",
+      "characters": 18,
+      "input_id": "short-1",
+      "size": "short",
+      "phase": "cold-first",
+      "round": -1
+    },
+    {
+      "started_at": "2026-10-02T19:53:20.627007+00:00",
+      "ok": true,
+      "protocol": "HTTP/1.1",
+      "first_text_ms": null,
+      "status": 200,
+      "headers_ms": 1369.181,
+      "retry_after": null,
+      "connection_reused": false,
+      "milliseconds": 1369.347,
+      "variant": "azure-auto",
+      "text": "Open the settings.",
+      "characters": 18,
+      "translation": "Відкрийте налаштування.",
+      "detected_language": {
+        "language": "en",
+        "score": 1.0
+      },
+      "input_id": "short-1",
+      "size": "short",
+      "phase": "cold-first",
+      "round": -1
+    },
+    {
+      "started_at": "2026-10-02T19:53:21.999638+00:00",
+      "ok": true,
+      "protocol": "HTTP/1.1",
+      "first_text_ms": null,
+      "status": 200,
+      "headers_ms": 383.32,
+      "retry_after": null,
+      "connection_reused": true,
+      "milliseconds": 383.475,
+      "variant": "azure-auto",
+      "text": "Planning a short trip with a group is easier when everyone can see the same schedule. Start by recording the arrival time, the address of the accommodation, and the first activity that requires a reservation. Leave enough time between transport connections to collect luggage and find the correct platform. A connection that is technically possible may still be stressful when the station is unfamiliar.\n\nAsk each person about the parts of the trip that matter most to them. Some people want to visit museums, while others prefer walking through neighborhoods or spending time outdoors. Make space for these different preferences instead of filling every hour with a shared activity. One or two planned events each day can provide structure while leaving room for weather, fatigue, and unexpected discoveries.\n\nWrite down the full cost of each reservation, including fees that appear only at checkout. A hotel with a lower nightly price may become more expensive after transport and luggage storage are included. Compare the total for the whole stay rather than a single headline number. Keep cancellation deadlines beside the booking details so that a change of plans does not become an avoidable expense.\n\nIf the group uses several languages, keep practical messages short and specific. An address, a date, and a meeting point should be easy to copy into another application. Expressions that sound friendly in one language may confuse someone reading a literal translation. For important details, prefer direct instructions and verify the translated meaning before sending the message.",
+      "characters": 1588,
+      "translation": "Планувати коротку поїздку з групою легше, коли всі бачать однаковий розклад. Почніть із запису часу прибуття, адреси житла та першої активності, що потребує бронювання. Залиште достатньо часу між пересадками на транспорт, щоб забрати багаж і знайти відповідну платформу. Технічно можливе сполучення може бути стресовим, навіть якщо станція незнайома. \n\nЗапитайте кожного про ті частини поїздки, які для них найважливіші. Дехто хоче відвідувати музеї, інші віддають перевагу прогулянкам районами або проведення часу на свіжому повітрі. Знайдіть місце для цих різних уподобань, замість того щоб заповнювати кожну годину спільною активністю. Одна-дві заплановані події щодня можуть надати структуру, залишаючи простір для погоди, втоми та несподіваних відкриттів. \n\nЗапишіть повну вартість кожного бронювання, включаючи збори, які з'являються лише під час виїзду. Готель із нижчою нічною ціною може стати дорожчим після включення транспорту та зберігання багажу. Порівняйте загальну суму за весь час перебування, а не лише один заголовний номер. Залишайте дедлайни скасування поруч із деталями бронювання, щоб зміна плану не стала уникненною витратою. \n\nЯкщо група використовує кілька мов, тримайте практичні повідомлення короткими та конкретними. Адресу, дату та місце зустрічі слід легко скопіювати в інший додаток. Вирази, які звучать дружньо однією мовою, можуть заплутати читача буквального перекладу. Для важливих деталей віддайте перевагу прямим інструкціям і перевіряйте перекладене значення перед відправкою повідомлення.",
+      "detected_language": {
+        "language": "en",
+        "score": 1.0
+      },
+      "input_id": "long-2",
+      "size": "long",
+      "phase": "warm",
+      "round": 0
+    },
+    {
+      "started_at": "2026-10-02T19:53:22.386013+00:00",
+      "ok": true,
+      "protocol": "HTTP/1.1",
+      "first_text_ms": null,
+      "status": 200,
+      "headers_ms": 358.037,
+      "retry_after": null,
+      "connection_reused": true,
+      "milliseconds": 358.125,
+      "variant": "azure-auto",
+      "text": "A reliable translation panel starts with a clear connection between the selected text and the request that represents it. The browser can generate several selection events while a person drags across a paragraph. Sending a request for every event wastes time and makes the interface feel unstable. Wait until the selection is complete, keep the source text in memory, and send the request when the translation button is clicked.\n\nThe user should see the panel immediately after clicking. Its position depends on the visible selection rectangle and the available space around it. Near the right edge of the page, the panel may need to move to the left. Near the bottom, it may need to open above the selection. Scrolling should not leave the panel floating over unrelated content. These adjustments should happen locally and should not delay the translation request.\n\nA second selection may be made before the first translation finishes. Give each request a unique identifier and compare it with the current selection before displaying the result. Cancel a request when the transport supports cancellation. If cancellation is unavailable, discard the stale response. The important behavior is that the result always belongs to the text the person most recently asked to translate.\n\nPersist the target language after it changes. For a person who normally translates into Ukrainian, a remembered preference removes an extra action from every request. The source language can be detected by the provider in the same translation call. Very short words are sometimes ambiguous, so the panel may also need an optional way to choose a source language when automatic detection produces the wrong result.",
+      "characters": 1694,
+      "translation": "Надійна панель перекладу починається з чіткого зв'язку між вибраним текстом і запитом, що його представляє. Браузер може генерувати кілька подій вибору, поки людина перетягує абзац. Надсилання запиту на кожну подію марнує час і робить інтерфейс нестабільним. Дочекайтеся, поки відбір буде завершено, зберігайте вихідний текст у пам'яті та надсилайте запит при натисканні кнопки перекладу. \n\nКористувач повинен побачити панель одразу після натискання. Її положення залежить від видимого прямокутника вибору та доступного простору навколо нього. Біля правого краю сторінки панель може знадобитися переміщення вліво. Ближче до низу її може знадобитися відкриття над вибором. Прокручування не повинно залишати панель плавати над непов'язаним контентом. Ці коригування мають відбуватися локально і не повинні затримувати запит на переклад. \n\nДругий вибір можна зробити до завершення першого перекладу. Надайте кожному запиту унікальний ідентифікатор і порівняйте його з поточним вибором перед відображенням результату. Скасуйте запит, коли транспорт підтримує скасування. Якщо скасування недоступне, відкидайте застарілу відповідь. Важливо, що результат завжди належить тексту, який особа нещодавно попросила перекласти. \n\nЗберігайте цільову мову після її зміни. Для людини, яка зазвичай перекладає українською, запам'ятана перевага усуває додаткову дію з кожного запиту. Вихідна мова може бути виявлена провайдером у тому ж виклику перекладу. Дуже короткі слова іноді бувають неоднозначними, тому панелі також може знадобитися опціональний спосіб вибору вихідної мови, якщо автоматичне виявлення дає неправильний результат.",
+      "detected_language": {
+        "language": "en",
+        "score": 1.0
+      },
+      "input_id": "long-1",
+      "size": "long",
+      "phase": "warm",
+      "round": 0
+    },
+    {
+      "started_at": "2026-10-02T19:53:22.747144+00:00",
+      "ok": true,
+      "protocol": "HTTP/1.1",
+      "first_text_ms": null,
+      "status": 200,
+      "headers_ms": 127.267,
+      "retry_after": null,
+      "connection_reused": true,
+      "milliseconds": 127.338,
+      "variant": "azure-auto",
+      "text": "Your changes have been saved.",
+      "characters": 29,
+      "translation": "Ваші зміни збережені.",
+      "detected_language": {
+        "language": "en",
+        "score": 1.0
+      },
+      "input_id": "short-2",
+      "size": "short",
+      "phase": "warm",
+      "round": 0
+    },
+    {
+      "started_at": "2026-10-02T19:53:22.875519+00:00",
+      "ok": true,
+      "protocol": "HTTP/1.1",
+      "first_text_ms": null,
+      "status": 200,
+      "headers_ms": 369.385,
+      "retry_after": null,
+      "connection_reused": true,
+      "milliseconds": 369.663,
+      "variant": "azure-auto",
+      "text": "When you select text on a web page, a small translation button appears beside it. Click the button to open a panel with the translation. You can change the target language in that panel, and the browser will remember your choice for the next session. Press Escape or click outside the panel to close it. The selected text should remain highlighted so that you can compare the original with the translated version. If the request fails, the panel should explain what happened and offer a retry without losing your selection.",
+      "characters": 523,
+      "translation": "Коли ви обираєте текст на веб-сторінці, поруч з'являється маленька кнопка перекладу. Натисніть кнопку, щоб відкрити панель із перекладом. Ви можете змінити цільову мову в цій панелі, і браузер запам'ятає ваш вибір для наступної сесії. Натисніть Escape або поза панеллю, щоб закрити її. Вибраний текст має залишатися виділеним, щоб порівняти оригінал із перекладеною версією. Якщо запит не вдасться, панель має пояснити, що сталося, і запропонувати повторну спробу без втрати вибору.",
+      "detected_language": {
+        "language": "en",
+        "score": 1.0
+      },
+      "input_id": "paragraph-1",
+      "size": "paragraph",
+      "phase": "warm",
+      "round": 0
+    },
+    {
+      "started_at": "2026-10-02T19:53:23.247851+00:00",
+      "ok": true,
+      "protocol": "HTTP/1.1",
+      "first_text_ms": null,
+      "status": 200,
+      "headers_ms": 66.836,
+      "retry_after": null,
+      "connection_reused": true,
+      "milliseconds": 66.941,
+      "variant": "azure-auto",
+      "text": "Please restart your browser after the installation is complete.",
+      "characters": 63,
+      "translation": "Будь ласка, перезавантажте браузер після завершення встановлення.",
+      "detected_language": {
+        "language": "en",
+        "score": 1.0
+      },
+      "input_id": "short-3",
+      "size": "short",
+      "phase": "warm",
+      "round": 0
+    },
+    {
+      "started_at": "2026-10-02T19:53:23.317129+00:00",
+      "ok": true,
+      "protocol": "HTTP/1.1",
+      "first_text_ms": null,
+      "status": 200,
+      "headers_ms": 285.207,
+      "retry_after": null,
+      "connection_reused": true,
+      "milliseconds": 285.305,
+      "variant": "azure-auto",
+      "text": "The package should arrive by Friday, but the tracking page has not been updated since yesterday. Please contact support if the delivery address needs to be changed.",
+      "characters": 164,
+      "translation": "Посилка має прибути до п'ятниці, але сторінка відстеження не оновлювалася з учорашнього дня. Будь ласка, зверніться до служби підтримки, якщо потрібно змінити адресу доставки.",
+      "detected_language": {
+        "language": "en",
+        "score": 1.0
+      },
+      "input_id": "sentence-2",
+      "size": "sentence",
+      "phase": "warm",
+      "round": 0
+    },
+    {
+      "started_at": "2026-10-02T19:53:23.604914+00:00",
+      "ok": true,
+      "protocol": "HTTP/1.1",
+      "first_text_ms": null,
+      "status": 200,
+      "headers_ms": 497.381,
+      "retry_after": null,
+      "connection_reused": true,
+      "milliseconds": 497.505,
+      "variant": "azure-auto",
+      "text": "Planning a short trip with a group is easier when everyone can see the same schedule. Start by recording the arrival time, the address of the accommodation, and the first activity that requires a reservation. Leave enough time between transport connections to collect luggage and find the correct platform. A connection that is technically possible may still be stressful when the station is unfamiliar.\n\nAsk each person about the parts of the trip that matter most to them. Some people want to visit museums, while others prefer walking through neighborhoods or spending time outdoors. Make space for these different preferences instead of filling every hour with a shared activity. One or two planned events each day can provide structure while leaving room for weather, fatigue, and unexpected discoveries.\n\nWrite down the full cost of each reservation, including fees that appear only at checkout. A hotel with a lower nightly price may become more expensive after transport and luggage storage are included. Compare the total for the whole stay rather than a single headline number. Keep cancellation deadlines beside the booking details so that a change of plans does not become an avoidable expense.\n\nIf the group uses several languages, keep practical messages short and specific. An address, a date, and a meeting point should be easy to copy into another application. Expressions that sound friendly in one language may confuse someone reading a literal translation. For important details, prefer direct instructions and verify the translated meaning before sending the message.\n\nPrepare a simple fallback for a delayed train or flight. Identify the next available connection and explain who should be contacted if the group is separated. The fallback does not need to cover every possible disruption. It should answer the first questions people will have when the original plan stops working, such as where to wait and whether a reservation can be moved.\n\nKeep documents available when the network is unreliable. Download tickets, booking confirmations, and a map of the area before leaving. Share a copy with another member of the group so that a flat phone battery does not block the next step. Store personal documents carefully and avoid placing private information in a public group message.\n\nChoose meeting points that are easy to recognize. A large square may contain several entrances and landmarks, so naming the square alone is often insufficient. Use the entrance, the side of the building, or a nearby sign that everyone can identify. Include the planned departure time and say whether the group will wait if someone is late.\n\nA good schedule allows people to rest. Long walks, queues, and early departures can become tiring even when every activity looks enjoyable on its own. Put a flexible break after the busiest part of the day and avoid treating every free hour as a gap that must be filled. A calmer pace often makes the trip more memorable than another rushed stop.\n\nAfter each day, review the next morning together. Confirm which reservations remain fixed and which activities can change. If a place was closed or a journey took longer than expected, adjust the following plan while the details are still fresh. A short conversation can prevent several people from following different versions of the schedule.\n\nAt the end of the trip, record what worked and what you would change. Keep useful addresses and explain why a particular transport route was convenient. Future plans benefit from concrete observations, such as the actual travel time or the need to book in advance. General statements that a place was wonderful are pleasant to read but harder to use when making the next decision.",
+      "characters": 3724,
+      "translation": "Планувати коротку поїздку з групою легше, коли всі бачать однаковий розклад. Почніть із запису часу прибуття, адреси житла та першої активності, що потребує бронювання. Залиште достатньо часу між пересадками на транспорт, щоб забрати багаж і знайти відповідну платформу. Технічно можливе сполучення може бути стресовим, навіть якщо станція незнайома. \n\nЗапитайте кожного про ті частини поїздки, які для них найважливіші. Дехто хоче відвідувати музеї, інші віддають перевагу прогулянкам районами або проведення часу на свіжому повітрі. Знайдіть місце для цих різних уподобань, замість того щоб заповнювати кожну годину спільною активністю. Одна-дві заплановані події щодня можуть надати структуру, залишаючи простір для погоди, втоми та несподіваних відкриттів. \n\nЗапишіть повну вартість кожного бронювання, включаючи збори, які з'являються лише під час виїзду. Готель із нижчою нічною ціною може стати дорожчим після включення транспорту та зберігання багажу. Порівняйте загальну суму за весь час перебування, а не лише один заголовний номер. Залишайте дедлайни скасування поруч із деталями бронювання, щоб зміна плану не стала уникненною витратою. \n\nЯкщо група використовує кілька мов, тримайте практичні повідомлення короткими та конкретними. Адресу, дату та місце зустрічі слід легко скопіювати в інший додаток. Вирази, які звучать дружньо однією мовою, можуть заплутати читача буквального перекладу. Для важливих деталей віддайте перевагу прямим інструкціям і перевіряйте перекладене значення перед відправкою повідомлення. \n\nПідготуйте простий запасний варіант для затриманого поїзда чи рейсу. Визначте наступне доступне пересадження і поясніть, з ким слід зв'язатися, якщо група розділена. Резервний варіант не обов'язково має покривати всі можливі перебої. Він має відповісти на перші питання, які виникнуть у людей, коли початковий план припинить працювати, наприклад, де чекати і чи можна перенести бронювання. \n\nТримайте документи під рукою, коли мережа ненадійна. Завантажте квитки, підтвердження бронювання та карту району перед виходом. Поділіться копією з іншим членом групи, щоб розряджена батарея телефону не блокувала наступний крок. Зберігайте особисті документи обережно і уникайте розміщення приватної інформації у публічному груповому повідомленні. \n\nОбирайте місця зустрічі, які легко впізнати. Велика площа може містити кілька входів і орієнтирів, тому сама назва площі часто недостатньо. Використовуйте вхід, бік будівлі або знак поруч, який кожен може впізнати. Вкажіть запланований час відправлення і скажіть, чи буде група чекати, якщо хтось запізниться. \n\nХороший розклад дозволяє людям відпочити. Довгі прогулянки, черги та ранні відправлення можуть виснажувати, навіть якщо кожна діяльність здається приємною сама по собі. Зробіть гнучку перерву після найзавантаженішої частини дня і уникайте сприймати кожну вільну годину як прогалину, яку потрібно заповнити. Спокійніший темп часто робить поїздку більш пам'ятною, ніж ще одна поспішна зупинка. \n\nПісля кожного дня разом переглядайте наступний ранок. Переконайтеся, які бронювання залишаються незмінними, а які активності можуть змінитися. Якщо місце було закрите або поїздка зайняла більше часу, поки деталі ще свіжі. Коротка розмова може завадити кільком людям дотримуватися різних версій розкладу. \n\nНаприкінці поїздки зафіксуйте, що спрацювало і що ви б змінили. Зберігайте корисні адреси та пояснюйте, чому певний транспортний маршрут був зручним. Майбутні плани виграють від конкретних спостережень, таких як фактичний час у дорозі або необхідність бронювати заздалегідь. Загальні заяви про те, що місце було чудовим, приємно читати, але важче використовувати при прийнятті наступного рішення.",
+      "detected_language": {
+        "language": "en",
+        "score": 1.0
+      },
+      "input_id": "large-2",
+      "size": "large",
+      "phase": "warm",
+      "round": 0
+    },
+    {
+      "started_at": "2026-10-02T19:53:24.104752+00:00",
+      "ok": true,
+      "protocol": "HTTP/1.1",
+      "first_text_ms": null,
+      "status": 200,
+      "headers_ms": 172.217,
+      "retry_after": null,
+      "connection_reused": true,
+      "milliseconds": 172.343,
+      "variant": "azure-auto",
+      "text": "You can select a different language from the menu. Your choice will be remembered the next time you open the browser.",
+      "characters": 117,
+      "translation": "Ви можете вибрати іншу мову з меню. Ваш вибір буде запам'ятаний наступного разу, коли ви відкриєте браузер.",
+      "detected_language": {
+        "language": "en",
+        "score": 1.0
+      },
+      "input_id": "sentence-1",
+      "size": "sentence",
+      "phase": "warm",
+      "round": 0
+    },
+    {
+      "started_at": "2026-10-02T19:53:24.279641+00:00",
+      "ok": true,
+      "protocol": "HTTP/1.1",
+      "first_text_ms": null,
+      "status": 200,
+      "headers_ms": 495.307,
+      "retry_after": null,
+      "connection_reused": true,
+      "milliseconds": 495.438,
+      "variant": "azure-auto",
+      "text": "The update improves performance and fixes several bugs in the background worker. In earlier versions, two requests could finish in the wrong order, allowing an older result to replace a newer one. Each request now carries an identifier, and the interface accepts a result only when its identifier matches the current selection. Please restart your browser after the installation is complete. Your saved settings and bookmarks will remain available. The release also improves keyboard navigation and keeps the panel inside the visible area of the page.",
+      "characters": 551,
+      "translation": "Оновлення покращує продуктивність і виправляє кілька помилок у фоновому робочому пристрої. У попередніх версіях два запити могли закінчуватися у неправильному порядку, що дозволяло старішому результату замінювати новий. Тепер кожен запит має ідентифікатор, і інтерфейс приймає результат лише тоді, коли його ідентифікатор відповідає поточному вибору. Будь ласка, перезавантажте браузер після завершення встановлення. Ваші збережені налаштування та закладки залишаться доступними. Реліз також покращує навігацію клавіатурою і зберігає панель у видимій області сторінки.",
+      "detected_language": {
+        "language": "en",
+        "score": 1.0
+      },
+      "input_id": "paragraph-2",
+      "size": "paragraph",
+      "phase": "warm",
+      "round": 0
+    },
+    {
+      "started_at": "2026-10-02T19:53:24.780556+00:00",
+      "ok": true,
+      "protocol": "HTTP/1.1",
+      "first_text_ms": null,
+      "status": 200,
+      "headers_ms": 325.574,
+      "retry_after": null,
+      "connection_reused": true,
+      "milliseconds": 325.659,
+      "variant": "azure-auto",
+      "text": "A reliable translation panel starts with a clear connection between the selected text and the request that represents it. The browser can generate several selection events while a person drags across a paragraph. Sending a request for every event wastes time and makes the interface feel unstable. Wait until the selection is complete, keep the source text in memory, and send the request when the translation button is clicked.\n\nThe user should see the panel immediately after clicking. Its position depends on the visible selection rectangle and the available space around it. Near the right edge of the page, the panel may need to move to the left. Near the bottom, it may need to open above the selection. Scrolling should not leave the panel floating over unrelated content. These adjustments should happen locally and should not delay the translation request.\n\nA second selection may be made before the first translation finishes. Give each request a unique identifier and compare it with the current selection before displaying the result. Cancel a request when the transport supports cancellation. If cancellation is unavailable, discard the stale response. The important behavior is that the result always belongs to the text the person most recently asked to translate.\n\nPersist the target language after it changes. For a person who normally translates into Ukrainian, a remembered preference removes an extra action from every request. The source language can be detected by the provider in the same translation call. Very short words are sometimes ambiguous, so the panel may also need an optional way to choose a source language when automatic detection produces the wrong result.\n\nNetwork connections make a measurable difference. The first request can include DNS lookup, a TCP connection, and a TLS handshake before the service receives any text. Later requests may reuse that connection. A benchmark should show both cases and should record the time until the entire translation is available. For a streamed response, also record when the first translated characters arrive.\n\nTranslation quality depends on context. A river bank and a financial bank share the same English spelling but require different Ukrainian words. Idioms such as feeling blue and spilling the beans should preserve their intended meaning. A fast engine that translates these expressions literally can make a paragraph harder to understand. Evaluate complete passages as well as isolated labels.\n\nLong passages need enough space in the panel to remain readable. Set a maximum height and allow the text to scroll inside it. Preserve paragraph boundaries where possible, and keep the close button accessible while scrolling. Keyboard users should be able to move focus into the panel, copy the translation, and return to the original page without losing their place.\n\nFailures should leave the source selection intact. A temporary network error, an exhausted allowance, and an invalid key require different recovery actions. Show a concise message with the relevant action. A retry should use the same source text and target language. Avoid repeatedly retrying a rejected credential because another request will not fix the configuration.\n\nMeasurements should describe the environment in which they were collected. Browser version, hardware, network connection, input length, model identifier, and source-language settings can all affect the result. Keep the raw timings together with the actual translations so that a later run can be compared against the same inputs. A single unusually fast request does not establish the normal experience.\n\nThe first prototype can concentrate on selection, translation, language preference, and closing the panel. Additional actions should be added only when they remove a frequent obstacle. A small interface can still be dependable if it handles stale requests, keyboard focus, page boundaries, and clear errors. These details matter more to everyday speed than a long list of optional features.",
+      "characters": 4023,
+      "translation": "Надійна панель перекладу починається з чіткого зв'язку між вибраним текстом і запитом, що його представляє. Браузер може генерувати кілька подій вибору, поки людина перетягує абзац. Надсилання запиту на кожну подію марнує час і робить інтерфейс нестабільним. Дочекайтеся, поки відбір буде завершено, зберігайте вихідний текст у пам'яті та надсилайте запит при натисканні кнопки перекладу. \n\nКористувач повинен побачити панель одразу після натискання. Її положення залежить від видимого прямокутника вибору та доступного простору навколо нього. Біля правого краю сторінки панель може знадобитися переміщення вліво. Ближче до низу її може знадобитися відкриття над вибором. Прокручування не повинно залишати панель плавати над непов'язаним контентом. Ці коригування мають відбуватися локально і не повинні затримувати запит на переклад. \n\nДругий вибір можна зробити до завершення першого перекладу. Надайте кожному запиту унікальний ідентифікатор і порівняйте його з поточним вибором перед відображенням результату. Скасуйте запит, коли транспорт підтримує скасування. Якщо скасування недоступне, відкидайте застарілу відповідь. Важливо, що результат завжди належить тексту, який особа нещодавно попросила перекласти. \n\nЗберігайте цільову мову після її зміни. Для людини, яка зазвичай перекладає українською, запам'ятана перевага усуває додаткову дію з кожного запиту. Вихідна мова може бути виявлена провайдером у тому ж виклику перекладу. Дуже короткі слова іноді бувають неоднозначними, тому панелі також може знадобитися опціональний спосіб вибору вихідної мови, якщо автоматичне виявлення дає неправильний результат. \n\nМережеві з'єднання мають вимірювану різницю. Перший запит може включати DNS-пошук, TCP-з'єднання та TLS-рукостискання до того, як сервіс отримає будь-який текст. Пізніші запити можуть повторно використовувати це з'єднання. Бенчмарк має показати обидва випадки і фіксувати час до того, як весь переклад стане доступним. Для потокової відповіді також фіксуйте, коли приходять перші перекладені символи. \n\nЯкість перекладу залежить від контексту. Річковий берег і фінансовий банк мають однакове англійське написання, але потребують різних українських слів. Ідіоми на кшталт «feeling blue» та «розкривати секрети» мають зберігати своє значення. Швидкий механізм, який буквально перекладає ці вирази, може ускладнити розуміння абзацу. Оцінюйте повні уривки, а також окремі ярлики. \n\nДовгі уривки потребують достатнього місця в панелі, щоб залишатися читабельними. Встановіть максимальну висоту і дозвольте тексту прокручуватися всередині. Зберігайте межі абзаців, де це можливо, і тримайте кнопку закриття доступною під час прокручування. Користувачі клавіатури повинні мати змогу перемістити фокус у панель, скопіювати переклад і повернутися до оригінальної сторінки, не втрачаючи свого місця. \n\nПомилки мають залишати вибір вихідного коду незмінним. Тимчасова мережева помилка, вичерпаний дозвіл і недійсний ключ вимагають різних дій для відновлення. Покажіть коротке повідомлення з відповідною дією. Повторна спроба має використовувати той самий вихідний текст і цільову мову. Уникайте повторних спроб відхиленого облікового запису, оскільки інший запит не виправить конфігурацію. \n\nВимірювання повинні описувати середовище, в якому вони були зібрані. Версія браузера, апаратне забезпечення, мережеве з'єднання, довжина введення, ідентифікатор моделі та налаштування мови джерела можуть впливати на результат. Зберігайте сирі таймінги разом із фактичними перекладами, щоб пізніший запуск можна було порівняти з тими ж вхідними даними. Один незвично швидкий запит не встановлює нормальний досвід. \n\nПерший прототип може зосереджуватися на виборі, перекладі, мовних вподобаннях і закритті панелі. Додаткові дії слід додавати лише тоді, коли вони усувають часті перешкоди. Невеликий інтерфейс все ще може бути надійним, якщо він обробляє застарілі запити, фокус на клавіатурі, межі сторінок і чіткі помилки. Ці деталі важливіші для щоденної швидкості, ніж довгий список опціональних функцій.",
+      "detected_language": {
+        "language": "en",
+        "score": 1.0
+      },
+      "input_id": "large-1",
+      "size": "large",
+      "phase": "warm",
+      "round": 0
+    },
+    {
+      "started_at": "2026-10-02T19:53:25.108433+00:00",
+      "ok": true,
+      "protocol": "HTTP/1.1",
+      "first_text_ms": null,
+      "status": 200,
+      "headers_ms": 128.925,
+      "retry_after": null,
+      "connection_reused": true,
+      "milliseconds": 129.048,
+      "variant": "azure-auto",
+      "text": "Save",
+      "characters": 4,
+      "translation": "Збереження",
+      "detected_language": {
+        "language": "en",
+        "score": 0.97
+      },
+      "input_id": "word-2",
+      "size": "word",
+      "phase": "warm",
+      "round": 0
+    },
+    {
+      "started_at": "2026-10-02T19:53:25.240331+00:00",
+      "ok": true,
+      "protocol": "HTTP/1.1",
+      "first_text_ms": null,
+      "status": 200,
+      "headers_ms": 660.342,
+      "retry_after": null,
+      "connection_reused": true,
+      "milliseconds": 660.46,
+      "variant": "azure-auto",
+      "text": "Our team works across several time zones, so a message that looks urgent in the morning may arrive late at night for someone else. Include the date, the deadline, and the action you need in the first paragraph. If a task can wait until the following day, say so directly. For discussions that require a decision, summarize the available options and explain which one you recommend. Keep related files in the shared project folder so that a teammate can continue the work without searching through a long conversation. A short, clear handoff usually saves more time than another meeting.",
+      "characters": 586,
+      "translation": "Наша команда працює у кількох часових поясах, тому повідомлення, яке здається терміновим вранці, може прийти пізно вночі для когось іншого. Вкажіть дату, дедлайн і необхідну дію у першому абзаці. Якщо завдання може почекати до наступного дня, скажіть про це прямо. Для обговорень, що потребують прийняття рішення, підсумуйте доступні варіанти і поясніть, який саме ви рекомендуєте. Зберігайте пов'язані файли у спільній папці проєкту, щоб колега міг продовжити роботу, не шукаючи довгу розмову. Коротка, чітка передача зазвичай економить більше часу, ніж інша зустріч.",
+      "detected_language": {
+        "language": "en",
+        "score": 1.0
+      },
+      "input_id": "paragraph-3",
+      "size": "paragraph",
+      "phase": "warm",
+      "round": 0
+    },
+    {
+      "started_at": "2026-10-02T19:53:25.903372+00:00",
+      "ok": true,
+      "protocol": "HTTP/1.1",
+      "first_text_ms": null,
+      "status": 200,
+      "headers_ms": 61.635,
+      "retry_after": null,
+      "connection_reused": true,
+      "milliseconds": 61.767,
+      "variant": "azure-auto",
+      "text": "Close",
+      "characters": 5,
+      "translation": "Закриття",
+      "detected_language": {
+        "language": "en",
+        "score": 0.98
+      },
+      "input_id": "word-3",
+      "size": "word",
+      "phase": "warm",
+      "round": 0
+    },
+    {
+      "started_at": "2026-10-02T19:53:25.968293+00:00",
+      "ok": true,
+      "protocol": "HTTP/1.1",
+      "first_text_ms": null,
+      "status": 200,
+      "headers_ms": 502.261,
+      "retry_after": null,
+      "connection_reused": true,
+      "milliseconds": 502.346,
+      "variant": "azure-auto",
+      "text": "The team introduced a shared release checklist after several updates required last-minute fixes. The purpose of the checklist is to make the final state of a release visible to everyone. It should record the version, the changes that users will notice, the checks that actually ran, and any remaining limitations. A checked box is useful only when it points to evidence.\n\nStart each release note with the behavior that changed. A person reading the note should understand when the change applies and what they can expect afterward. Technical terms can be included when they help explain a limitation or a migration. Details about internal file movement usually belong in the review rather than in the message shown to users.\n\nBefore publishing, test the workflows that the change affects. A build can succeed while a runtime interaction still fails. For a browser extension, selecting text, opening the panel, changing the target language, and closing the panel are separate actions that need observation. Record the browser version and distinguish an isolated test page from behavior on a real website.\n\nKeep configuration separate from the packaged application. A development key can be stored locally for a personal prototype, but a distributed package should not contain a shared secret. The release process should verify which files are included in the final archive. Documentation and benchmark reports can be useful in the repository while remaining outside the installed extension.",
+      "characters": 1489,
+      "translation": "Команда запровадила спільний чек-лист релізів після кількох оновлень, які вимагали виправлень у останню хвилину. Мета цього списку — зробити фінальний стан релізу видимим для всіх. Він має фіксувати версію, зміни, які користувачі помітять, перевірки, які фактично виконалися, і будь-які залишкові обмеження. Галочка корисна лише тоді, коли вона вказує на докази. \n\nПочинайте кожну нотатку про реліз з поведінки, яка змінилася. Людина, яка читає записку, повинна розуміти, коли застосовується ця зміна і чого очікувати після неї. Технічні терміни можуть бути включені, коли вони допомагають пояснити обмеження або міграцію. Деталі внутрішнього переміщення файлу зазвичай мають бути у рецензії, а не в повідомленні, яке показують користувачам. \n\nПеред публікацією протестуйте робочі процеси, на які впливає ця зміна. Збірка може бути успішною, а взаємодія під час виконання все одно не спрацює. Для розширення браузера вибір тексту, відкриття панелі, зміна цільової мови та закриття панелі — це окремі дії, які потребують спостереження. Запишіть версію браузера та відрізніть ізольовану тестову сторінку від поведінки на реальному вебсайті. \n\nТримати конфігурацію окремо від упакованого додатка. Ключ розробки можна зберігати локально для персонального прототипу, але розподілений пакет не повинен містити спільного секрету. Процес випуску має перевіряти, які файли включені до фінального архіву. Документація та звіти бенчмарків можуть бути корисними в репозиторії, залишаючись поза встановленим розширенням.",
+      "detected_language": {
+        "language": "en",
+        "score": 1.0
+      },
+      "input_id": "long-3",
+      "size": "long",
+      "phase": "warm",
+      "round": 0
+    },
+    {
+      "started_at": "2026-10-02T19:53:26.473179+00:00",
+      "ok": true,
+      "protocol": "HTTP/1.1",
+      "first_text_ms": null,
+      "status": 200,
+      "headers_ms": 312.291,
+      "retry_after": null,
+      "connection_reused": true,
+      "milliseconds": 312.43,
+      "variant": "azure-auto",
+      "text": "The team introduced a shared release checklist after several updates required last-minute fixes. The purpose of the checklist is to make the final state of a release visible to everyone. It should record the version, the changes that users will notice, the checks that actually ran, and any remaining limitations. A checked box is useful only when it points to evidence.\n\nStart each release note with the behavior that changed. A person reading the note should understand when the change applies and what they can expect afterward. Technical terms can be included when they help explain a limitation or a migration. Details about internal file movement usually belong in the review rather than in the message shown to users.\n\nBefore publishing, test the workflows that the change affects. A build can succeed while a runtime interaction still fails. For a browser extension, selecting text, opening the panel, changing the target language, and closing the panel are separate actions that need observation. Record the browser version and distinguish an isolated test page from behavior on a real website.\n\nKeep configuration separate from the packaged application. A development key can be stored locally for a personal prototype, but a distributed package should not contain a shared secret. The release process should verify which files are included in the final archive. Documentation and benchmark reports can be useful in the repository while remaining outside the installed extension.\n\nReview failures before repeating a test. If a request was rejected because its credential was invalid, changing the input text will not improve the result. If a streamed response was parsed incorrectly, preserve the failed run and correct the parser before comparing its timing with successful requests. A fast error response is not a fast translation.\n\nUse the same input set when comparing providers. Include short labels, ordinary sentences, ambiguous words, technical passages, and longer paragraphs. Repeat each text several times, but report the first round separately because a provider may cache repeated requests. Show the number of successful requests and failures together with the median and slower tail of the distribution.\n\nA release can remain small without omitting necessary behavior. The first version may provide a translation panel and one remembered preference. It still needs to handle requests that finish out of order, pages with unusual layouts, and errors that require user action. Narrowing the feature list should make these common paths easier to test and maintain.\n\nAssign one person to prepare the release and another to inspect the final artifact when the team has enough people. The inspection should use the packaged version rather than the development server. Verify that the version shown to users matches the release note and that installation instructions describe the current file. This catches problems that source review alone cannot reveal.\n\nAfter publication, collect concrete reports. Ask which browser was used, what text was selected, and whether the issue occurred on the first request or after several successful translations. Keep private text out of public reports unless the person explicitly chooses to share it. A small synthetic example can often reproduce the same failure without exposing personal information.\n\nUse the results of the release to choose the next change. Frequent friction in a common action deserves attention before another optional feature is added. If people repeatedly change the target language, improve that interaction. If most complaints concern long translations, investigate provider latency and rendering separately. Clear evidence makes the next version easier to prioritize.",
+      "characters": 3750,
+      "translation": "Команда запровадила спільний чек-лист релізів після кількох оновлень, які вимагали виправлень у останню хвилину. Мета цього списку — зробити фінальний стан релізу видимим для всіх. Він має фіксувати версію, зміни, які користувачі помітять, перевірки, які фактично виконалися, і будь-які залишкові обмеження. Галочка корисна лише тоді, коли вона вказує на докази. \n\nПочинайте кожну нотатку про реліз з поведінки, яка змінилася. Людина, яка читає записку, повинна розуміти, коли застосовується ця зміна і чого очікувати після неї. Технічні терміни можуть бути включені, коли вони допомагають пояснити обмеження або міграцію. Деталі внутрішнього переміщення файлу зазвичай мають бути у рецензії, а не в повідомленні, яке показують користувачам. \n\nПеред публікацією протестуйте робочі процеси, на які впливає ця зміна. Збірка може бути успішною, а взаємодія під час виконання все одно не спрацює. Для розширення браузера вибір тексту, відкриття панелі, зміна цільової мови та закриття панелі — це окремі дії, які потребують спостереження. Запишіть версію браузера та відрізніть ізольовану тестову сторінку від поведінки на реальному вебсайті. \n\nТримати конфігурацію окремо від упакованого додатка. Ключ розробки можна зберігати локально для персонального прототипу, але розподілений пакет не повинен містити спільного секрету. Процес випуску має перевіряти, які файли включені до фінального архіву. Документація та звіти бенчмарків можуть бути корисними в репозиторії, залишаючись поза встановленим розширенням. \n\nПерегляньте невдачі перед повторенням тесту. Якщо запит було відхилено через недійсність його облікових даних, зміна вхідного тексту не покращить результат. Якщо потокова відповідь була некоректно проаналізована, зберігайте невдалий запуск і виправляйте парсер перед порівнянням його часу з успішними запитами. Швидка відповідь на помилку — це не швидкий переклад. \n\nВикористовуйте той самий набір вхідних даних при порівнянні постачальників. Включайте короткі мітки, звичайні речення, неоднозначні слова, технічні уривки та довші абзаци. Повторюйте кожен текст кілька разів, але звітуйте про перший раунд окремо, оскільки провайдер може кешувати повторні запити. Покажіть кількість успішних запитів і невдач разом із медіаною та повільнішим хвістом розподілу. \n\nРеліз може залишатися невеликим без необхідності поведінки. Перша версія може містити панель перекладу та одну запам'ятану перевагу. Вона все ще повинна обробляти запити, що закінчуються не по порядку, сторінки з незвичайним макетом і помилки, що потребують дій користувача. Звуження списку функцій має полегшити тестування та підтримку цих поширених шляхів. \n\nПризначте одну людину для підготовки релізу, а іншу — для огляду фінального артефакту, коли команда буде достатньо людей. Інспекція повинна використовувати упаковану версію, а не сервер розробки. Перевірте, чи версія, показана користувачам, відповідає примітці релізу і що інструкції з встановлення описують поточний файл. Це виявляє проблеми, які не може виявити лише перевірка джерела. \n\nПісля публікації збирайте конкретні звіти. Запитуйте, який браузер використовувався, який текст було обрано і чи виникла проблема з першого запиту, чи після кількох успішних перекладів. Тримайте приватний текст подалі від публічних звітів, якщо особа явно не вирішила його поділитися. Невеликий синтетичний приклад часто може відтворити ту ж помилку, не розкриваючи особисту інформацію. \n\nВикористовуйте результати релізу, щоб обрати наступну зміну. Часті труднощі у спільній дії заслуговують на увагу перед додаванням іншої опціональної функції. Якщо люди неодноразово змінюють цільову мову, покращіть цю взаємодію. Якщо більшість скарг стосуються довгих перекладів, досліджуйте затримку провайдера та відображення окремо. Чіткі докази роблять наступну версію легшою для пріоритетизації.",
+      "detected_language": {
+        "language": "en",
+        "score": 1.0
+      },
+      "input_id": "large-3",
+      "size": "large",
+      "phase": "warm",
+      "round": 0
+    },
+    {
+      "started_at": "2026-10-02T19:53:26.789419+00:00",
+      "ok": true,
+      "protocol": "HTTP/1.1",
+      "first_text_ms": null,
+      "status": 200,
+      "headers_ms": 284.452,
+      "retry_after": null,
+      "connection_reused": true,
+      "milliseconds": 284.576,
+      "variant": "azure-auto",
+      "text": "I was feeling blue after the meeting, but a walk by the river helped. The new laptop costs an arm and a leg, so I will wait until the end of the month before buying it.",
+      "characters": 168,
+      "translation": "Після зустрічі я почувався сумно, але прогулянка біля річки допомогла. Новий ноутбук коштує дуже дорого, тож я почекаю до кінця місяця, перш ніж його купити.",
+      "detected_language": {
+        "language": "en",
+        "score": 1.0
+      },
+      "input_id": "sentence-3",
+      "size": "sentence",
+      "phase": "warm",
+      "round": 0
+    },
+    {
+      "started_at": "2026-10-02T19:53:27.077101+00:00",
+      "ok": true,
+      "protocol": "HTTP/1.1",
+      "first_text_ms": null,
+      "status": 200,
+      "headers_ms": 63.444,
+      "retry_after": null,
+      "connection_reused": true,
+      "milliseconds": 63.554,
+      "variant": "azure-auto",
+      "text": "bank",
+      "characters": 4,
+      "translation": "Банк",
+      "detected_language": {
+        "language": "en",
+        "score": 0.77
+      },
+      "input_id": "word-1",
+      "size": "word",
+      "phase": "warm",
+      "round": 0
+    },
+    {
+      "started_at": "2026-10-02T19:53:27.143051+00:00",
+      "ok": true,
+      "protocol": "HTTP/1.1",
+      "first_text_ms": null,
+      "status": 200,
+      "headers_ms": 118.551,
+      "retry_after": null,
+      "connection_reused": true,
+      "milliseconds": 118.657,
+      "variant": "azure-auto",
+      "text": "Open the settings.",
+      "characters": 18,
+      "translation": "Відкрийте налаштування.",
+      "detected_language": {
+        "language": "en",
+        "score": 1.0
+      },
+      "input_id": "short-1",
+      "size": "short",
+      "phase": "warm",
+      "round": 0
+    },
+    {
+      "started_at": "2026-10-02T19:53:27.267770+00:00",
+      "ok": true,
+      "protocol": "HTTP/1.1",
+      "first_text_ms": null,
+      "status": 200,
+      "headers_ms": 613.493,
+      "retry_after": null,
+      "connection_reused": true,
+      "milliseconds": 613.944,
+      "variant": "azure-auto",
+      "text": "Our team works across several time zones, so a message that looks urgent in the morning may arrive late at night for someone else. Include the date, the deadline, and the action you need in the first paragraph. If a task can wait until the following day, say so directly. For discussions that require a decision, summarize the available options and explain which one you recommend. Keep related files in the shared project folder so that a teammate can continue the work without searching through a long conversation. A short, clear handoff usually saves more time than another meeting.",
+      "characters": 586,
+      "translation": "Наша команда працює у кількох часових поясах, тому повідомлення, яке здається терміновим вранці, може прийти пізно вночі для когось іншого. Вкажіть дату, дедлайн і необхідну дію у першому абзаці. Якщо завдання може почекати до наступного дня, скажіть про це прямо. Для обговорень, що потребують прийняття рішення, підсумуйте доступні варіанти і поясніть, який саме ви рекомендуєте. Зберігайте пов'язані файли у спільній папці проєкту, щоб колега міг продовжити роботу, не шукаючи довгу розмову. Коротка, чітка передача зазвичай економить більше часу, ніж інша зустріч.",
+      "detected_language": {
+        "language": "en",
+        "score": 1.0
+      },
+      "input_id": "paragraph-3",
+      "size": "paragraph",
+      "phase": "warm",
+      "round": 1
+    },
+    {
+      "started_at": "2026-10-02T19:53:27.885252+00:00",
+      "ok": true,
+      "protocol": "HTTP/1.1",
+      "first_text_ms": null,
+      "status": 200,
+      "headers_ms": 345.779,
+      "retry_after": null,
+      "connection_reused": true,
+      "milliseconds": 345.913,
+      "variant": "azure-auto",
+      "text": "The team introduced a shared release checklist after several updates required last-minute fixes. The purpose of the checklist is to make the final state of a release visible to everyone. It should record the version, the changes that users will notice, the checks that actually ran, and any remaining limitations. A checked box is useful only when it points to evidence.\n\nStart each release note with the behavior that changed. A person reading the note should understand when the change applies and what they can expect afterward. Technical terms can be included when they help explain a limitation or a migration. Details about internal file movement usually belong in the review rather than in the message shown to users.\n\nBefore publishing, test the workflows that the change affects. A build can succeed while a runtime interaction still fails. For a browser extension, selecting text, opening the panel, changing the target language, and closing the panel are separate actions that need observation. Record the browser version and distinguish an isolated test page from behavior on a real website.\n\nKeep configuration separate from the packaged application. A development key can be stored locally for a personal prototype, but a distributed package should not contain a shared secret. The release process should verify which files are included in the final archive. Documentation and benchmark reports can be useful in the repository while remaining outside the installed extension.",
+      "characters": 1489,
+      "translation": "Команда запровадила спільний чек-лист релізів після кількох оновлень, які вимагали виправлень у останню хвилину. Мета цього списку — зробити фінальний стан релізу видимим для всіх. Він має фіксувати версію, зміни, які користувачі помітять, перевірки, які фактично виконалися, і будь-які залишкові обмеження. Галочка корисна лише тоді, коли вона вказує на докази. \n\nПочинайте кожну нотатку про реліз з поведінки, яка змінилася. Людина, яка читає записку, повинна розуміти, коли застосовується ця зміна і чого очікувати після неї. Технічні терміни можуть бути включені, коли вони допомагають пояснити обмеження або міграцію. Деталі внутрішнього переміщення файлу зазвичай мають бути у рецензії, а не в повідомленні, яке показують користувачам. \n\nПеред публікацією протестуйте робочі процеси, на які впливає ця зміна. Збірка може бути успішною, а взаємодія під час виконання все одно не спрацює. Для розширення браузера вибір тексту, відкриття панелі, зміна цільової мови та закриття панелі — це окремі дії, які потребують спостереження. Запишіть версію браузера та відрізніть ізольовану тестову сторінку від поведінки на реальному вебсайті. \n\nТримати конфігурацію окремо від упакованого додатка. Ключ розробки можна зберігати локально для персонального прототипу, але розподілений пакет не повинен містити спільного секрету. Процес випуску має перевіряти, які файли включені до фінального архіву. Документація та звіти бенчмарків можуть бути корисними в репозиторії, залишаючись поза встановленим розширенням.",
+      "detected_language": {
+        "language": "en",
+        "score": 1.0
+      },
+      "input_id": "long-3",
+      "size": "long",
+      "phase": "warm",
+      "round": 1
+    },
+    {
+      "started_at": "2026-10-02T19:53:28.234639+00:00",
+      "ok": true,
+      "protocol": "HTTP/1.1",
+      "first_text_ms": null,
+      "status": 200,
+      "headers_ms": 602.015,
+      "retry_after": null,
+      "connection_reused": true,
+      "milliseconds": 602.099,
+      "variant": "azure-auto",
+      "text": "The update improves performance and fixes several bugs in the background worker. In earlier versions, two requests could finish in the wrong order, allowing an older result to replace a newer one. Each request now carries an identifier, and the interface accepts a result only when its identifier matches the current selection. Please restart your browser after the installation is complete. Your saved settings and bookmarks will remain available. The release also improves keyboard navigation and keeps the panel inside the visible area of the page.",
+      "characters": 551,
+      "translation": "Оновлення покращує продуктивність і виправляє кілька помилок у фоновому робочому пристрої. У попередніх версіях два запити могли закінчуватися у неправильному порядку, що дозволяло старішому результату замінювати новий. Тепер кожен запит має ідентифікатор, і інтерфейс приймає результат лише тоді, коли його ідентифікатор відповідає поточному вибору. Будь ласка, перезавантажте браузер після завершення встановлення. Ваші збережені налаштування та закладки залишаться доступними. Реліз також покращує навігацію клавіатурою і зберігає панель у видимій області сторінки.",
+      "detected_language": {
+        "language": "en",
+        "score": 1.0
+      },
+      "input_id": "paragraph-2",
+      "size": "paragraph",
+      "phase": "warm",
+      "round": 1
+    },
+    {
+      "started_at": "2026-10-02T19:53:28.841799+00:00",
+      "ok": true,
+      "protocol": "HTTP/1.1",
+      "first_text_ms": null,
+      "status": 200,
+      "headers_ms": 152.895,
+      "retry_after": null,
+      "connection_reused": true,
+      "milliseconds": 152.959,
+      "variant": "azure-auto",
+      "text": "I was feeling blue after the meeting, but a walk by the river helped. The new laptop costs an arm and a leg, so I will wait until the end of the month before buying it.",
+      "characters": 168,
+      "translation": "Після зустрічі я почувався сумно, але прогулянка біля річки допомогла. Новий ноутбук коштує дуже дорого, тож я почекаю до кінця місяця, перш ніж його купити.",
+      "detected_language": {
+        "language": "en",
+        "score": 1.0
+      },
+      "input_id": "sentence-3",
+      "size": "sentence",
+      "phase": "warm",
+      "round": 1
+    },
+    {
+      "started_at": "2026-10-02T19:53:28.996630+00:00",
+      "ok": true,
+      "protocol": "HTTP/1.1",
+      "first_text_ms": null,
+      "status": 200,
+      "headers_ms": 408.149,
+      "retry_after": null,
+      "connection_reused": true,
+      "milliseconds": 408.777,
+      "variant": "azure-auto",
+      "text": "A reliable translation panel starts with a clear connection between the selected text and the request that represents it. The browser can generate several selection events while a person drags across a paragraph. Sending a request for every event wastes time and makes the interface feel unstable. Wait until the selection is complete, keep the source text in memory, and send the request when the translation button is clicked.\n\nThe user should see the panel immediately after clicking. Its position depends on the visible selection rectangle and the available space around it. Near the right edge of the page, the panel may need to move to the left. Near the bottom, it may need to open above the selection. Scrolling should not leave the panel floating over unrelated content. These adjustments should happen locally and should not delay the translation request.\n\nA second selection may be made before the first translation finishes. Give each request a unique identifier and compare it with the current selection before displaying the result. Cancel a request when the transport supports cancellation. If cancellation is unavailable, discard the stale response. The important behavior is that the result always belongs to the text the person most recently asked to translate.\n\nPersist the target language after it changes. For a person who normally translates into Ukrainian, a remembered preference removes an extra action from every request. The source language can be detected by the provider in the same translation call. Very short words are sometimes ambiguous, so the panel may also need an optional way to choose a source language when automatic detection produces the wrong result.\n\nNetwork connections make a measurable difference. The first request can include DNS lookup, a TCP connection, and a TLS handshake before the service receives any text. Later requests may reuse that connection. A benchmark should show both cases and should record the time until the entire translation is available. For a streamed response, also record when the first translated characters arrive.\n\nTranslation quality depends on context. A river bank and a financial bank share the same English spelling but require different Ukrainian words. Idioms such as feeling blue and spilling the beans should preserve their intended meaning. A fast engine that translates these expressions literally can make a paragraph harder to understand. Evaluate complete passages as well as isolated labels.\n\nLong passages need enough space in the panel to remain readable. Set a maximum height and allow the text to scroll inside it. Preserve paragraph boundaries where possible, and keep the close button accessible while scrolling. Keyboard users should be able to move focus into the panel, copy the translation, and return to the original page without losing their place.\n\nFailures should leave the source selection intact. A temporary network error, an exhausted allowance, and an invalid key require different recovery actions. Show a concise message with the relevant action. A retry should use the same source text and target language. Avoid repeatedly retrying a rejected credential because another request will not fix the configuration.\n\nMeasurements should describe the environment in which they were collected. Browser version, hardware, network connection, input length, model identifier, and source-language settings can all affect the result. Keep the raw timings together with the actual translations so that a later run can be compared against the same inputs. A single unusually fast request does not establish the normal experience.\n\nThe first prototype can concentrate on selection, translation, language preference, and closing the panel. Additional actions should be added only when they remove a frequent obstacle. A small interface can still be dependable if it handles stale requests, keyboard focus, page boundaries, and clear errors. These details matter more to everyday speed than a long list of optional features.",
+      "characters": 4023,
+      "translation": "Надійна панель перекладу починається з чіткого зв'язку між вибраним текстом і запитом, що його представляє. Браузер може генерувати кілька подій вибору, поки людина перетягує абзац. Надсилання запиту на кожну подію марнує час і робить інтерфейс нестабільним. Дочекайтеся, поки відбір буде завершено, зберігайте вихідний текст у пам'яті та надсилайте запит при натисканні кнопки перекладу. \n\nКористувач повинен побачити панель одразу після натискання. Її положення залежить від видимого прямокутника вибору та доступного простору навколо нього. Біля правого краю сторінки панель може знадобитися переміщення вліво. Ближче до низу її може знадобитися відкриття над вибором. Прокручування не повинно залишати панель плавати над непов'язаним контентом. Ці коригування мають відбуватися локально і не повинні затримувати запит на переклад. \n\nДругий вибір можна зробити до завершення першого перекладу. Надайте кожному запиту унікальний ідентифікатор і порівняйте його з поточним вибором перед відображенням результату. Скасуйте запит, коли транспорт підтримує скасування. Якщо скасування недоступне, відкидайте застарілу відповідь. Важливо, що результат завжди належить тексту, який особа нещодавно попросила перекласти. \n\nЗберігайте цільову мову після її зміни. Для людини, яка зазвичай перекладає українською, запам'ятана перевага усуває додаткову дію з кожного запиту. Вихідна мова може бути виявлена провайдером у тому ж виклику перекладу. Дуже короткі слова іноді бувають неоднозначними, тому панелі також може знадобитися опціональний спосіб вибору вихідної мови, якщо автоматичне виявлення дає неправильний результат. \n\nМережеві з'єднання мають вимірювану різницю. Перший запит може включати DNS-пошук, TCP-з'єднання та TLS-рукостискання до того, як сервіс отримає будь-який текст. Пізніші запити можуть повторно використовувати це з'єднання. Бенчмарк має показати обидва випадки і фіксувати час до того, як весь переклад стане доступним. Для потокової відповіді також фіксуйте, коли приходять перші перекладені символи. \n\nЯкість перекладу залежить від контексту. Річковий берег і фінансовий банк мають однакове англійське написання, але потребують різних українських слів. Ідіоми на кшталт «feeling blue» та «розкривати секрети» мають зберігати своє значення. Швидкий механізм, який буквально перекладає ці вирази, може ускладнити розуміння абзацу. Оцінюйте повні уривки, а також окремі ярлики. \n\nДовгі уривки потребують достатнього місця в панелі, щоб залишатися читабельними. Встановіть максимальну висоту і дозвольте тексту прокручуватися всередині. Зберігайте межі абзаців, де це можливо, і тримайте кнопку закриття доступною під час прокручування. Користувачі клавіатури повинні мати змогу перемістити фокус у панель, скопіювати переклад і повернутися до оригінальної сторінки, не втрачаючи свого місця. \n\nПомилки мають залишати вибір вихідного коду незмінним. Тимчасова мережева помилка, вичерпаний дозвіл і недійсний ключ вимагають різних дій для відновлення. Покажіть коротке повідомлення з відповідною дією. Повторна спроба має використовувати той самий вихідний текст і цільову мову. Уникайте повторних спроб відхиленого облікового запису, оскільки інший запит не виправить конфігурацію. \n\nВимірювання повинні описувати середовище, в якому вони були зібрані. Версія браузера, апаратне забезпечення, мережеве з'єднання, довжина введення, ідентифікатор моделі та налаштування мови джерела можуть впливати на результат. Зберігайте сирі таймінги разом із фактичними перекладами, щоб пізніший запуск можна було порівняти з тими ж вхідними даними. Один незвично швидкий запит не встановлює нормальний досвід. \n\nПерший прототип може зосереджуватися на виборі, перекладі, мовних вподобаннях і закритті панелі. Додаткові дії слід додавати лише тоді, коли вони усувають часті перешкоди. Невеликий інтерфейс все ще може бути надійним, якщо він обробляє застарілі запити, фокус на клавіатурі, межі сторінок і чіткі помилки. Ці деталі важливіші для щоденної швидкості, ніж довгий список опціональних функцій.",
+      "detected_language": {
+        "language": "en",
+        "score": 1.0
+      },
+      "input_id": "large-1",
+      "size": "large",
+      "phase": "warm",
+      "round": 1
+    },
+    {
+      "started_at": "2026-10-02T19:53:29.409791+00:00",
+      "ok": true,
+      "protocol": "HTTP/1.1",
+      "first_text_ms": null,
+      "status": 200,
+      "headers_ms": 68.765,
+      "retry_after": null,
+      "connection_reused": true,
+      "milliseconds": 68.856,
+      "variant": "azure-auto",
+      "text": "Save",
+      "characters": 4,
+      "translation": "Збереження",
+      "detected_language": {
+        "language": "en",
+        "score": 0.97
+      },
+      "input_id": "word-2",
+      "size": "word",
+      "phase": "warm",
+      "round": 1
+    },
+    {
+      "started_at": "2026-10-02T19:53:29.482843+00:00",
+      "ok": true,
+      "protocol": "HTTP/1.1",
+      "first_text_ms": null,
+      "status": 200,
+      "headers_ms": 440.052,
+      "retry_after": null,
+      "connection_reused": true,
+      "milliseconds": 440.311,
+      "variant": "azure-auto",
+      "text": "A reliable translation panel starts with a clear connection between the selected text and the request that represents it. The browser can generate several selection events while a person drags across a paragraph. Sending a request for every event wastes time and makes the interface feel unstable. Wait until the selection is complete, keep the source text in memory, and send the request when the translation button is clicked.\n\nThe user should see the panel immediately after clicking. Its position depends on the visible selection rectangle and the available space around it. Near the right edge of the page, the panel may need to move to the left. Near the bottom, it may need to open above the selection. Scrolling should not leave the panel floating over unrelated content. These adjustments should happen locally and should not delay the translation request.\n\nA second selection may be made before the first translation finishes. Give each request a unique identifier and compare it with the current selection before displaying the result. Cancel a request when the transport supports cancellation. If cancellation is unavailable, discard the stale response. The important behavior is that the result always belongs to the text the person most recently asked to translate.\n\nPersist the target language after it changes. For a person who normally translates into Ukrainian, a remembered preference removes an extra action from every request. The source language can be detected by the provider in the same translation call. Very short words are sometimes ambiguous, so the panel may also need an optional way to choose a source language when automatic detection produces the wrong result.",
+      "characters": 1694,
+      "translation": "Надійна панель перекладу починається з чіткого зв'язку між вибраним текстом і запитом, що його представляє. Браузер може генерувати кілька подій вибору, поки людина перетягує абзац. Надсилання запиту на кожну подію марнує час і робить інтерфейс нестабільним. Дочекайтеся, поки відбір буде завершено, зберігайте вихідний текст у пам'яті та надсилайте запит при натисканні кнопки перекладу. \n\nКористувач повинен побачити панель одразу після натискання. Її положення залежить від видимого прямокутника вибору та доступного простору навколо нього. Біля правого краю сторінки панель може знадобитися переміщення вліво. Ближче до низу її може знадобитися відкриття над вибором. Прокручування не повинно залишати панель плавати над непов'язаним контентом. Ці коригування мають відбуватися локально і не повинні затримувати запит на переклад. \n\nДругий вибір можна зробити до завершення першого перекладу. Надайте кожному запиту унікальний ідентифікатор і порівняйте його з поточним вибором перед відображенням результату. Скасуйте запит, коли транспорт підтримує скасування. Якщо скасування недоступне, відкидайте застарілу відповідь. Важливо, що результат завжди належить тексту, який особа нещодавно попросила перекласти. \n\nЗберігайте цільову мову після її зміни. Для людини, яка зазвичай перекладає українською, запам'ятана перевага усуває додаткову дію з кожного запиту. Вихідна мова може бути виявлена провайдером у тому ж виклику перекладу. Дуже короткі слова іноді бувають неоднозначними, тому панелі також може знадобитися опціональний спосіб вибору вихідної мови, якщо автоматичне виявлення дає неправильний результат.",
+      "detected_language": {
+        "language": "en",
+        "score": 1.0
+      },
+      "input_id": "long-1",
+      "size": "long",
+      "phase": "warm",
+      "round": 1
+    },
+    {
+      "started_at": "2026-10-02T19:53:29.932483+00:00",
+      "ok": true,
+      "protocol": "HTTP/1.1",
+      "first_text_ms": null,
+      "status": 200,
+      "headers_ms": 63.691,
+      "retry_after": null,
+      "connection_reused": true,
+      "milliseconds": 63.837,
+      "variant": "azure-auto",
+      "text": "Please restart your browser after the installation is complete.",
+      "characters": 63,
+      "translation": "Будь ласка, перезавантажте браузер після завершення встановлення.",
+      "detected_language": {
+        "language": "en",
+        "score": 1.0
+      },
+      "input_id": "short-3",
+      "size": "short",
+      "phase": "warm",
+      "round": 1
+    },
+    {
+      "started_at": "2026-10-02T19:53:30.000825+00:00",
+      "ok": true,
+      "protocol": "HTTP/1.1",
+      "first_text_ms": null,
+      "status": 200,
+      "headers_ms": 505.305,
+      "retry_after": null,
+      "connection_reused": true,
+      "milliseconds": 505.454,
+      "variant": "azure-auto",
+      "text": "Planning a short trip with a group is easier when everyone can see the same schedule. Start by recording the arrival time, the address of the accommodation, and the first activity that requires a reservation. Leave enough time between transport connections to collect luggage and find the correct platform. A connection that is technically possible may still be stressful when the station is unfamiliar.\n\nAsk each person about the parts of the trip that matter most to them. Some people want to visit museums, while others prefer walking through neighborhoods or spending time outdoors. Make space for these different preferences instead of filling every hour with a shared activity. One or two planned events each day can provide structure while leaving room for weather, fatigue, and unexpected discoveries.\n\nWrite down the full cost of each reservation, including fees that appear only at checkout. A hotel with a lower nightly price may become more expensive after transport and luggage storage are included. Compare the total for the whole stay rather than a single headline number. Keep cancellation deadlines beside the booking details so that a change of plans does not become an avoidable expense.\n\nIf the group uses several languages, keep practical messages short and specific. An address, a date, and a meeting point should be easy to copy into another application. Expressions that sound friendly in one language may confuse someone reading a literal translation. For important details, prefer direct instructions and verify the translated meaning before sending the message.\n\nPrepare a simple fallback for a delayed train or flight. Identify the next available connection and explain who should be contacted if the group is separated. The fallback does not need to cover every possible disruption. It should answer the first questions people will have when the original plan stops working, such as where to wait and whether a reservation can be moved.\n\nKeep documents available when the network is unreliable. Download tickets, booking confirmations, and a map of the area before leaving. Share a copy with another member of the group so that a flat phone battery does not block the next step. Store personal documents carefully and avoid placing private information in a public group message.\n\nChoose meeting points that are easy to recognize. A large square may contain several entrances and landmarks, so naming the square alone is often insufficient. Use the entrance, the side of the building, or a nearby sign that everyone can identify. Include the planned departure time and say whether the group will wait if someone is late.\n\nA good schedule allows people to rest. Long walks, queues, and early departures can become tiring even when every activity looks enjoyable on its own. Put a flexible break after the busiest part of the day and avoid treating every free hour as a gap that must be filled. A calmer pace often makes the trip more memorable than another rushed stop.\n\nAfter each day, review the next morning together. Confirm which reservations remain fixed and which activities can change. If a place was closed or a journey took longer than expected, adjust the following plan while the details are still fresh. A short conversation can prevent several people from following different versions of the schedule.\n\nAt the end of the trip, record what worked and what you would change. Keep useful addresses and explain why a particular transport route was convenient. Future plans benefit from concrete observations, such as the actual travel time or the need to book in advance. General statements that a place was wonderful are pleasant to read but harder to use when making the next decision.",
+      "characters": 3724,
+      "translation": "Планувати коротку поїздку з групою легше, коли всі бачать однаковий розклад. Почніть із запису часу прибуття, адреси житла та першої активності, що потребує бронювання. Залиште достатньо часу між пересадками на транспорт, щоб забрати багаж і знайти відповідну платформу. Технічно можливе сполучення може бути стресовим, навіть якщо станція незнайома. \n\nЗапитайте кожного про ті частини поїздки, які для них найважливіші. Дехто хоче відвідувати музеї, інші віддають перевагу прогулянкам районами або проведення часу на свіжому повітрі. Знайдіть місце для цих різних уподобань, замість того щоб заповнювати кожну годину спільною активністю. Одна-дві заплановані події щодня можуть надати структуру, залишаючи простір для погоди, втоми та несподіваних відкриттів. \n\nЗапишіть повну вартість кожного бронювання, включаючи збори, які з'являються лише під час виїзду. Готель із нижчою нічною ціною може стати дорожчим після включення транспорту та зберігання багажу. Порівняйте загальну суму за весь час перебування, а не лише один заголовний номер. Залишайте дедлайни скасування поруч із деталями бронювання, щоб зміна плану не стала уникненною витратою. \n\nЯкщо група використовує кілька мов, тримайте практичні повідомлення короткими та конкретними. Адресу, дату та місце зустрічі слід легко скопіювати в інший додаток. Вирази, які звучать дружньо однією мовою, можуть заплутати читача буквального перекладу. Для важливих деталей віддайте перевагу прямим інструкціям і перевіряйте перекладене значення перед відправкою повідомлення. \n\nПідготуйте простий запасний варіант для затриманого поїзда чи рейсу. Визначте наступне доступне пересадження і поясніть, з ким слід зв'язатися, якщо група розділена. Резервний варіант не обов'язково має покривати всі можливі перебої. Він має відповісти на перші питання, які виникнуть у людей, коли початковий план припинить працювати, наприклад, де чекати і чи можна перенести бронювання. \n\nТримайте документи під рукою, коли мережа ненадійна. Завантажте квитки, підтвердження бронювання та карту району перед виходом. Поділіться копією з іншим членом групи, щоб розряджена батарея телефону не блокувала наступний крок. Зберігайте особисті документи обережно і уникайте розміщення приватної інформації у публічному груповому повідомленні. \n\nОбирайте місця зустрічі, які легко впізнати. Велика площа може містити кілька входів і орієнтирів, тому сама назва площі часто недостатньо. Використовуйте вхід, бік будівлі або знак поруч, який кожен може впізнати. Вкажіть запланований час відправлення і скажіть, чи буде група чекати, якщо хтось запізниться. \n\nХороший розклад дозволяє людям відпочити. Довгі прогулянки, черги та ранні відправлення можуть виснажувати, навіть якщо кожна діяльність здається приємною сама по собі. Зробіть гнучку перерву після найзавантаженішої частини дня і уникайте сприймати кожну вільну годину як прогалину, яку потрібно заповнити. Спокійніший темп часто робить поїздку більш пам'ятною, ніж ще одна поспішна зупинка. \n\nПісля кожного дня разом переглядайте наступний ранок. Переконайтеся, які бронювання залишаються незмінними, а які активності можуть змінитися. Якщо місце було закрите або поїздка зайняла більше часу, поки деталі ще свіжі. Коротка розмова може завадити кільком людям дотримуватися різних версій розкладу. \n\nНаприкінці поїздки зафіксуйте, що спрацювало і що ви б змінили. Зберігайте корисні адреси та пояснюйте, чому певний транспортний маршрут був зручним. Майбутні плани виграють від конкретних спостережень, таких як фактичний час у дорозі або необхідність бронювати заздалегідь. Загальні заяви про те, що місце було чудовим, приємно читати, але важче використовувати при прийнятті наступного рішення.",
+      "detected_language": {
+        "language": "en",
+        "score": 1.0
+      },
+      "input_id": "large-2",
+      "size": "large",
+      "phase": "warm",
+      "round": 1
+    },
+    {
+      "started_at": "2026-10-02T19:53:30.510155+00:00",
+      "ok": true,
+      "protocol": "HTTP/1.1",
+      "first_text_ms": null,
+      "status": 200,
+      "headers_ms": 101.005,
+      "retry_after": null,
+      "connection_reused": true,
+      "milliseconds": 101.137,
+      "variant": "azure-auto",
+      "text": "Close",
+      "characters": 5,
+      "translation": "Закриття",
+      "detected_language": {
+        "language": "en",
+        "score": 0.98
+      },
+      "input_id": "word-3",
+      "size": "word",
+      "phase": "warm",
+      "round": 1
+    },
+    {
+      "started_at": "2026-10-02T19:53:30.617591+00:00",
+      "ok": true,
+      "protocol": "HTTP/1.1",
+      "first_text_ms": null,
+      "status": 200,
+      "headers_ms": 61.245,
+      "retry_after": null,
+      "connection_reused": true,
+      "milliseconds": 61.376,
+      "variant": "azure-auto",
+      "text": "bank",
+      "characters": 4,
+      "translation": "Банк",
+      "detected_language": {
+        "language": "en",
+        "score": 0.77
+      },
+      "input_id": "word-1",
+      "size": "word",
+      "phase": "warm",
+      "round": 1
+    },
+    {
+      "started_at": "2026-10-02T19:53:30.683624+00:00",
+      "ok": true,
+      "protocol": "HTTP/1.1",
+      "first_text_ms": null,
+      "status": 200,
+      "headers_ms": 63.684,
+      "retry_after": null,
+      "connection_reused": true,
+      "milliseconds": 63.816,
+      "variant": "azure-auto",
+      "text": "Your changes have been saved.",
+      "characters": 29,
+      "translation": "Ваші зміни збережені.",
+      "detected_language": {
+        "language": "en",
+        "score": 1.0
+      },
+      "input_id": "short-2",
+      "size": "short",
+      "phase": "warm",
+      "round": 1
+    },
+    {
+      "started_at": "2026-10-02T19:53:30.754785+00:00",
+      "ok": true,
+      "protocol": "HTTP/1.1",
+      "first_text_ms": null,
+      "status": 200,
+      "headers_ms": 312.511,
+      "retry_after": null,
+      "connection_reused": true,
+      "milliseconds": 312.627,
+      "variant": "azure-auto",
+      "text": "When you select text on a web page, a small translation button appears beside it. Click the button to open a panel with the translation. You can change the target language in that panel, and the browser will remember your choice for the next session. Press Escape or click outside the panel to close it. The selected text should remain highlighted so that you can compare the original with the translated version. If the request fails, the panel should explain what happened and offer a retry without losing your selection.",
+      "characters": 523,
+      "translation": "Коли ви обираєте текст на веб-сторінці, поруч з'являється маленька кнопка перекладу. Натисніть кнопку, щоб відкрити панель із перекладом. Ви можете змінити цільову мову в цій панелі, і браузер запам'ятає ваш вибір для наступної сесії. Натисніть Escape або поза панеллю, щоб закрити її. Вибраний текст має залишатися виділеним, щоб порівняти оригінал із перекладеною версією. Якщо запит не вдасться, панель має пояснити, що сталося, і запропонувати повторну спробу без втрати вибору.",
+      "detected_language": {
+        "language": "en",
+        "score": 1.0
+      },
+      "input_id": "paragraph-1",
+      "size": "paragraph",
+      "phase": "warm",
+      "round": 1
+    },
+    {
+      "started_at": "2026-10-02T19:53:31.071148+00:00",
+      "ok": true,
+      "protocol": "HTTP/1.1",
+      "first_text_ms": null,
+      "status": 200,
+      "headers_ms": 340.007,
+      "retry_after": null,
+      "connection_reused": true,
+      "milliseconds": 340.26,
+      "variant": "azure-auto",
+      "text": "The package should arrive by Friday, but the tracking page has not been updated since yesterday. Please contact support if the delivery address needs to be changed.",
+      "characters": 164,
+      "translation": "Посилка має прибути до п'ятниці, але сторінка відстеження не оновлювалася з учорашнього дня. Будь ласка, зверніться до служби підтримки, якщо потрібно змінити адресу доставки.",
+      "detected_language": {
+        "language": "en",
+        "score": 1.0
+      },
+      "input_id": "sentence-2",
+      "size": "sentence",
+      "phase": "warm",
+      "round": 1
+    },
+    {
+      "started_at": "2026-10-02T19:53:31.417670+00:00",
+      "ok": true,
+      "protocol": "HTTP/1.1",
+      "first_text_ms": null,
+      "status": 200,
+      "headers_ms": 44.908,
+      "retry_after": null,
+      "connection_reused": true,
+      "milliseconds": 44.98,
+      "variant": "azure-auto",
+      "text": "Open the settings.",
+      "characters": 18,
+      "translation": "Відкрийте налаштування.",
+      "detected_language": {
+        "language": "en",
+        "score": 1.0
+      },
+      "input_id": "short-1",
+      "size": "short",
+      "phase": "warm",
+      "round": 1
+    },
+    {
+      "started_at": "2026-10-02T19:53:31.466158+00:00",
+      "ok": true,
+      "protocol": "HTTP/1.1",
+      "first_text_ms": null,
+      "status": 200,
+      "headers_ms": 277.533,
+      "retry_after": null,
+      "connection_reused": true,
+      "milliseconds": 277.704,
+      "variant": "azure-auto",
+      "text": "Planning a short trip with a group is easier when everyone can see the same schedule. Start by recording the arrival time, the address of the accommodation, and the first activity that requires a reservation. Leave enough time between transport connections to collect luggage and find the correct platform. A connection that is technically possible may still be stressful when the station is unfamiliar.\n\nAsk each person about the parts of the trip that matter most to them. Some people want to visit museums, while others prefer walking through neighborhoods or spending time outdoors. Make space for these different preferences instead of filling every hour with a shared activity. One or two planned events each day can provide structure while leaving room for weather, fatigue, and unexpected discoveries.\n\nWrite down the full cost of each reservation, including fees that appear only at checkout. A hotel with a lower nightly price may become more expensive after transport and luggage storage are included. Compare the total for the whole stay rather than a single headline number. Keep cancellation deadlines beside the booking details so that a change of plans does not become an avoidable expense.\n\nIf the group uses several languages, keep practical messages short and specific. An address, a date, and a meeting point should be easy to copy into another application. Expressions that sound friendly in one language may confuse someone reading a literal translation. For important details, prefer direct instructions and verify the translated meaning before sending the message.",
+      "characters": 1588,
+      "translation": "Планувати коротку поїздку з групою легше, коли всі бачать однаковий розклад. Почніть із запису часу прибуття, адреси житла та першої активності, що потребує бронювання. Залиште достатньо часу між пересадками на транспорт, щоб забрати багаж і знайти відповідну платформу. Технічно можливе сполучення може бути стресовим, навіть якщо станція незнайома. \n\nЗапитайте кожного про ті частини поїздки, які для них найважливіші. Дехто хоче відвідувати музеї, інші віддають перевагу прогулянкам районами або проведення часу на свіжому повітрі. Знайдіть місце для цих різних уподобань, замість того щоб заповнювати кожну годину спільною активністю. Одна-дві заплановані події щодня можуть надати структуру, залишаючи простір для погоди, втоми та несподіваних відкриттів. \n\nЗапишіть повну вартість кожного бронювання, включаючи збори, які з'являються лише під час виїзду. Готель із нижчою нічною ціною може стати дорожчим після включення транспорту та зберігання багажу. Порівняйте загальну суму за весь час перебування, а не лише один заголовний номер. Залишайте дедлайни скасування поруч із деталями бронювання, щоб зміна плану не стала уникненною витратою. \n\nЯкщо група використовує кілька мов, тримайте практичні повідомлення короткими та конкретними. Адресу, дату та місце зустрічі слід легко скопіювати в інший додаток. Вирази, які звучать дружньо однією мовою, можуть заплутати читача буквального перекладу. Для важливих деталей віддайте перевагу прямим інструкціям і перевіряйте перекладене значення перед відправкою повідомлення.",
+      "detected_language": {
+        "language": "en",
+        "score": 1.0
+      },
+      "input_id": "long-2",
+      "size": "long",
+      "phase": "warm",
+      "round": 1
+    },
+    {
+      "started_at": "2026-10-02T19:53:31.748736+00:00",
+      "ok": true,
+      "protocol": "HTTP/1.1",
+      "first_text_ms": null,
+      "status": 200,
+      "headers_ms": 128.195,
+      "retry_after": null,
+      "connection_reused": true,
+      "milliseconds": 128.332,
+      "variant": "azure-auto",
+      "text": "You can select a different language from the menu. Your choice will be remembered the next time you open the browser.",
+      "characters": 117,
+      "translation": "Ви можете вибрати іншу мову з меню. Ваш вибір буде запам'ятаний наступного разу, коли ви відкриєте браузер.",
+      "detected_language": {
+        "language": "en",
+        "score": 1.0
+      },
+      "input_id": "sentence-1",
+      "size": "sentence",
+      "phase": "warm",
+      "round": 1
+    },
+    {
+      "started_at": "2026-10-02T19:53:31.882381+00:00",
+      "ok": false,
+      "protocol": "HTTP/1.1",
+      "first_text_ms": null,
+      "status": 429,
+      "headers_ms": 61.248,
+      "retry_after": null,
+      "connection_reused": true,
+      "milliseconds": 61.357,
+      "variant": "azure-auto",
+      "text": "The team introduced a shared release checklist after several updates required last-minute fixes. The purpose of the checklist is to make the final state of a release visible to everyone. It should record the version, the changes that users will notice, the checks that actually ran, and any remaining limitations. A checked box is useful only when it points to evidence.\n\nStart each release note with the behavior that changed. A person reading the note should understand when the change applies and what they can expect afterward. Technical terms can be included when they help explain a limitation or a migration. Details about internal file movement usually belong in the review rather than in the message shown to users.\n\nBefore publishing, test the workflows that the change affects. A build can succeed while a runtime interaction still fails. For a browser extension, selecting text, opening the panel, changing the target language, and closing the panel are separate actions that need observation. Record the browser version and distinguish an isolated test page from behavior on a real website.\n\nKeep configuration separate from the packaged application. A development key can be stored locally for a personal prototype, but a distributed package should not contain a shared secret. The release process should verify which files are included in the final archive. Documentation and benchmark reports can be useful in the repository while remaining outside the installed extension.\n\nReview failures before repeating a test. If a request was rejected because its credential was invalid, changing the input text will not improve the result. If a streamed response was parsed incorrectly, preserve the failed run and correct the parser before comparing its timing with successful requests. A fast error response is not a fast translation.\n\nUse the same input set when comparing providers. Include short labels, ordinary sentences, ambiguous words, technical passages, and longer paragraphs. Repeat each text several times, but report the first round separately because a provider may cache repeated requests. Show the number of successful requests and failures together with the median and slower tail of the distribution.\n\nA release can remain small without omitting necessary behavior. The first version may provide a translation panel and one remembered preference. It still needs to handle requests that finish out of order, pages with unusual layouts, and errors that require user action. Narrowing the feature list should make these common paths easier to test and maintain.\n\nAssign one person to prepare the release and another to inspect the final artifact when the team has enough people. The inspection should use the packaged version rather than the development server. Verify that the version shown to users matches the release note and that installation instructions describe the current file. This catches problems that source review alone cannot reveal.\n\nAfter publication, collect concrete reports. Ask which browser was used, what text was selected, and whether the issue occurred on the first request or after several successful translations. Keep private text out of public reports unless the person explicitly chooses to share it. A small synthetic example can often reproduce the same failure without exposing personal information.\n\nUse the results of the release to choose the next change. Frequent friction in a common action deserves attention before another optional feature is added. If people repeatedly change the target language, improve that interaction. If most complaints concern long translations, investigate provider latency and rendering separately. Clear evidence makes the next version easier to prioritize.",
+      "characters": 3750,
+      "provider_error": {
+        "error": {
+          "code": 429001,
+          "message": "The server rejected the request because the client has exceeded request limits."
+        }
+      },
+      "input_id": "large-3",
+      "size": "large",
+      "phase": "warm",
+      "round": 1
+    }
+  ],
+  "summary": {
+    "go-mimo-v2.6-flash": {
+      "cold-first": {
+        "attempted": 1,
+        "successful": 0,
+        "failed": 1
+      }
+    },
+    "go-glm-5.3-flash": {
+      "cold-first": {
+        "attempted": 1,
+        "successful": 0,
+        "failed": 1
+      }
+    },
+    "azure-auto": {
+      "cold-first": {
+        "attempted": 1,
+        "successful": 1,
+        "failed": 0,
+        "median_ms": 1369.35,
+        "p95_ms": 1369.35,
+        "min_ms": 1369.35,
+        "max_ms": 1369.35,
+        "reused_connections": 0
+      },
+      "warm": {
+        "attempted": 36,
+        "successful": 35,
+        "failed": 1,
+        "median_ms": 285.31,
+        "p95_ms": 613.94,
+        "min_ms": 44.98,
+        "max_ms": 660.46,
+        "reused_connections": 35
+      }
+    }
+  },
+  "blocked": [
+    {
+      "variant": "go-mimo-v2.6-flash",
+      "reason": {
+        "type": "error",
+        "error": {
+          "type": "GoUsageLimitError",
+          "message": "Go usage limit exceeded"
+        },
+        "metadata": {
+          "workspace": "wrk_01KEM0YPTS49HY4CE0A140FC2B",
+          "limitName": "5 hour"
+        }
+      }
+    },
+    {
+      "variant": "go-glm-5.3-flash",
+      "reason": {
+        "type": "error",
+        "error": {
+          "type": "GoUsageLimitError",
+          "message": "Go usage limit exceeded"
+        },
+        "metadata": {
+          "workspace": "wrk_01KEM0YPTS49HY4CE0A140FC2B",
+          "limitName": "5 hour"
+        }
+      }
+    },
+    {
+      "variant": "azure-auto",
+      "reason": "Stop after credential/quota failure or three request failures"
+    }
+  ]
+}

@@ -4,6 +4,7 @@
 |---|---|---|---|---|---|
 | 2026-10-02 | English -> Ukrainian | Apple M4 Pro, 48 GiB | Local engines in Helium and Chrome; earlier MyMemory aggregates; other cloud providers pending keys | [Report](2026-10-02/report.md) | [JSON](2026-10-02/results.json) |
 | 2026-10-02 | English -> Ukrainian | Apple M4 Pro, 48 GiB | Azure, DeepL speed/quality, North Small Translate and Command R7B; short core set and 18 realistic texts up to about 600 words; Google skipped by user | [Cloud report](2026-10-02/cloud-report.md) | [Summary and raw-run links](2026-10-02/cloud-summary.json) |
+| 2026-10-02 | English -> Ukrainian | Apple M4 Pro, 48 GiB | OpenCode Go MiMo/GLM blocked by the five-hour quota; Zen free MiMo blocked outside OpenCode; partial Azure control archived | [Additional providers and attempt notes](../additional-providers.md) | [Go attempt](2026-10-02/go-195318/results.json), [Zen free attempt](2026-10-02/zen-free-195805/results.json) |
 
 Keep each dated report and raw dataset when adding a new run. Compare the same input set and separate model download, cold startup, warm translation, and complete extension interaction times.
 

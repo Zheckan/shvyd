@@ -25,6 +25,14 @@ DEFAULTS = {
     "COHERE_TRANSLATION_MODEL": "north-small-translate-09-2026",
     "COHERE_FAST_MODEL": "command-r7b-12-2024",
     "GOOGLE_TRANSLATE_ENDPOINT": "https://translation.googleapis.com",
+    "GROQ_API_ENDPOINT": "https://api.groq.com",
+    "GROQ_TRANSLATION_MODEL": "qwen/qwen3.8-27b",
+    "CLOUDFLARE_API_ENDPOINT": "https://api.cloudflare.com",
+    "CLOUDFLARE_TRANSLATION_MODEL": "@cf/meta/m2m100-1.2b",
+    "GEMINI_API_ENDPOINT": "https://generativelanguage.googleapis.com",
+    "GEMINI_TRANSLATION_MODEL": "gemini-3.1-flash-lite",
+    "CEREBRAS_API_ENDPOINT": "https://api.cerebras.ai",
+    "CEREBRAS_TRANSLATION_MODEL": "qwen-3.8-27b",
 }
 
 
@@ -63,6 +71,16 @@ def public_config(values):
                    "model": values["COHERE_TRANSLATION_MODEL"]},
         "google": {"configured": bool(values.get("GOOGLE_TRANSLATE_API_KEY")),
                    "endpoint": values["GOOGLE_TRANSLATE_ENDPOINT"]},
+        **{provider: {"configured": bool(values.get(key)), "endpoint": values[endpoint],
+                      "model": values[model]}
+           for provider, key, endpoint, model in (
+               ("groq", "GROQ_API_KEY", "GROQ_API_ENDPOINT", "GROQ_TRANSLATION_MODEL"),
+               ("gemini", "GEMINI_API_KEY", "GEMINI_API_ENDPOINT", "GEMINI_TRANSLATION_MODEL"),
+               ("cerebras", "CEREBRAS_API_KEY", "CEREBRAS_API_ENDPOINT", "CEREBRAS_TRANSLATION_MODEL"))},
+        "cloudflare": {"configured": bool(values.get("CLOUDFLARE_API_TOKEN") and values.get("CLOUDFLARE_ACCOUNT_ID")),
+                       "endpoint": values["CLOUDFLARE_API_ENDPOINT"], "model": values["CLOUDFLARE_TRANSLATION_MODEL"],
+                       "token_present": bool(values.get("CLOUDFLARE_API_TOKEN")),
+                       "account_id_present": bool(values.get("CLOUDFLARE_ACCOUNT_ID"))},
     }}
 
 
@@ -95,7 +113,7 @@ def summarize(samples):
 def redact(value, config):
     encoded = json.dumps(value, ensure_ascii=False)
     for name, secret in config.items():
-        if name.endswith("_KEY") and secret:
+        if name.endswith(("_KEY", "_TOKEN")) and secret:
             encoded = encoded.replace(secret, "[redacted]")
     return json.loads(encoded)
 
@@ -111,17 +129,40 @@ def stream_event(line):
     return json.loads(payload)
 
 
-def parse_stream(lines):
-    chunks, finish_reason = [], None
+def stream_state():
+    return {"translation": "", "finish_reason": None, "usage": None, "reasoning_characters": 0}
+
+
+def accept_stream_event(state, event, format):
+    visible = ""
+    if event.get("error"):
+        state["stream_error"] = event["error"]
+    if format == "openai":
+        state["usage"] = event.get("usage") or event.get("x_groq", {}).get("usage") or state["usage"]
+        for choice in event.get("choices", []):
+            delta = choice.get("delta", {})
+            visible += delta.get("content") or ""
+            state["reasoning_characters"] += len(delta.get("reasoning_content") or delta.get("reasoning") or "")
+            state["finish_reason"] = choice.get("finish_reason") or state["finish_reason"]
+    elif event.get("type") == "content-delta":
+        visible = event["delta"]["message"]["content"].get("text", "")
+    elif event.get("type") == "message-end":
+        state["finish_reason"] = event.get("delta", {}).get("finish_reason")
+        state["usage"] = event.get("delta", {}).get("usage")
+    elif event.get("type") == "error":
+        state["stream_error"] = event
+    state["translation"] += visible
+    return visible
+
+
+def parse_stream(lines, format="cohere"):
+    state = stream_state()
     for line in lines:
         event = stream_event(line)
         if not event:
             continue
-        if event.get("type") == "content-delta":
-            chunks.append(event["delta"]["message"]["content"].get("text", ""))
-        elif event.get("type") == "message-end":
-            finish_reason = event.get("delta", {}).get("finish_reason")
-    return {"translation": "".join(chunks), "finish_reason": finish_reason}
+        accept_stream_event(state, event, format)
+    return state
 
 
 class Transport:
@@ -420,6 +461,7 @@ def main():
     parser.add_argument("--check", action="store_true", help="Print configuration status, never keys")
     parser.add_argument("--summarize", type=Path, help="Summarize an existing results JSON without network calls")
     parser.add_argument("--parse-stream", type=Path, help="Decode an SSE fixture without network calls")
+    parser.add_argument("--stream-format", choices=("cohere", "openai", "gemini"), default="cohere")
     parser.add_argument("--providers", help="Comma-separated provider names; default is every configured provider")
     parser.add_argument("--variants", help="Comma-separated variant IDs, to run a focused comparison")
     parser.add_argument("--inputs", type=Path, help="JSON array of texts or objects with id, size, and text")
@@ -432,7 +474,7 @@ def main():
         print(json.dumps(summarize(json.loads(args.summarize.read_text())["samples"]), indent=2))
         return
     if args.parse_stream:
-        print(json.dumps(parse_stream(args.parse_stream.read_text().splitlines()), ensure_ascii=False))
+        print(json.dumps(parse_stream(args.parse_stream.read_text().splitlines(), args.stream_format), ensure_ascii=False))
         return
     values = load_env(args.env)
     if args.check:

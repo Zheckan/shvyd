@@ -62,6 +62,8 @@ References: [project setup and billing](https://docs.cloud.google.com/translate/
 
 ## Run or repeat the cloud comparison
 
+Additional candidates, setup links, and the quota-limited OpenCode Go experiment are documented in [additional-providers.md](additional-providers.md). Their reserved key fields are in `.env` and `.env.example`. The four new cloud providers require adapters before the main runner can benchmark them; Go has a separate experimental runner.
+
 ```sh
 python3 scripts/benchmark-cloud.py --check
 python3 scripts/test_benchmark_cloud.py
