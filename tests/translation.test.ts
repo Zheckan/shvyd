@@ -9,7 +9,7 @@ describe("selected-text translation", () => {
       readSettings: async () => ({ ...DEFAULT_SETTINGS, azure: { key: "test-key", region: "" } }),
       fetcher: async (input, init) => {
         requests.push(new Request(input, init));
-        return Response.json([{ detectedLanguage: { language: "en" }, translations: [{ text: "Привіт", language: "uk" }] }]);
+        return Response.json({ value: [{ detectedLanguage: { language: "en" }, translations: [{ text: "Привіт", language: "uk" }] }] });
       },
     });
     const result = await service.translate({ text: "Hello", target: "uk" });
@@ -42,7 +42,7 @@ describe("selected-text translation", () => {
       readSettings: async () => ({ ...DEFAULT_SETTINGS, azure: { key: "test-key", region: "" } }),
       fetcher: async () => {
         calls++;
-        return Response.json([{ translations: [{ text: "Translated" }] }]);
+        return Response.json({ value: [{ translations: [{ text: "Translated" }] }] });
       },
     });
     await service.translate({ text: "Hello", target: "uk" });
