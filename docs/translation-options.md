@@ -69,25 +69,9 @@ Open the popup immediately and populate it when the translation arrives. A small
 
 The next useful validation is the real Helium extension: measure click to visible translation, including worker startup, messaging, network, and rendering. Review Ukrainian outputs on actual reading selections as well. Those results should decide whether the default needs changing.
 
-## Future idea: offline mode? Maybe useful, maybe unnecessary
+## Future ideas
 
-**Status: speculative, outside the first prototype. Its usefulness is unproven. It may be dropped entirely.**
-
-Local translation is extremely fast once ready. In the earlier short-text engine tests, Chrome's native Translator had a 3.10 ms warm median and portable Bergamot in Helium had an 11.40 ms median. Those tests used a different, shorter corpus than the realistic cloud comparison and excluded the extension UI.
-
-The trade-offs are unresolved. Helium's native Translator did not finish initialization within 30 seconds. The tested Bergamot wrapper allocated a 522.625 MiB Wasm heap, which is allocated linear memory rather than a measurement of physical RAM. Its compressed model assets plus runtime were about 29 MB to download. Both tested local engines translated several idioms literally.
-
-Questions before treating offline support as a feature:
-
-- Would we actually use it enough to justify the download and maintenance?
-- Is offline availability or keeping selected text on the device valuable for this use case?
-- Can Helium reliably initialize a native engine for the required language pairs?
-- Can a portable engine produce Ukrainian wording good enough for everyday reading, including idioms and long passages?
-- What memory, battery, and startup cost is acceptable for a lightweight extension?
-- Can model loading and browser worker eviction be handled without making the first translation feel slow?
-- Would a small dedicated translation model be a better fit than a tiny general LLM?
-
-A tiny open-weight browser LLM is a separate speculative option, not something we tested. Roughly 0.5 to 1 billion parameters at four bits imply about 250 to 500 MB of raw weights before runtime buffers and caches. Its Ukrainian quality, actual download size, and responsiveness would depend on the chosen model and implementation. No browser LLM was downloaded or benchmarked.
+Offline mode and a tiny open-weight browser LLM remain speculative, outside the first prototype. Their usefulness is unproven, and they may be dropped entirely. The discussion, local test evidence, and unanswered questions are saved in [future.md](future.md).
 
 ## Evidence
 
