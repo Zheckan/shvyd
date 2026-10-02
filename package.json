@@ -1,0 +1,19 @@
+{
+  "name": "shvyd",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "build": "bun scripts/build.ts",
+    "build:local": "bun scripts/build.ts --local",
+    "dev": "bun scripts/dev.ts",
+    "test": "bun test tests",
+    "typecheck": "tsc --noEmit",
+    "check": "bun run typecheck && bun run test && bun run build"
+  },
+  "devDependencies": {
+    "@types/bun": "^1.4.2",
+    "@types/chrome": "^0.3.4",
+    "typescript": "^7.0.2"
+  }
+}

@@ -1,0 +1,22 @@
+{
+  "manifest_version": 3,
+  "name": "Shvyd",
+  "description": "Select text and translate it in a small popup that fits the page.",
+  "version": "0.1.0",
+  "minimum_chrome_version": "120",
+  "permissions": ["storage"],
+  "host_permissions": [
+    "https://api.cognitive.microsofttranslator.com/*",
+    "https://api-free.deepl.com/*",
+    "https://api.deepl.com/*"
+  ],
+  "background": { "service_worker": "background.js" },
+  "action": { "default_title": "Shvyd settings" },
+  "options_ui": { "page": "options.html", "open_in_tab": true },
+  "content_scripts": [{
+    "matches": ["http://*/*", "https://*/*"],
+    "js": ["content.js"],
+    "run_at": "document_idle",
+    "all_frames": true
+  }]
+}
