@@ -32,7 +32,7 @@ export function parseTranslation(value: unknown): Translation {
 }
 
 function readAzureText(payload: unknown): string {
-  const first = Array.isArray(payload) ? payload[0] : undefined;
+  const first: unknown = isRecord(payload) && Array.isArray(payload.value) ? payload.value[0] : undefined;
   if (!isRecord(first) || !Array.isArray(first.translations)) {
     throw new TranslationError("provider", "Azure returned an unreadable translation.");
   }
