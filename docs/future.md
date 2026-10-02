@@ -1,6 +1,6 @@
 # Future ideas
 
-Updated 2026-10-03. These are ideas we discussed, not committed features. The first prototype stays focused on fast cloud translation of selected text. The current provider recommendation is in [translation-options.md](translation-options.md).
+Updated 2026-10-03. This file records ideas we discussed and their open questions. Speculative items are not committed features. The first prototype stays focused on fast cloud translation of selected text. The current provider recommendation is in [translation-options.md](translation-options.md).
 
 ## Offline mode? Maybe useful, maybe unnecessary
 
@@ -31,3 +31,9 @@ Roughly 0.5 to 1 billion parameters at four bits imply about 250 to 500 MB of ra
 Could a model this small translate Ukrainian well enough? Would it improve on a dedicated local translation engine? Would its first-use download and startup cost fit the lightweight extension we want? Those questions remain unanswered.
 
 See the [model research and browser-LLM opinion](benchmarks/2026-10-02/model-research.md) for the earlier discussion and sources.
+
+## A translation popup that belongs to the page?
+
+The prototype now has a first pass: sample nearby computed styles for fonts, surface and text colors, link accents, borders, corner radius, and shadow. It keeps contrast readable and offers a setting to use a neutral popup instead.
+
+Further adaptation remains an idea with open questions. Can we recognize a page's component style more reliably? What should happen over image or gradient backgrounds? Does matching an unusual font or visual treatment help reading, or get in the way? How well does it work with custom web components and embedded frames? The aim is a quiet translation window, with the translated text taking most of the space.
