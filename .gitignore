@@ -5,3 +5,9 @@
 # Python benchmark bytecode
 __pycache__/
 *.pyc
+
+# Prototype builds and development dependencies
+node_modules/
+dist/
+.preview/
+test-results/

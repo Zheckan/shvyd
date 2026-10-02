@@ -1,0 +1,111 @@
+export const LANGUAGES = [
+  { code: "uk", label: "Українська" },
+  { code: "en", label: "English" },
+  { code: "pl", label: "Polski" },
+  { code: "de", label: "Deutsch" },
+  { code: "fr", label: "Français" },
+  { code: "es", label: "Español" },
+  { code: "it", label: "Italiano" },
+  { code: "pt", label: "Português" },
+  { code: "ja", label: "日本語" },
+] as const;
+
+export type Language = (typeof LANGUAGES)[number]["code"];
+export type Provider = "azure" | "deepl";
+export type Preferences = {
+  provider: Provider;
+  target: Language;
+  adaptToPage: boolean;
+};
+export type Settings = Preferences & {
+  azure: { key: string; region: string };
+  deepl: { key: string; endpoint: "https://api-free.deepl.com" | "https://api.deepl.com" };
+};
+
+export const DEFAULT_SETTINGS: Settings = {
+  provider: "azure",
+  target: "uk",
+  adaptToPage: true,
+  azure: { key: "", region: "" },
+  deepl: { key: "", endpoint: "https://api-free.deepl.com" },
+};
+
+export function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === "object" && value !== null && !Array.isArray(value);
+}
+
+export function isLanguage(value: unknown): value is Language {
+  return LANGUAGES.some(language => language.code === value);
+}
+
+export function isProvider(value: unknown): value is Provider {
+  return value === "azure" || value === "deepl";
+}
+
+export function parsePreferences(value: unknown): Preferences {
+  if (!isRecord(value) || !isProvider(value.provider) || !isLanguage(value.target)
+    || typeof value.adaptToPage !== "boolean") {
+    throw new Error("Invalid translation preferences.");
+  }
+  return { provider: value.provider, target: value.target, adaptToPage: value.adaptToPage };
+}
+
+function credential(value: unknown): string {
+  if (typeof value !== "string" || value.length > 512 || /[\r\n]/.test(value)) {
+    throw new Error("Check the API key. It should be a single line.");
+  }
+  return value.trim();
+}
+
+export function parseSettings(value: unknown): Settings {
+  const preferences = parsePreferences(value);
+  if (!isRecord(value) || !isRecord(value.azure) || !isRecord(value.deepl)) {
+    throw new Error("Invalid provider settings.");
+  }
+  if (typeof value.azure.region !== "string" || !/^[a-z0-9-]{0,64}$/i.test(value.azure.region)) {
+    throw new Error("Check the Azure location code, or leave it empty for Global.");
+  }
+  if (value.deepl.endpoint !== "https://api-free.deepl.com" && value.deepl.endpoint !== "https://api.deepl.com") {
+    throw new Error("Choose an official DeepL endpoint.");
+  }
+  return {
+    ...preferences,
+    azure: {
+      key: credential(value.azure.key),
+      region: value.azure.region.toLowerCase() === "global" ? "" : value.azure.region.toLowerCase(),
+    },
+    deepl: { key: credential(value.deepl.key), endpoint: value.deepl.endpoint },
+  };
+}
+
+export function publicPreferences(settings: Settings): Preferences {
+  return { provider: settings.provider, target: settings.target, adaptToPage: settings.adaptToPage };
+}
+
+export function settingsFromEnv(values: Record<string, string | undefined>): Settings {
+  return parseSettings({
+    ...structuredClone(DEFAULT_SETTINGS),
+    azure: { key: values.AZURE_TRANSLATOR_KEY ?? "", region: values.AZURE_TRANSLATOR_REGION ?? "" },
+    deepl: {
+      key: values.DEEPL_API_KEY ?? "",
+      endpoint: (values.DEEPL_API_ENDPOINT ?? "https://api-free.deepl.com").replace(/\/$/, ""),
+    },
+  });
+}
+
+export function parseEnvFile(text: string): Record<string, string> {
+  const values: Record<string, string> = {};
+  for (const raw of text.split(/\r?\n/)) {
+    const line = raw.trim().replace(/^export\s+/, "");
+    const match = /^([A-Z_][A-Z_0-9]*)\s*=\s*(.*)$/.exec(line);
+    if (!match?.[1] || match[2] === undefined) continue;
+    let value = match[2].trim();
+    if (value.startsWith('"') && value.endsWith('"') || value.startsWith("'") && value.endsWith("'")) {
+      value = value.slice(1, -1);
+    } else {
+      value = value.replace(/\s+#.*$/, "").trim();
+    }
+    values[match[1]] = value;
+  }
+  return values;
+}
