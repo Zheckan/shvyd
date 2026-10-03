@@ -1,0 +1,47 @@
+{
+  "date": "2026-10-03",
+  "method": "T3 collaborative browser computed-style inspection of mounted popup elements",
+  "scope": "Typography only. No completed translation or screenshot verification in this follow-up.",
+  "checks": [
+    {
+      "bubbleFont": "-apple-system, \"system-ui\", \"SF Pro Text\", \"SF Pro Display\", system-ui, sans-serif",
+      "font": "-apple-system, \"system-ui\", \"SF Pro Text\", \"SF Pro Display\", system-ui, sans-serif",
+      "fontSize": "15px",
+      "letterSpacing": "normal",
+      "page": "technical",
+      "passed": true,
+      "ready": true,
+      "sourceFont": "SFMono-Regular, Consolas, \"Liberation Mono\", monospace"
+    },
+    {
+      "bubbleFont": "-apple-system, \"system-ui\", \"SF Pro Text\", \"SF Pro Display\", system-ui, sans-serif",
+      "font": "-apple-system, \"system-ui\", \"SF Pro Text\", \"SF Pro Display\", system-ui, sans-serif",
+      "fontSize": "15px",
+      "letterSpacing": "normal",
+      "page": "editorial",
+      "passed": true,
+      "ready": true,
+      "sourceFont": "Georgia, \"Times New Roman\", serif"
+    },
+    {
+      "bubbleFont": "-apple-system, \"system-ui\", \"SF Pro Text\", \"SF Pro Display\", system-ui, sans-serif",
+      "font": "-apple-system, \"system-ui\", \"SF Pro Text\", \"SF Pro Display\", system-ui, sans-serif",
+      "fontSize": "15px",
+      "letterSpacing": "normal",
+      "page": "journal",
+      "passed": true,
+      "ready": true,
+      "sourceFont": "Arial, sans-serif"
+    },
+    {
+      "bubbleFont": "-apple-system, \"system-ui\", \"SF Pro Text\", \"SF Pro Display\", system-ui, sans-serif",
+      "font": "-apple-system, \"system-ui\", \"SF Pro Text\", \"SF Pro Display\", system-ui, sans-serif",
+      "fontSize": "15px",
+      "letterSpacing": "normal",
+      "page": "warm",
+      "passed": true,
+      "ready": true,
+      "sourceFont": "\"Avenir Next\", \"Segoe UI\", sans-serif"
+    }
+  ]
+}

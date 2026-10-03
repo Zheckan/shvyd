@@ -34,6 +34,6 @@ See the [model research and browser-LLM opinion](benchmarks/2026-10-02/model-res
 
 ## A translation popup that belongs to the page?
 
-The prototype now has a first pass: sample nearby computed styles for fonts, surface and text colors, link accents, borders, corner radius, and shadow. It keeps contrast readable and offers a setting to use a neutral popup instead.
+The prototype now samples nearby computed styles for surface and text colors, link accents, borders, corner radius, and shadow. Typography stays consistent: SF Pro / the native system font, fixed text size, and normal letter spacing. It keeps contrast readable and offers a setting to use a neutral popup instead.
 
-Further adaptation remains an idea with open questions. Can we recognize a page's component style more reliably? What should happen over image or gradient backgrounds? Does matching an unusual font or visual treatment help reading, or get in the way? How well does it work with custom web components and embedded frames? The aim is a quiet translation window, with the translated text taking most of the space.
+Further adaptation remains an idea with open questions. Can we recognize a page's component style more reliably? What should happen over image or gradient backgrounds? Does matching an unusual visual treatment help reading, or get in the way? How well does it work with custom web components and embedded frames? The aim is a quiet translation window, with the translated text taking most of the space.

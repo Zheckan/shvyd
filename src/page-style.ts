@@ -6,9 +6,6 @@ export type PageStyle = {
   foreground: string;
   accent: string;
   border: string;
-  font: string;
-  fontSize: string;
-  letterSpacing: string;
   radius: string;
   shadow: string;
 };
@@ -76,9 +73,6 @@ export function samplePageStyle(element: Element, adapt: boolean): PageStyle {
   const shadow = adapt ? ancestors.find(style => style.boxShadow !== "none")?.boxShadow : undefined;
   return {
     background: css(background), foreground: css(foreground), accent: css(accent), border: css(border),
-    font: adapt ? `${source.fontFamily}, system-ui, sans-serif` : "system-ui, sans-serif",
-    fontSize: `${adapt ? Math.max(14, Math.min(18, parseFloat(source.fontSize) || 16)) : 15}px`,
-    letterSpacing: adapt && source.letterSpacing !== "normal" ? `${Math.max(-0.3, Math.min(0.8, parseFloat(source.letterSpacing) || 0))}px` : "normal",
     radius: adapt ? `${rounding ? Math.min(20, parseFloat(rounding.borderTopLeftRadius)) : 4}px` : "12px",
     shadow: shadow ?? `0 8px 30px rgba(0, 0, 0, ${dark ? 0.32 : 0.12})`,
   };
