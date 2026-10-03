@@ -16,7 +16,7 @@ const store = createSettingsStore({
   seed: async () => settingsFromEnv(Bun.env),
 });
 const translator = createTranslationService({ readSettings: store.settings });
-const styles = new Set(["editorial", "technical", "journal", "warm"]);
+const styles = new Set(["editorial", "technical", "journal", "warm", "forest", "contrast", "neon", "gradient"]);
 const server = Bun.serve({
   hostname: "127.0.0.1", port: 5173,
   async fetch(request) {
@@ -50,11 +50,12 @@ const server = Bun.serve({
     }
     if (url.pathname === "/demo.js") return new Response(Bun.file(resolve(root, ".preview/demo.js")), { headers: { "Content-Type": "application/javascript" } });
     if (url.pathname === "/demo.css") return new Response(Bun.file(resolve(root, "demo/demo.css")));
+    if (url.pathname === "/playground.js") return new Response(Bun.file(resolve(root, "demo/playground.js")), { headers: { "Content-Type": "application/javascript" } });
     if (url.pathname === "/favicon.ico") return new Response(null, { status: 204 });
-    if (url.pathname !== "/" && url.pathname !== "/fixture") return new Response("Not found", { status: 404 });
+    if (url.pathname !== "/" && url.pathname !== "/fixture" && url.pathname !== "/test-page.html") return new Response("Not found", { status: 404 });
     const style = url.searchParams.get("style") ?? "editorial";
-    let html = (await Bun.file(resolve(root, "demo/index.html")).text()).replace('data-style="editorial"', `data-style="${styles.has(style) ? style : "editorial"}"`);
-    if (url.pathname === "/fixture") html = html.replace('<script src="/demo.js" defer></script>', "");
+    let html = (await Bun.file(resolve(root, "demo/test-page.html")).text()).replace('data-style="editorial"', `data-style="${styles.has(style) ? style : "editorial"}"`);
+    if (url.pathname === "/") html = html.replace("</body>", '<script src="/demo.js" defer></script></body>');
     return new Response(html, { headers: { "Content-Type": "text/html; charset=utf-8" } });
   },
 });
