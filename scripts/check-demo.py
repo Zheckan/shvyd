@@ -53,8 +53,8 @@ with tempfile.TemporaryDirectory(prefix='shvyd-demo-') as profile:
             assert not value['error']
             return value
 
-        def select():
-            page.evaluate("(() => {const p=document.getElementById('sample-text');p.scrollIntoView({block:'center'});const r=document.createRange();r.selectNodeContents(p);const s=getSelection();s.removeAllRanges();s.addRange(r);})()")
+        def select(passage='sample-text', range_expression=None):
+            page.evaluate("(() => {const p=document.getElementById(PASSAGE);p.scrollIntoView({block:'center'});const r=document.createRange();RANGE;const s=getSelection();s.removeAllRanges();s.addRange(r);})()".replace('PASSAGE',json.dumps(passage)).replace('RANGE',range_expression or 'r.selectNodeContents(p)'))
             wait_for(lambda:page.evaluate("!document.getElementById('shvyd-root').shadowRoot.querySelector('.bubble').hidden"),'demo selection button')
             click('.bubble', True)
 
@@ -92,6 +92,65 @@ with tempfile.TemporaryDirectory(prefix='shvyd-demo-') as profile:
         checks.append({'check':'demo-additional-language-search','passed':True})
         screenshot=page.call('Page.captureScreenshot',{'format':'png'})
         (output/'search-menu.png').write_bytes(base64.b64decode(screenshot['data']))
+
+        # Controlled provider responses exercise the public popup without sending attack fixtures to a cloud API.
+        page.evaluate("""(() => {
+          window.shvydTestRequests=[];window.shvydTestReply=null;window.shvydExecuted=0;
+          const original=window.fetch.bind(window);window.shvydOriginalFetch=original;
+          window.fetch=async (input,init) => {
+            if (input==='/api' && init?.body) {
+              const value=JSON.parse(init.body);
+              if(value.kind==='translate') {
+                window.shvydTestRequests.push(value);
+                return Response.json({ok:true,data:{text:window.shvydTestReply ?? value.text,format:value.format ?? 'plain',
+                  target:value.target,provider:value.provider,cached:false,durationMs:0}});
+              }
+            }
+            return original(input,init);
+          };
+          const section=document.createElement('section');section.id='partial-paragraphs';
+          section.innerHTML='<p class="source-class" style="font-family:serif" onclick="window.shvydExecuted++">OUTSIDE_START Keep <strong>this</strong><span hidden>HIDDEN_SENTINEL</span> paragraph.</p><p data-private="source-attribute">Second <em>paragraph</em>. OUTSIDE_END</p>';
+          document.querySelector('article').append(section);
+        })()""")
+        click('button[aria-label="Close translation"]',True)
+        select('partial-paragraphs', "r.setStart(p.firstChild.firstChild,14);r.setEnd(p.lastChild.lastChild,1)")
+        complete('uk')
+        request=page.evaluate('window.shvydTestRequests.at(-1)')
+        assert request['format']=='html'
+        assert all(marker not in request['text'] for marker in ['OUTSIDE_START','OUTSIDE_END','HIDDEN_SENTINEL','source-class','style=','onclick=','data-private=']),request['text']
+        assert page.evaluate("document.getElementById('shvyd-root').shadowRoot.querySelectorAll('.translation p').length")==2
+        assert page.evaluate("document.getElementById('shvyd-root').shadowRoot.querySelector('.translation').textContent")=="Keep this paragraph.Second paragraph."
+        checks.append({'check':'partial-selection-only-with-paragraph-boundaries','passed':True,'controlledResponse':True})
+
+        page.evaluate("""(() => {const section=document.createElement('section');section.id='css-paragraphs';section.innerHTML='<span style="display:block">First CSS paragraph.</span><span style="display:block">Second CSS paragraph.</span>';document.querySelector('article').append(section);})()""")
+        click('button[aria-label="Close translation"]',True)
+        select('css-paragraphs')
+        complete('uk')
+        request=page.evaluate('window.shvydTestRequests.at(-1)')
+        assert '<div>First CSS paragraph.</div>' in request['text'] and '<div>Second CSS paragraph.</div>' in request['text']
+        checks.append({'check':'css-block-paragraph-boundaries','passed':True,'controlledResponse':True})
+
+        page.evaluate("""window.shvydTestReply='<div id="evil" onclick="window.shvydExecuted++" style="font-family:serif"><p>Safe <strong onclick="window.shvydExecuted++">paragraph</strong>.</p><ul><li>First item</li><li>Second item</li></ul><table><tr><td>A</td><td>B</td></tr></table><img src="/shvyd-security-probe" onerror="window.shvydExecuted++"><iframe src="/shvyd-security-probe"></iframe><svg onload="window.shvydExecuted++"></svg><script>window.shvydExecuted++</script><a href="javascript:window.shvydExecuted++">Readable link text</a></div>';Object.defineProperty(navigator,'clipboard',{configurable:true,value:{writeText:async text=>{window.shvydCopiedText=text;}}});""")
+        click('button[aria-label="Close translation"]',True)
+        select('formatted-text')
+        complete('uk')
+        assert page.evaluate("""(() => {const o=document.getElementById('shvyd-root').shadowRoot.querySelector('.translation');return !o.querySelector('img,iframe,svg,script,a') && !o.querySelector('[onclick],[onerror],[onload],[style],[href],[id]') && window.shvydExecuted===0 && !performance.getEntriesByType('resource').some(e=>e.name.includes('shvyd-security-probe'));})()""")
+        checks.append({'check':'provider-html-has-no-active-content-or-page-attributes','passed':True,'controlledResponse':True})
+        click('button[aria-label="Copy translation"]',True)
+        wait_for(lambda:page.evaluate("typeof window.shvydCopiedText==='string'"),'formatted clipboard result')
+        copied=page.evaluate('window.shvydCopiedText')
+        assert 'Safe paragraph.\n\n• First item\n• Second item\n\nA\tB' in copied,copied
+        assert '<' not in copied and 'shvydExecuted' not in copied
+        checks.append({'check':'copy-preserves-paragraphs-list-markers-and-table-columns','passed':True,'controlledResponse':True})
+
+        page.evaluate("window.shvydTestReply=null;const p=document.createElement('p');p.id='oversized-markup';p.innerHTML='<strong>x</strong>'.repeat(1200);document.querySelector('article').append(p);")
+        click('button[aria-label="Close translation"]',True)
+        select('oversized-markup')
+        complete('uk')
+        request=page.evaluate('window.shvydTestRequests.at(-1)')
+        assert request['format']=='plain' and request['text']=='x'*1200
+        checks.append({'check':'excessive-markup-falls-back-to-bounded-plain-text','passed':True,'controlledResponse':True})
+        page.evaluate('window.fetch=window.shvydOriginalFetch')
         (output/'results.json').write_text(json.dumps({'passed':True,'browser':'Helium','isolatedProfile':True,'extensionLoaded':False,'checks':checks},ensure_ascii=False,indent=2))
         print(json.dumps({'passed':True,'checks':len(checks)}))
     finally:

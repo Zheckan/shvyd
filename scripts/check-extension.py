@@ -194,6 +194,25 @@ def main():
             record('azure-preserved-paragraphs-and-lists', {**value, **structure})
             screenshot('formatted-paragraphs')
 
+            value = translate_selection('structured-text', 'uk')
+            structure = page.evaluate("""(() => {const o=document.getElementById('shvyd-root').shadowRoot.querySelector('.translation');return {
+              rows:o.querySelectorAll('tr').length, cells:o.querySelectorAll('th,td').length,
+              codePreserved:o.querySelector('pre code')?.textContent===document.getElementById('code-text').textContent};})()""")
+            assert structure == {'rows':3,'cells':6,'codePreserved':True}, structure
+            record('azure-preserved-table-and-code', {**value, **structure})
+            screenshot('formatted-table')
+
+            page.evaluate("document.querySelector('#table-text tbody td:last-child').id='partial-cell'")
+            value = translate_selection('partial-cell', 'uk')
+            assert page.evaluate("document.getElementById('shvyd-root').shadowRoot.querySelectorAll('.translation td').length") == 1
+            record('partial-table-cell-selection', value)
+
+            page.evaluate("document.querySelector('#formatted-text ol li:last-child').id='fourth-item'")
+            value = translate_selection('fourth-item', 'uk')
+            assert page.evaluate("document.getElementById('shvyd-root').shadowRoot.querySelector('.translation ol').getAttribute('start')") == '4'
+            assert page.evaluate("document.getElementById('shvyd-root').shadowRoot.querySelectorAll('.translation li').length") == 1
+            record('partial-list-retains-numbering', value)
+
             choose_language('pl')
             navigate('journal')
             value = translate_selection(target='pl')
@@ -237,6 +256,7 @@ def main():
             record('escape-closes-language-menu-first', {'passed': True})
 
             value = translate_selection('long-text', 'uk')
+            assert page.evaluate("document.getElementById('shvyd-root').shadowRoot.querySelectorAll('.translation p').length") == 4
             record('long-selection-viewport', value)
             screenshot('long-translation')
             value = translate_selection('contrast-text', 'uk')
@@ -252,6 +272,11 @@ def main():
             navigate('warm')
             value = translate_selection(target='uk')
             record('deepl-direct-request', value)
+            value = translate_selection('formatted-text', 'uk')
+            assert page.evaluate("document.getElementById('shvyd-root').shadowRoot.querySelectorAll('.translation p').length") == 3
+            assert page.evaluate("document.getElementById('shvyd-root').shadowRoot.querySelectorAll('.translation li').length") == 5
+            record('deepl-preserved-paragraphs-and-lists', value)
+            screenshot('deepl-formatted-paragraphs')
             record('deepl-expanded-target-hindi', choose_language('hi', 'Hindi'))
 
             options()

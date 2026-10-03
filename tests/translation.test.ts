@@ -1,6 +1,6 @@
 import { describe, expect, test } from "bun:test";
 import { DEFAULT_SETTINGS } from "../src/settings";
-import { createTranslationService } from "../src/translation";
+import { createTranslationService, parseTranslation, parseTranslationRequest } from "../src/translation";
 
 describe("selected-text translation", () => {
   test("rejects a target unavailable with the provider before sending selected text", async () => {
@@ -114,5 +114,25 @@ describe("selected-text translation", () => {
     await expect(service.translate({ text: "Hello", target: "uk" })).rejects.toMatchObject({
       code: "authentication", message: "The API key was rejected. Check Shvyd settings.",
     });
+  });
+
+  test("keeps literal angle brackets separate from cached formatted translations", async () => {
+    let calls = 0;
+    const service = createTranslationService({
+      readSettings: async () => ({ ...DEFAULT_SETTINGS, azure: { key: "test-key", region: "" } }),
+      fetcher: async () => { calls++; return Response.json({ value: [{ translations: [{ text: "<p>Привіт</p>" }] }] }); },
+    });
+    const request = { text: "<p>Hello</p>", target: "uk" };
+    expect(await service.translate(request)).toMatchObject({ format: "plain", cached: false });
+    expect(await service.translate({ ...request, format: "html" })).toMatchObject({ format: "html", cached: false });
+    expect(await service.translate({ ...request, format: "html" })).toMatchObject({ format: "html", cached: true });
+    expect(calls).toBe(2);
+  });
+
+  test("validates formatting at message boundaries and accepts older plain-text responses", () => {
+    expect(parseTranslationRequest({ text: "Hello", target: "uk" }).format).toBe("plain");
+    expect(() => parseTranslationRequest({ text: "Hello", target: "uk", format: "markdown" })).toThrow();
+    expect(() => parseTranslation({ text: "Hello", target: "uk", provider: "azure", cached: false, durationMs: 1, format: "markdown" })).toThrow();
+    expect(parseTranslation({ text: "Hello", target: "uk", provider: "azure", cached: false, durationMs: 1 }).format).toBe("plain");
   });
 });
