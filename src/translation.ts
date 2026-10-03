@@ -2,14 +2,16 @@ import { isLanguage, isProvider, isRecord, type Language, type Provider, type Se
 import { getLanguage } from "./languages";
 
 export const MAX_SELECTION_LENGTH = 10_000;
+export type TranslationFormat = "plain" | "html";
 export type Translation = {
   text: string;
+  format: TranslationFormat;
   target: Language;
   provider: Provider;
   cached: boolean;
   durationMs: number;
 };
-export type TranslationRequest = { text: string; target: Language; provider?: Provider };
+export type TranslationRequest = { text: string; format?: TranslationFormat; target: Language; provider?: Provider };
 export type Fetcher = (url: string, init: RequestInit) => Promise<Response>;
 export type ErrorCode = "selection" | "configuration" | "authentication" | "quota" | "network" | "provider";
 
@@ -20,14 +22,28 @@ export class TranslationError extends Error {
   }
 }
 
+function isTranslationFormat(value: unknown): value is TranslationFormat {
+  return value === "plain" || value === "html";
+}
+
+export function parseTranslationRequest(value: unknown): TranslationRequest {
+  if (!isRecord(value) || typeof value.text !== "string" || !isLanguage(value.target)
+    || value.provider !== undefined && !isProvider(value.provider)
+    || value.format !== undefined && !isTranslationFormat(value.format)) {
+    throw new TranslationError("selection", "Choose some text and a target language.");
+  }
+  return { text: value.text, format: value.format ?? "plain", target: value.target, provider: value.provider };
+}
+
 export function parseTranslation(value: unknown): Translation {
   if (!isRecord(value) || typeof value.text !== "string" || !isLanguage(value.target)
     || !isProvider(value.provider) || typeof value.cached !== "boolean"
-    || typeof value.durationMs !== "number" || !Number.isFinite(value.durationMs)) {
+    || typeof value.durationMs !== "number" || !Number.isFinite(value.durationMs)
+    || value.format !== undefined && !isTranslationFormat(value.format)) {
     throw new TranslationError("provider", "The translation response could not be read.");
   }
   return {
-    text: value.text, target: value.target, provider: value.provider,
+    text: value.text, format: value.format ?? "plain", target: value.target, provider: value.provider,
     cached: value.cached, durationMs: value.durationMs,
   };
 }
@@ -58,7 +74,8 @@ export function createTranslationService({ readSettings, fetcher = fetch }: {
 }) {
   const cache = new Map<string, Translation>();
   async function translate(request: TranslationRequest): Promise<Translation> {
-    if (!isLanguage(request.target) || typeof request.text !== "string"
+    const format = request.format ?? "plain";
+    if (!isLanguage(request.target) || typeof request.text !== "string" || !isTranslationFormat(format)
       || !request.text.trim() || request.text.length > MAX_SELECTION_LENGTH) {
       throw new TranslationError("selection", "Select between 1 and 10,000 characters to translate.");
     }
@@ -71,7 +88,7 @@ export function createTranslationService({ readSettings, fetcher = fetch }: {
       throw new TranslationError("configuration", "Add your provider API key in Shvyd settings.");
     }
     const text = request.text.trim();
-    const cacheKey = JSON.stringify([provider, request.target, text]);
+    const cacheKey = JSON.stringify([provider, request.target, format, text]);
     const cached = cache.get(cacheKey);
     if (cached) {
       cache.delete(cacheKey);
@@ -85,11 +102,14 @@ export function createTranslationService({ readSettings, fetcher = fetch }: {
       url = "https://api.cognitive.microsofttranslator.com/translate?api-version=2026-06-06";
       headers["Ocp-Apim-Subscription-Key"] = settings.azure.key;
       if (settings.azure.region) headers["Ocp-Apim-Subscription-Region"] = settings.azure.region;
-      body = { inputs: [{ text, targets: [{ language: providerTarget }] }] };
+      body = { inputs: [{ text, ...(format === "html" ? { textType: "html" } : {}), targets: [{ language: providerTarget }] }] };
     } else {
       url = `${settings.deepl.endpoint}/v2/translate`;
       headers.Authorization = `DeepL-Auth-Key ${settings.deepl.key}`;
-      body = { text: [text], target_lang: providerTarget.toUpperCase(), model_type: "latency_optimized" };
+      body = {
+        text: [text], target_lang: providerTarget.toUpperCase(), model_type: "latency_optimized",
+        ...(format === "html" ? { tag_handling: "html", tag_handling_version: "v1" } : {}),
+      };
     }
     const started = performance.now();
     let response: Response;
@@ -113,7 +133,7 @@ export function createTranslationService({ readSettings, fetcher = fetch }: {
     catch { throw new TranslationError("provider", "The provider returned an unreadable response. Try again."); }
     const result: Translation = {
       text: provider === "azure" ? readAzureText(payload) : readDeepLText(payload),
-      provider, target: request.target,
+      format, provider, target: request.target,
       cached: false, durationMs: Math.round(performance.now() - started),
     };
     cache.set(cacheKey, result);

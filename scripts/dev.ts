@@ -1,7 +1,7 @@
 import { resolve } from "node:path";
-import { isLanguage, isProvider, isRecord, settingsFromEnv, type Settings } from "../src/settings";
+import { isRecord, settingsFromEnv, type Settings } from "../src/settings";
 import { createSettingsStore } from "../src/settings-store";
-import { createTranslationService, TranslationError } from "../src/translation";
+import { createTranslationService, parseTranslationRequest, TranslationError } from "../src/translation";
 
 const root = resolve(import.meta.dir, "..");
 const result = await Bun.build({
@@ -36,9 +36,7 @@ const server = Bun.serve({
           case "preferences": data = await store.preferences(); break;
           case "update-preferences": data = await store.updatePreferences(value.value); break;
           case "translate":
-            if (typeof value.text !== "string" || !isLanguage(value.target)
-              || value.provider !== undefined && !isProvider(value.provider)) throw new Error("Invalid translation request.");
-            data = await translator.translate({ text: value.text, target: value.target, provider: value.provider });
+            data = await translator.translate(parseTranslationRequest(value));
             break;
           case "open-settings": data = null; break;
           default: throw new Error("Use the extension's settings page to manage keys.");

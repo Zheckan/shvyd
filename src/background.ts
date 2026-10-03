@@ -1,6 +1,6 @@
-import { DEFAULT_SETTINGS, isLanguage, isProvider, isRecord } from "./settings";
+import { DEFAULT_SETTINGS, isRecord } from "./settings";
 import { createSettingsStore } from "./settings-store";
-import { createTranslationService, TranslationError } from "./translation";
+import { createTranslationService, parseTranslationRequest, TranslationError } from "./translation";
 
 const ready = chrome.storage.local.setAccessLevel({ accessLevel: "TRUSTED_CONTEXTS" });
 const store = createSettingsStore({
@@ -25,11 +25,7 @@ async function handle(value: unknown, sender: chrome.runtime.MessageSender): Pro
     case "preferences": return store.preferences();
     case "update-preferences": return store.updatePreferences(value.value);
     case "translate":
-      if (typeof value.text !== "string" || !isLanguage(value.target)
-        || value.provider !== undefined && !isProvider(value.provider)) {
-        throw new TranslationError("selection", "Choose some text and a target language.");
-      }
-      return translator.translate({ text: value.text, target: value.target, provider: value.provider });
+      return translator.translate(parseTranslationRequest(value));
     case "open-settings": await chrome.runtime.openOptionsPage(); return null;
     case "get-settings":
     case "save-settings": {
