@@ -40,6 +40,23 @@ describe("selected-text translation", () => {
     expect(await request?.json()).toEqual({ inputs: [{ text: "Hello", targets: [{ language: "uk" }] }] });
   });
 
+  test("preserves selected paragraph markup in one Azure request", async () => {
+    const requests: Request[] = [];
+    const service = createTranslationService({
+      readSettings: async () => ({ ...DEFAULT_SETTINGS, azure: { key: "test-key", region: "" } }),
+      fetcher: async (input, init) => {
+        requests.push(new Request(input, init));
+        return Response.json({ value: [{ translations: [{ text: "<div><p>Привіт.</p><p>Другий абзац.</p></div>" }] }] });
+      },
+    });
+    const text = "<div><p>Hello.</p><p>Second paragraph.</p></div>";
+    expect(await service.translate({ text, format: "html", target: "uk" })).toMatchObject({
+      text: "<div><p>Привіт.</p><p>Другий абзац.</p></div>", format: "html",
+    });
+    expect(requests).toHaveLength(1);
+    expect(await requests[0]?.json()).toEqual({ inputs: [{ text, textType: "html", targets: [{ language: "uk" }] }] });
+  });
+
   test("can use DeepL speed mode without a separate language-detection request", async () => {
     const requests: Request[] = [];
     const service = createTranslationService({
@@ -55,6 +72,23 @@ describe("selected-text translation", () => {
     expect(requests).toHaveLength(1);
     expect(requests[0]?.url).toBe("https://api-free.deepl.com/v2/translate");
     expect(await requests[0]?.json()).toEqual({ text: ["I am feeling blue."], target_lang: "UK", model_type: "latency_optimized" });
+  });
+
+  test("preserves HTML lists with DeepL while keeping its speed model", async () => {
+    const requests: Request[] = [];
+    const service = createTranslationService({
+      readSettings: async () => ({ ...DEFAULT_SETTINGS, provider: "deepl", deepl: { key: "test-key", endpoint: "https://api-free.deepl.com" } }),
+      fetcher: async (input, init) => {
+        requests.push(new Request(input, init));
+        return Response.json({ translations: [{ text: "<div><ul><li>Привіт.</li></ul></div>" }] });
+      },
+    });
+    const text = "<div><ul><li>Hello.</li></ul></div>";
+    expect(await service.translate({ text, format: "html", target: "uk" })).toMatchObject({ format: "html" });
+    expect(requests).toHaveLength(1);
+    expect(await requests[0]?.json()).toEqual({
+      text: [text], target_lang: "UK", model_type: "latency_optimized", tag_handling: "html", tag_handling_version: "v1",
+    });
   });
 
   test("reuses a selection only for the same provider and target language", async () => {
