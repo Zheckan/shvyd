@@ -14,7 +14,7 @@
   "action": { "default_title": "Shvyd settings" },
   "options_ui": { "page": "options.html", "open_in_tab": true },
   "content_scripts": [{
-    "matches": ["http://*/*", "https://*/*"],
+    "matches": ["http://*/*", "https://*/*", "file:///*"],
     "js": ["content.js"],
     "run_at": "document_idle",
     "all_frames": true

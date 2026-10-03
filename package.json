@@ -6,6 +6,7 @@
   "scripts": {
     "build": "bun scripts/build.ts",
     "build:local": "bun scripts/build.ts --local",
+    "build:playground": "node scripts/build-playground.mjs",
     "dev": "bun scripts/dev.ts",
     "test": "bun test tests",
     "typecheck": "tsc --noEmit",
