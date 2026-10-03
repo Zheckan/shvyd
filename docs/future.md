@@ -36,4 +36,6 @@ See the [model research and browser-LLM opinion](benchmarks/2026-10-02/model-res
 
 The prototype now samples nearby computed styles for surface and text colors, link accents, borders, corner radius, and shadow. Typography stays consistent: SF Pro / the native system font, fixed text size, and normal letter spacing. It keeps contrast readable and offers a setting to use a neutral popup instead.
 
+The [HTML playground](../demo/test-page.html) now includes eight page styles, nested cards, faint text, gradient and translucent backgrounds, mixed scripts, long passages, tables, code, and scroll containers. The current language settings include preferred languages, a searchable full provider list, and remembered or fixed starting targets. These are implemented; offline support remains speculative.
+
 Further adaptation remains an idea with open questions. Can we recognize a page's component style more reliably? What should happen over image or gradient backgrounds? Does matching an unusual visual treatment help reading, or get in the way? How well does it work with custom web components and embedded frames? The aim is a quiet translation window, with the translated text taking most of the space.
