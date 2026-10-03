@@ -132,10 +132,15 @@ def main():
                 return value
 
             def choose_language(code, search=None):
+                before=page.evaluate("document.getElementById('shvyd-root').shadowRoot.querySelector('.panel').getBoundingClientRect().toJSON()")
                 click('.target')
+                after=page.evaluate("document.getElementById('shvyd-root').shadowRoot.querySelector('.panel').getBoundingClientRect().toJSON()")
+                assert all(abs(before[key]-after[key])<1 for key in ['x','y','width','height']), 'Opening languages moved the translation.'
                 if search:
                     click('.more-languages')
                     page.evaluate("(() => {const s=document.getElementById('shvyd-root').shadowRoot.querySelector('.language-search');s.value=QUERY;s.dispatchEvent(new Event('input'));})()".replace('QUERY', json.dumps(search)))
+                    after=page.evaluate("document.getElementById('shvyd-root').shadowRoot.querySelector('.panel').getBoundingClientRect().toJSON()")
+                    assert all(abs(before[key]-after[key])<1 for key in ['x','y','width','height']), 'Searching languages moved the translation.'
                     selector = f'.language-menu > div:last-child button[data-language="{code}"]'
                 else:
                     selector = f'.language-menu button[data-language="{code}"]'
@@ -240,6 +245,40 @@ def main():
             record('additional-language-search', completed('zh-hant'))
             navigate('warm')
             record('fixed-default-reset-on-navigation', translate_selection(target='uk'))
+
+            def menu_placement():
+                return page.evaluate("""(() => {
+                  const r=document.getElementById('shvyd-root').shadowRoot,m=r.querySelector('.language-menu'),a=r.querySelector('.target');
+                  const b=m.getBoundingClientRect(),anchor=a.getBoundingClientRect();
+                  const gap=Math.min(Math.abs(b.top-anchor.bottom),Math.abs(anchor.top-b.bottom));
+                  return {visible:!m.hidden,fitsViewport:b.left>=11&&b.top>=11&&b.right<=innerWidth-11&&b.bottom<=innerHeight-11,
+                    anchored:Math.abs(gap-6)<=1,scrollable:m.scrollHeight>m.clientHeight};
+                })()""")
+
+            def ready_menu():
+                value=menu_placement()
+                return value if all(value[key] for key in ['visible','fitsViewport','anchored']) else None
+
+            click('.target')
+            click('.more-languages')
+            screenshot('language-popover-desktop')
+            for width,height in [(390,520),(320,240),(1280,900)]:
+                page.call('Emulation.setDeviceMetricsOverride', {'width':width,'height':height,'deviceScaleFactor':1,'mobile':False})
+                try:
+                    value=wait_for(ready_menu, 'language menu placement after resize')
+                except Exception:
+                    print(json.dumps({'failedViewport':[width,height],'placement':menu_placement()}),flush=True)
+                    raise
+                if height==240:
+                    assert value['scrollable'], 'A short viewport must keep the menu scrollable.'
+                    page.evaluate("document.getElementById('shvyd-root').shadowRoot.querySelector('.language-menu').scrollTop=1000")
+                    assert page.evaluate("document.getElementById('shvyd-root').shadowRoot.querySelector('.language-menu').scrollTop>0")
+                    screenshot('language-popover-short-viewport')
+                record(f'language-popover-resize-{width}x{height}',value)
+            time.sleep(.1)
+            page.evaluate('window.scrollBy(0,40)')
+            wait_for(lambda:page.evaluate("document.getElementById('shvyd-root').shadowRoot.querySelector('.panel').hidden && document.getElementById('shvyd-root').shadowRoot.querySelector('.language-menu').hidden"), 'page scroll dismisses both popups')
+            record('page-scroll-still-dismisses-language-and-translation',{'passed':True})
 
             options()
             assert page.evaluate("[...document.querySelectorAll('.favorite-list input:checked')].map(x=>x.value).sort().join(',')") == 'ar,pl,uk'

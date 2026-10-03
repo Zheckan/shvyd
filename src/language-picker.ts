@@ -3,20 +3,20 @@ import type { Language, Preferences } from './settings'
 
 export function createLanguagePicker({
   onSelect,
-  onResize,
 }: {
   onSelect: (code: Language) => void
-  onResize: () => void
 }) {
   const button = document.createElement('button')
   button.type = 'button'
   button.className = 'target'
-  button.setAttribute('aria-haspopup', 'listbox')
+  button.setAttribute('aria-haspopup', 'dialog')
   button.setAttribute('aria-expanded', 'false')
   button.setAttribute('aria-controls', 'shvyd-language-menu')
   const menu = document.createElement('div')
   menu.className = 'language-menu'
   menu.id = 'shvyd-language-menu'
+  menu.setAttribute('role', 'dialog')
+  menu.setAttribute('aria-label', 'Translation languages')
   menu.hidden = true
   const preferred = document.createElement('div')
   preferred.className = 'language-list'
@@ -42,12 +42,33 @@ export function createLanguagePicker({
   menu.append(preferred, more, expanded)
   let current: { preferences: Preferences; target: Language } | undefined
 
+  function position(): void {
+    if (menu.hidden) return
+    const margin = 12
+    const gap = 6
+    const anchor = button.getBoundingClientRect()
+    // Measure the full menu again after search, expansion, or viewport changes.
+    menu.style.maxHeight = ''
+    const below = Math.max(0, window.innerHeight - anchor.bottom - gap - margin)
+    const above = Math.max(0, anchor.top - gap - margin)
+    const openBelow = below >= menu.offsetHeight || below >= above
+    menu.style.maxHeight = `${openBelow ? below : above}px`
+    const x = Math.max(
+      margin,
+      Math.min(anchor.left, window.innerWidth - menu.offsetWidth - margin)
+    )
+    const y = openBelow
+      ? anchor.bottom + gap
+      : anchor.top - menu.offsetHeight - gap
+    menu.style.left = `${x}px`
+    menu.style.top = `${Math.max(margin, Math.min(y, window.innerHeight - menu.offsetHeight - margin))}px`
+  }
+
   function close(): void {
     menu.hidden = true
     expanded.hidden = true
     button.setAttribute('aria-expanded', 'false')
     more.setAttribute('aria-expanded', 'false')
-    onResize()
   }
   function option(code: Language): HTMLButtonElement {
     const item = document.createElement('button')
@@ -76,7 +97,7 @@ export function createLanguagePicker({
       ...matches.map((language) => option(language.code))
     )
     if (!matches.length) additional.textContent = 'No matching languages.'
-    onResize()
+    position()
   }
   function update(value: { preferences: Preferences; target: Language }): void {
     current = value
@@ -98,6 +119,7 @@ export function createLanguagePicker({
     search.value = ''
     if (!value.preferences.showOtherLanguages) expanded.hidden = true
     if (!expanded.hidden) renderAdditional()
+    position()
   }
   button.addEventListener('click', () => {
     if (!menu.hidden) {
@@ -106,8 +128,8 @@ export function createLanguagePicker({
     }
     menu.hidden = false
     button.setAttribute('aria-expanded', 'true')
-    onResize()
-    preferred.querySelector<HTMLButtonElement>('button')?.focus()
+    position()
+    preferred.querySelector<HTMLButtonElement>('[aria-selected=true]')?.focus()
   })
   more.addEventListener('click', () => {
     expanded.hidden = !expanded.hidden
@@ -116,7 +138,7 @@ export function createLanguagePicker({
       renderAdditional()
       search.focus()
     }
-    onResize()
+    position()
   })
   search.addEventListener('input', renderAdditional)
   menu.addEventListener('keydown', (event) => {
@@ -149,5 +171,5 @@ export function createLanguagePicker({
             : (index - 1 + options.length) % options.length
     options[next]?.focus()
   })
-  return { button, menu, update, close }
+  return { button, menu, update, close, position }
 }
