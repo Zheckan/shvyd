@@ -6,7 +6,7 @@ import { createTranslationService, TranslationError } from "../src/translation";
 const root = resolve(import.meta.dir, "..");
 const result = await Bun.build({
   entrypoints: [resolve(root, "src/demo.ts")], outdir: resolve(root, ".preview"),
-  target: "browser", minify: false, env: "disable",
+  target: "browser", format: "iife", minify: false, env: "disable",
 });
 if (!result.success) throw new Error("The demo could not build.");
 let persisted: Settings | undefined;
