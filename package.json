@@ -10,12 +10,20 @@
     "playground": "bun scripts/dev.ts",
     "test": "bun test tests",
     "typecheck": "tsc --noEmit",
-    "check": "bun run typecheck && bun run test && bun run build",
+    "lint": "oxlint --deny-warnings src scripts tests demo",
+    "lint:fix": "oxlint --fix --deny-warnings src scripts tests demo",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "verify": "bun run lint && bun run format:check && bun run typecheck && bun run test && bun run build",
+    "check": "bun run verify",
+    "fix": "pnpm lint:fix && pnpm format && pnpm verify",
     "languages:update": "bun scripts/update-languages.ts"
   },
   "devDependencies": {
     "@types/bun": "^1.4.2",
     "@types/chrome": "^0.3.4",
+    "oxlint": "^1.86.0",
+    "prettier": "^3.9.9",
     "typescript": "^7.0.2"
   }
 }

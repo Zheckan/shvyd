@@ -47,11 +47,16 @@ Open [the static test page](http://localhost:5174/test-page.html). Its theme pic
 ## Development and verification
 
 ```sh
-bun run check
+pnpm fix
+pnpm check
 python3 -m unittest scripts.test_benchmark_cloud scripts.test_benchmark_opencode_go
 ```
 
-`check` runs strict TypeScript checking, the prototype's behavior tests, and a credential-free build. To run the live extension check on this Mac, leave the demo server running in another terminal:
+`fix` applies safe Oxlint fixes and Prettier formatting, then runs all checks. `check` and `verify` run lint, formatting checks, strict TypeScript checking, the prototype's behavior tests, and a credential-free build. Use `lint:fix` or `format` to run only the editing step. Saved benchmark results, verification evidence, generated files, and local credentials are excluded from formatting.
+
+Development tools are installed with `bun install`; `pnpm` runs the commands using those local dependencies. Linting uses Oxlint. Prettier uses single quotes, no semicolons, and two-space indentation. Type checking uses TypeScript 7.
+
+The verification build replaces the local credential bootstrap in `dist`. Run `pnpm build:local` afterward when you want a private build with your configured keys. To run the live extension check on this Mac, leave the demo server running in another terminal:
 
 ```sh
 bun run build:local
