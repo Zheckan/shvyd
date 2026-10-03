@@ -3,6 +3,15 @@ import { DEFAULT_SETTINGS } from "../src/settings";
 import { createTranslationService } from "../src/translation";
 
 describe("selected-text translation", () => {
+  test("rejects a target unavailable with the provider before sending selected text", async () => {
+    let sent = false;
+    const service = createTranslationService({
+      readSettings: async () => ({ ...DEFAULT_SETTINGS, azure: { key: "test-key", region: "" } }),
+      fetcher: async () => { sent = true; return Response.json({}); },
+    });
+    await expect(service.translate({ text: "Hello", target: "en-us" })).rejects.toMatchObject({ code: "configuration" });
+    expect(sent).toBe(false);
+  });
   test("uses the provider's script-specific language code for Traditional Chinese", async () => {
     const requests: Request[] = [];
     const service = createTranslationService({

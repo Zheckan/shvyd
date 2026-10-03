@@ -1,14 +1,17 @@
 import { unwrapResponse } from "./client";
-import { LANGUAGES, parseEnvFile, parseSettings, settingsFromEnv, type Settings } from "./settings";
+import { isProvider, parseEnvFile, parseSettings, settingsFromEnv, type Settings } from "./settings";
+import { mountLanguageSettings } from "./language-settings";
 
 const form = document.getElementById("settings");
 const status = document.getElementById("status");
 const details = document.getElementById("credentials");
 const summary = document.getElementById("key-summary");
 const envFile = document.getElementById("import-env");
+const languageContainer = document.getElementById("language-settings");
 if (!(form instanceof HTMLFormElement) || !status || !(details instanceof HTMLDetailsElement)
-  || !summary || !(envFile instanceof HTMLInputElement)) throw new Error("Settings could not load.");
+  || !summary || !(envFile instanceof HTMLInputElement) || !languageContainer) throw new Error("Settings could not load.");
 const fields = form;
+const languageSettings = mountLanguageSettings(languageContainer);
 
 function input(name: string): HTMLInputElement {
   const value = fields.elements.namedItem(name);
@@ -21,15 +24,9 @@ function select(name: string): HTMLSelectElement {
   return value;
 }
 
-for (const language of LANGUAGES) {
-  const option = document.createElement("option");
-  option.value = language.code;
-  option.textContent = language.label;
-  select("target").append(option);
-}
 function fill(settings: Settings): void {
   select("provider").value = settings.provider;
-  select("target").value = settings.target;
+  languageSettings.fill(settings);
   input("adaptToPage").checked = settings.adaptToPage;
   input("azureKey").value = settings.azure.key;
   input("azureRegion").value = settings.azure.region;
@@ -39,12 +36,16 @@ function fill(settings: Settings): void {
 }
 function read(): Settings {
   return parseSettings({
-    provider: select("provider").value, target: select("target").value,
+    ...languageSettings.read(), provider: select("provider").value,
     adaptToPage: input("adaptToPage").checked,
     azure: { key: input("azureKey").value, region: input("azureRegion").value.trim() },
     deepl: { key: input("deeplKey").value, endpoint: select("deeplEndpoint").value },
   });
 }
+select("provider").addEventListener("change", () => {
+  const provider = select("provider").value;
+  if (isProvider(provider)) languageSettings.setProvider(provider);
+});
 async function call(request: unknown): Promise<unknown> { return unwrapResponse(await chrome.runtime.sendMessage(request)); }
 
 void call({ kind: "get-settings" }).then(value => {

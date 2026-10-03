@@ -30,6 +30,11 @@ button { border: 0; border-radius: 7px; background: #275f53; color: #fff; paddin
 button:disabled { opacity: .5; }
 output { color: #275f53; font-size: 12px; }
 .privacy { font-size: 12px; line-height: 1.7; color: #727a75; margin-top: 24px; }
+.favorite-list { max-height: 240px; overflow: auto; border: 1px solid #d6ddd7; border-radius: 6px; padding: 8px; margin-bottom: 16px; }
+.favorite-choice { flex-direction: row; align-items: start; gap: 10px; margin: 0; padding: 9px 6px; cursor: pointer; }
+.preferred-chips { display: flex; flex-wrap: wrap; gap: 6px; margin: 12px 0 18px; }
+.language-chip { padding: 6px 9px; background: #e8f0eb; color: #275f53; font-size: 11px; }
+.language-mode-row { margin-top: 24px; }
 @media (max-width: 600px) { main { margin-top: 28px; } .row { grid-template-columns: 1fr; gap: 0; } h1 { font-size: 25px; } .import-row { align-items: start; } }
 @media (prefers-color-scheme: dark) {
   :root { background: #171b19; color: #e6eae7; }
@@ -37,4 +42,6 @@ output { color: #275f53; font-size: 12px; }
   .badge, .import-button { border-color: #354238; }
   .intro, .privacy, small, .hint, .import-row { color: #a2aea5; }
   .import-button, output { color: #a4d6bd; }
+  .favorite-list { border-color: #354238; }
+  .language-chip { background: #2c4032; color: #c5dfcc; }
 }
