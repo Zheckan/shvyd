@@ -1,0 +1,1393 @@
+{
+  "updated": "2026-10-03",
+  "sources": {
+    "azure": "https://api.cognitive.microsofttranslator.com/languages?api-version=2026-06-06&scope=translation",
+    "deepl": "https://api-free.deepl.com/v3/languages?resource=translate_text"
+  },
+  "languages": [
+    {
+      "code": "ace",
+      "name": "Acehnese",
+      "label": "Acehnese",
+      "direction": "ltr",
+      "azure": null,
+      "deepl": "ace"
+    },
+    {
+      "code": "af",
+      "name": "Afrikaans",
+      "label": "Afrikaans",
+      "direction": "ltr",
+      "azure": "af",
+      "deepl": "af"
+    },
+    {
+      "code": "sq",
+      "name": "Albanian",
+      "label": "Shqip",
+      "direction": "ltr",
+      "azure": "sq",
+      "deepl": "sq"
+    },
+    {
+      "code": "am",
+      "name": "Amharic",
+      "label": "አማርኛ",
+      "direction": "ltr",
+      "azure": "am",
+      "deepl": null
+    },
+    {
+      "code": "ar",
+      "name": "Arabic",
+      "label": "العربية",
+      "direction": "rtl",
+      "azure": "ar",
+      "deepl": "ar"
+    },
+    {
+      "code": "an",
+      "name": "Aragonese",
+      "label": "Aragonese",
+      "direction": "ltr",
+      "azure": null,
+      "deepl": "an"
+    },
+    {
+      "code": "hy",
+      "name": "Armenian",
+      "label": "Հայերեն",
+      "direction": "ltr",
+      "azure": "hy",
+      "deepl": "hy"
+    },
+    {
+      "code": "as",
+      "name": "Assamese",
+      "label": "অসমীয়া",
+      "direction": "ltr",
+      "azure": "as",
+      "deepl": "as"
+    },
+    {
+      "code": "ay",
+      "name": "Aymara",
+      "label": "Aymara",
+      "direction": "ltr",
+      "azure": null,
+      "deepl": "ay"
+    },
+    {
+      "code": "az",
+      "name": "Azerbaijani",
+      "label": "Azərbaycan",
+      "direction": "ltr",
+      "azure": "az",
+      "deepl": "az"
+    },
+    {
+      "code": "bn",
+      "name": "Bangla",
+      "label": "বাংলা",
+      "direction": "ltr",
+      "azure": "bn",
+      "deepl": "bn"
+    },
+    {
+      "code": "ba",
+      "name": "Bashkir",
+      "label": "Bashkir",
+      "direction": "ltr",
+      "azure": "ba",
+      "deepl": "ba"
+    },
+    {
+      "code": "eu",
+      "name": "Basque",
+      "label": "Euskara",
+      "direction": "ltr",
+      "azure": "eu",
+      "deepl": "eu"
+    },
+    {
+      "code": "be",
+      "name": "Belarusian",
+      "label": "беларуская",
+      "direction": "ltr",
+      "azure": "be",
+      "deepl": "be"
+    },
+    {
+      "code": "bho",
+      "name": "Bhojpuri",
+      "label": "भोजपुरी",
+      "direction": "ltr",
+      "azure": "bho",
+      "deepl": "bho"
+    },
+    {
+      "code": "brx",
+      "name": "Bodo",
+      "label": "बड़ो",
+      "direction": "ltr",
+      "azure": "brx",
+      "deepl": null
+    },
+    {
+      "code": "bs",
+      "name": "Bosnian",
+      "label": "Bosanski",
+      "direction": "ltr",
+      "azure": "bs",
+      "deepl": "bs"
+    },
+    {
+      "code": "br",
+      "name": "Breton",
+      "label": "brezhoneg",
+      "direction": "ltr",
+      "azure": null,
+      "deepl": "br"
+    },
+    {
+      "code": "bg",
+      "name": "Bulgarian",
+      "label": "Български",
+      "direction": "ltr",
+      "azure": "bg",
+      "deepl": "bg"
+    },
+    {
+      "code": "yue",
+      "name": "Cantonese (Traditional)",
+      "label": "粵語 (繁體)",
+      "direction": "ltr",
+      "azure": "yue",
+      "deepl": "yue"
+    },
+    {
+      "code": "ca",
+      "name": "Catalan",
+      "label": "Català",
+      "direction": "ltr",
+      "azure": "ca",
+      "deepl": "ca"
+    },
+    {
+      "code": "ceb",
+      "name": "Cebuano",
+      "label": "Cebuano",
+      "direction": "ltr",
+      "azure": null,
+      "deepl": "ceb"
+    },
+    {
+      "code": "hne",
+      "name": "Chhattisgarhi",
+      "label": "छत्तीसगढ़ी",
+      "direction": "ltr",
+      "azure": "hne",
+      "deepl": null
+    },
+    {
+      "code": "zh",
+      "name": "Chinese",
+      "label": "中文",
+      "direction": "ltr",
+      "azure": null,
+      "deepl": "zh"
+    },
+    {
+      "code": "lzh",
+      "name": "Chinese (Literary)",
+      "label": "中文 (文言文)",
+      "direction": "ltr",
+      "azure": "lzh",
+      "deepl": null
+    },
+    {
+      "code": "zh-hans",
+      "name": "Chinese Simplified",
+      "label": "中文 (简体)",
+      "direction": "ltr",
+      "azure": "zh-Hans",
+      "deepl": "zh-Hans"
+    },
+    {
+      "code": "zh-hant",
+      "name": "Chinese Traditional",
+      "label": "繁體中文 (繁體)",
+      "direction": "ltr",
+      "azure": "zh-Hant",
+      "deepl": "zh-Hant"
+    },
+    {
+      "code": "hr",
+      "name": "Croatian",
+      "label": "Hrvatski",
+      "direction": "ltr",
+      "azure": "hr",
+      "deepl": "hr"
+    },
+    {
+      "code": "cs",
+      "name": "Czech",
+      "label": "Čeština",
+      "direction": "ltr",
+      "azure": "cs",
+      "deepl": "cs"
+    },
+    {
+      "code": "da",
+      "name": "Danish",
+      "label": "Dansk",
+      "direction": "ltr",
+      "azure": "da",
+      "deepl": "da"
+    },
+    {
+      "code": "prs",
+      "name": "Dari",
+      "label": "دری",
+      "direction": "rtl",
+      "azure": "prs",
+      "deepl": "prs"
+    },
+    {
+      "code": "dv",
+      "name": "Divehi",
+      "label": "ދިވެހިބަސް",
+      "direction": "rtl",
+      "azure": "dv",
+      "deepl": null
+    },
+    {
+      "code": "doi",
+      "name": "Dogri",
+      "label": "डोगरी",
+      "direction": "ltr",
+      "azure": "doi",
+      "deepl": null
+    },
+    {
+      "code": "nl",
+      "name": "Dutch",
+      "label": "Nederlands",
+      "direction": "ltr",
+      "azure": "nl",
+      "deepl": "nl"
+    },
+    {
+      "code": "en",
+      "name": "English",
+      "label": "English",
+      "direction": "ltr",
+      "azure": "en",
+      "deepl": "en"
+    },
+    {
+      "code": "en-us",
+      "name": "English (American)",
+      "label": "American English",
+      "direction": "ltr",
+      "azure": null,
+      "deepl": "en-US"
+    },
+    {
+      "code": "en-gb",
+      "name": "English (British)",
+      "label": "British English",
+      "direction": "ltr",
+      "azure": null,
+      "deepl": "en-GB"
+    },
+    {
+      "code": "eo",
+      "name": "Esperanto",
+      "label": "Esperanto",
+      "direction": "ltr",
+      "azure": null,
+      "deepl": "eo"
+    },
+    {
+      "code": "et",
+      "name": "Estonian",
+      "label": "Eesti",
+      "direction": "ltr",
+      "azure": "et",
+      "deepl": "et"
+    },
+    {
+      "code": "fo",
+      "name": "Faroese",
+      "label": "Føroyskt",
+      "direction": "ltr",
+      "azure": "fo",
+      "deepl": null
+    },
+    {
+      "code": "fj",
+      "name": "Fijian",
+      "label": "Na Vosa Vakaviti",
+      "direction": "ltr",
+      "azure": "fj",
+      "deepl": null
+    },
+    {
+      "code": "fil",
+      "name": "Filipino",
+      "label": "Filipino",
+      "direction": "ltr",
+      "azure": "fil",
+      "deepl": null
+    },
+    {
+      "code": "fi",
+      "name": "Finnish",
+      "label": "Suomi",
+      "direction": "ltr",
+      "azure": "fi",
+      "deepl": "fi"
+    },
+    {
+      "code": "fr",
+      "name": "French",
+      "label": "Français",
+      "direction": "ltr",
+      "azure": "fr",
+      "deepl": "fr"
+    },
+    {
+      "code": "fr-fr",
+      "name": "French",
+      "label": "français (France)",
+      "direction": "ltr",
+      "azure": null,
+      "deepl": "fr-FR"
+    },
+    {
+      "code": "fr-ca",
+      "name": "French (Canada)",
+      "label": "Français (Canada)",
+      "direction": "ltr",
+      "azure": "fr-CA",
+      "deepl": "fr-CA"
+    },
+    {
+      "code": "gl",
+      "name": "Galician",
+      "label": "Galego",
+      "direction": "ltr",
+      "azure": "gl",
+      "deepl": "gl"
+    },
+    {
+      "code": "lug",
+      "name": "Ganda",
+      "label": "Ganda",
+      "direction": "ltr",
+      "azure": "lug",
+      "deepl": null
+    },
+    {
+      "code": "ka",
+      "name": "Georgian",
+      "label": "ქართული",
+      "direction": "ltr",
+      "azure": "ka",
+      "deepl": "ka"
+    },
+    {
+      "code": "de",
+      "name": "German",
+      "label": "Deutsch",
+      "direction": "ltr",
+      "azure": "de",
+      "deepl": "de"
+    },
+    {
+      "code": "de-de",
+      "name": "German",
+      "label": "Deutsch (Deutschland)",
+      "direction": "ltr",
+      "azure": null,
+      "deepl": "de-DE"
+    },
+    {
+      "code": "de-ch",
+      "name": "German (Swiss)",
+      "label": "Schweizer Hochdeutsch",
+      "direction": "ltr",
+      "azure": null,
+      "deepl": "de-CH"
+    },
+    {
+      "code": "el",
+      "name": "Greek",
+      "label": "Ελληνικά",
+      "direction": "ltr",
+      "azure": "el",
+      "deepl": "el"
+    },
+    {
+      "code": "gn",
+      "name": "Guarani",
+      "label": "avañe’ẽ",
+      "direction": "ltr",
+      "azure": null,
+      "deepl": "gn"
+    },
+    {
+      "code": "gu",
+      "name": "Gujarati",
+      "label": "ગુજરાતી",
+      "direction": "ltr",
+      "azure": "gu",
+      "deepl": "gu"
+    },
+    {
+      "code": "ht",
+      "name": "Haitian Creole",
+      "label": "Haitian Creole",
+      "direction": "ltr",
+      "azure": "ht",
+      "deepl": "ht"
+    },
+    {
+      "code": "ha",
+      "name": "Hausa",
+      "label": "Hausa",
+      "direction": "ltr",
+      "azure": "ha",
+      "deepl": "ha"
+    },
+    {
+      "code": "he",
+      "name": "Hebrew",
+      "label": "עברית",
+      "direction": "rtl",
+      "azure": "he",
+      "deepl": "he"
+    },
+    {
+      "code": "hi",
+      "name": "Hindi",
+      "label": "हिन्दी",
+      "direction": "ltr",
+      "azure": "hi",
+      "deepl": "hi"
+    },
+    {
+      "code": "mww",
+      "name": "Hmong Daw",
+      "label": "Hmong Daw",
+      "direction": "ltr",
+      "azure": "mww",
+      "deepl": null
+    },
+    {
+      "code": "hu",
+      "name": "Hungarian",
+      "label": "Magyar",
+      "direction": "ltr",
+      "azure": "hu",
+      "deepl": "hu"
+    },
+    {
+      "code": "is",
+      "name": "Icelandic",
+      "label": "Íslenska",
+      "direction": "ltr",
+      "azure": "is",
+      "deepl": "is"
+    },
+    {
+      "code": "ig",
+      "name": "Igbo",
+      "label": "Ásụ̀sụ́ Ìgbò",
+      "direction": "ltr",
+      "azure": "ig",
+      "deepl": "ig"
+    },
+    {
+      "code": "id",
+      "name": "Indonesian",
+      "label": "Indonesia",
+      "direction": "ltr",
+      "azure": "id",
+      "deepl": "id"
+    },
+    {
+      "code": "ikt",
+      "name": "Inuinnaqtun",
+      "label": "Inuinnaqtun",
+      "direction": "ltr",
+      "azure": "ikt",
+      "deepl": null
+    },
+    {
+      "code": "iu",
+      "name": "Inuktitut",
+      "label": "ᐃᓄᒃᑎᑐᑦ",
+      "direction": "ltr",
+      "azure": "iu",
+      "deepl": null
+    },
+    {
+      "code": "iu-latn",
+      "name": "Inuktitut (Latin)",
+      "label": "Inuktitut (Latin)",
+      "direction": "ltr",
+      "azure": "iu-Latn",
+      "deepl": null
+    },
+    {
+      "code": "ga",
+      "name": "Irish",
+      "label": "Gaeilge",
+      "direction": "ltr",
+      "azure": "ga",
+      "deepl": "ga"
+    },
+    {
+      "code": "it",
+      "name": "Italian",
+      "label": "Italiano",
+      "direction": "ltr",
+      "azure": "it",
+      "deepl": "it"
+    },
+    {
+      "code": "ja",
+      "name": "Japanese",
+      "label": "日本語",
+      "direction": "ltr",
+      "azure": "ja",
+      "deepl": "ja"
+    },
+    {
+      "code": "jv",
+      "name": "Javanese",
+      "label": "Jawa",
+      "direction": "ltr",
+      "azure": null,
+      "deepl": "jv"
+    },
+    {
+      "code": "kn",
+      "name": "Kannada",
+      "label": "ಕನ್ನಡ",
+      "direction": "ltr",
+      "azure": "kn",
+      "deepl": null
+    },
+    {
+      "code": "pam",
+      "name": "Kapampangan",
+      "label": "Pampanga",
+      "direction": "ltr",
+      "azure": null,
+      "deepl": "pam"
+    },
+    {
+      "code": "ks",
+      "name": "Kashmiri",
+      "label": "کٲشُر",
+      "direction": "rtl",
+      "azure": "ks",
+      "deepl": null
+    },
+    {
+      "code": "kk",
+      "name": "Kazakh",
+      "label": "Қазақ Тілі",
+      "direction": "ltr",
+      "azure": "kk",
+      "deepl": "kk"
+    },
+    {
+      "code": "km",
+      "name": "Khmer",
+      "label": "ខ្មែរ",
+      "direction": "ltr",
+      "azure": "km",
+      "deepl": null
+    },
+    {
+      "code": "rw",
+      "name": "Kinyarwanda",
+      "label": "Kinyarwanda",
+      "direction": "ltr",
+      "azure": "rw",
+      "deepl": null
+    },
+    {
+      "code": "tlh-latn",
+      "name": "Klingon (Latin)",
+      "label": "Klingon (Latin)",
+      "direction": "ltr",
+      "azure": "tlh-Latn",
+      "deepl": null
+    },
+    {
+      "code": "tlh-piqd",
+      "name": "Klingon (pIqaD)",
+      "label": "Klingon (pIqaD)",
+      "direction": "ltr",
+      "azure": "tlh-Piqd",
+      "deepl": null
+    },
+    {
+      "code": "gom",
+      "name": "Konkani",
+      "label": "कोंकणी",
+      "direction": "ltr",
+      "azure": "gom",
+      "deepl": "gom"
+    },
+    {
+      "code": "ko",
+      "name": "Korean",
+      "label": "한국어",
+      "direction": "ltr",
+      "azure": "ko",
+      "deepl": "ko"
+    },
+    {
+      "code": "ku",
+      "name": "Kurdish (Central)",
+      "label": "Kurdî (Navîn)",
+      "direction": "rtl",
+      "azure": "ku",
+      "deepl": null
+    },
+    {
+      "code": "kmr",
+      "name": "Kurdish (Northern)",
+      "label": "Kurdî (Bakur)",
+      "direction": "ltr",
+      "azure": "kmr",
+      "deepl": "kmr"
+    },
+    {
+      "code": "ckb",
+      "name": "Kurdish (Sorani)",
+      "label": "کوردیی ناوەندی",
+      "direction": "ltr",
+      "azure": null,
+      "deepl": "ckb"
+    },
+    {
+      "code": "ky",
+      "name": "Kyrgyz",
+      "label": "Кыргызча",
+      "direction": "ltr",
+      "azure": "ky",
+      "deepl": "ky"
+    },
+    {
+      "code": "lo",
+      "name": "Lao",
+      "label": "ລາວ",
+      "direction": "ltr",
+      "azure": "lo",
+      "deepl": null
+    },
+    {
+      "code": "la",
+      "name": "Latin",
+      "label": "Latin",
+      "direction": "ltr",
+      "azure": null,
+      "deepl": "la"
+    },
+    {
+      "code": "lv",
+      "name": "Latvian",
+      "label": "Latviešu",
+      "direction": "ltr",
+      "azure": "lv",
+      "deepl": "lv"
+    },
+    {
+      "code": "ln",
+      "name": "Lingala",
+      "label": "Lingála",
+      "direction": "ltr",
+      "azure": "ln",
+      "deepl": "ln"
+    },
+    {
+      "code": "lt",
+      "name": "Lithuanian",
+      "label": "Lietuvių",
+      "direction": "ltr",
+      "azure": "lt",
+      "deepl": "lt"
+    },
+    {
+      "code": "lmo",
+      "name": "Lombard",
+      "label": "Lombard",
+      "direction": "ltr",
+      "azure": null,
+      "deepl": "lmo"
+    },
+    {
+      "code": "dsb",
+      "name": "Lower Sorbian",
+      "label": "Dolnoserbšćina",
+      "direction": "ltr",
+      "azure": "dsb",
+      "deepl": null
+    },
+    {
+      "code": "lb",
+      "name": "Luxembourgish",
+      "label": "Lëtzebuergesch",
+      "direction": "ltr",
+      "azure": "lb",
+      "deepl": "lb"
+    },
+    {
+      "code": "mk",
+      "name": "Macedonian",
+      "label": "Македонски",
+      "direction": "ltr",
+      "azure": "mk",
+      "deepl": "mk"
+    },
+    {
+      "code": "mai",
+      "name": "Maithili",
+      "label": "मैथिली",
+      "direction": "ltr",
+      "azure": "mai",
+      "deepl": "mai"
+    },
+    {
+      "code": "mg",
+      "name": "Malagasy",
+      "label": "Malagasy",
+      "direction": "ltr",
+      "azure": "mg",
+      "deepl": "mg"
+    },
+    {
+      "code": "ms",
+      "name": "Malay",
+      "label": "Melayu",
+      "direction": "ltr",
+      "azure": "ms",
+      "deepl": "ms"
+    },
+    {
+      "code": "ml",
+      "name": "Malayalam",
+      "label": "മലയാളം",
+      "direction": "ltr",
+      "azure": "ml",
+      "deepl": "ml"
+    },
+    {
+      "code": "mt",
+      "name": "Maltese",
+      "label": "Malti",
+      "direction": "ltr",
+      "azure": "mt",
+      "deepl": "mt"
+    },
+    {
+      "code": "mni",
+      "name": "Manipuri",
+      "label": "ꯃꯩꯇꯩꯂꯣꯟ",
+      "direction": "ltr",
+      "azure": "mni",
+      "deepl": null
+    },
+    {
+      "code": "mi",
+      "name": "Māori",
+      "label": "Te Reo Māori",
+      "direction": "ltr",
+      "azure": "mi",
+      "deepl": "mi"
+    },
+    {
+      "code": "mr",
+      "name": "Marathi",
+      "label": "मराठी",
+      "direction": "ltr",
+      "azure": "mr",
+      "deepl": "mr"
+    },
+    {
+      "code": "mn",
+      "name": "Mongolian",
+      "label": "монгол",
+      "direction": "ltr",
+      "azure": null,
+      "deepl": "mn"
+    },
+    {
+      "code": "mn-cyrl",
+      "name": "Mongolian (Cyrillic)",
+      "label": "Монгол",
+      "direction": "ltr",
+      "azure": "mn-Cyrl",
+      "deepl": null
+    },
+    {
+      "code": "mn-mong",
+      "name": "Mongolian (Traditional)",
+      "label": "ᠮᠣᠩᠭᠣᠯ ᠬᠡᠯᠡ",
+      "direction": "ltr",
+      "azure": "mn-Mong",
+      "deepl": null
+    },
+    {
+      "code": "my",
+      "name": "Myanmar (Burmese)",
+      "label": "မြန်မာ",
+      "direction": "ltr",
+      "azure": "my",
+      "deepl": "my"
+    },
+    {
+      "code": "ne",
+      "name": "Nepali",
+      "label": "नेपाली",
+      "direction": "ltr",
+      "azure": "ne",
+      "deepl": "ne"
+    },
+    {
+      "code": "nb",
+      "name": "Norwegian",
+      "label": "Norsk Bokmål",
+      "direction": "ltr",
+      "azure": "nb",
+      "deepl": "nb"
+    },
+    {
+      "code": "nya",
+      "name": "Nyanja",
+      "label": "Nyanja",
+      "direction": "ltr",
+      "azure": "nya",
+      "deepl": null
+    },
+    {
+      "code": "oc",
+      "name": "Occitan",
+      "label": "occitan",
+      "direction": "ltr",
+      "azure": null,
+      "deepl": "oc"
+    },
+    {
+      "code": "or",
+      "name": "Odia",
+      "label": "ଓଡ଼ିଆ",
+      "direction": "ltr",
+      "azure": "or",
+      "deepl": null
+    },
+    {
+      "code": "om",
+      "name": "Oromo",
+      "label": "Oromoo",
+      "direction": "ltr",
+      "azure": null,
+      "deepl": "om"
+    },
+    {
+      "code": "pag",
+      "name": "Pangasinan",
+      "label": "Pangasinan",
+      "direction": "ltr",
+      "azure": null,
+      "deepl": "pag"
+    },
+    {
+      "code": "ps",
+      "name": "Pashto",
+      "label": "پښتو",
+      "direction": "rtl",
+      "azure": "ps",
+      "deepl": "ps"
+    },
+    {
+      "code": "fa",
+      "name": "Persian",
+      "label": "فارسی",
+      "direction": "rtl",
+      "azure": "fa",
+      "deepl": "fa"
+    },
+    {
+      "code": "pl",
+      "name": "Polish",
+      "label": "Polski",
+      "direction": "ltr",
+      "azure": "pl",
+      "deepl": "pl"
+    },
+    {
+      "code": "pt",
+      "name": "Portuguese",
+      "label": "Português",
+      "direction": "ltr",
+      "azure": "pt",
+      "deepl": "pt"
+    },
+    {
+      "code": "pt-br",
+      "name": "Portuguese (Brazilian)",
+      "label": "Português (Brasil)",
+      "direction": "ltr",
+      "azure": null,
+      "deepl": "pt-BR"
+    },
+    {
+      "code": "pt-pt",
+      "name": "Portuguese (Portugal)",
+      "label": "Português (Portugal)",
+      "direction": "ltr",
+      "azure": "pt-PT",
+      "deepl": "pt-PT"
+    },
+    {
+      "code": "pa",
+      "name": "Punjabi",
+      "label": "ਪੰਜਾਬੀ",
+      "direction": "ltr",
+      "azure": "pa",
+      "deepl": "pa"
+    },
+    {
+      "code": "qu",
+      "name": "Quechua",
+      "label": "Runasimi",
+      "direction": "ltr",
+      "azure": null,
+      "deepl": "qu"
+    },
+    {
+      "code": "otq",
+      "name": "Querétaro Otomi",
+      "label": "Hñähñu",
+      "direction": "ltr",
+      "azure": "otq",
+      "deepl": null
+    },
+    {
+      "code": "ro",
+      "name": "Romanian",
+      "label": "Română",
+      "direction": "ltr",
+      "azure": "ro",
+      "deepl": "ro"
+    },
+    {
+      "code": "run",
+      "name": "Rundi",
+      "label": "Rundi",
+      "direction": "ltr",
+      "azure": "run",
+      "deepl": null
+    },
+    {
+      "code": "ru",
+      "name": "Russian",
+      "label": "Русский",
+      "direction": "ltr",
+      "azure": "ru",
+      "deepl": "ru"
+    },
+    {
+      "code": "sm",
+      "name": "Samoan",
+      "label": "Gagana Sāmoa",
+      "direction": "ltr",
+      "azure": "sm",
+      "deepl": null
+    },
+    {
+      "code": "sa",
+      "name": "Sanskrit",
+      "label": "संस्कृत भाषा",
+      "direction": "ltr",
+      "azure": null,
+      "deepl": "sa"
+    },
+    {
+      "code": "sr",
+      "name": "Serbian",
+      "label": "српски",
+      "direction": "ltr",
+      "azure": null,
+      "deepl": "sr"
+    },
+    {
+      "code": "sr-cyrl",
+      "name": "Serbian (Cyrillic)",
+      "label": "Српски (ћирилица)",
+      "direction": "ltr",
+      "azure": "sr-Cyrl",
+      "deepl": null
+    },
+    {
+      "code": "sr-latn",
+      "name": "Serbian (Latin)",
+      "label": "Srpski (latinica)",
+      "direction": "ltr",
+      "azure": "sr-Latn",
+      "deepl": null
+    },
+    {
+      "code": "st",
+      "name": "Sesotho",
+      "label": "Sesotho",
+      "direction": "ltr",
+      "azure": "st",
+      "deepl": "st"
+    },
+    {
+      "code": "nso",
+      "name": "Sesotho sa Leboa",
+      "label": "Sesotho sa Leboa",
+      "direction": "ltr",
+      "azure": "nso",
+      "deepl": null
+    },
+    {
+      "code": "tn",
+      "name": "Setswana",
+      "label": "Setswana",
+      "direction": "ltr",
+      "azure": "tn",
+      "deepl": "tn"
+    },
+    {
+      "code": "sn",
+      "name": "Shona",
+      "label": "chiShona",
+      "direction": "ltr",
+      "azure": "sn",
+      "deepl": null
+    },
+    {
+      "code": "scn",
+      "name": "Sicilian",
+      "label": "sicilianu",
+      "direction": "ltr",
+      "azure": null,
+      "deepl": "scn"
+    },
+    {
+      "code": "sd",
+      "name": "Sindhi",
+      "label": "سنڌي",
+      "direction": "rtl",
+      "azure": "sd",
+      "deepl": null
+    },
+    {
+      "code": "si",
+      "name": "Sinhala",
+      "label": "සිංහල",
+      "direction": "ltr",
+      "azure": "si",
+      "deepl": null
+    },
+    {
+      "code": "sk",
+      "name": "Slovak",
+      "label": "Slovenčina",
+      "direction": "ltr",
+      "azure": "sk",
+      "deepl": "sk"
+    },
+    {
+      "code": "sl",
+      "name": "Slovenian",
+      "label": "Slovenščina",
+      "direction": "ltr",
+      "azure": "sl",
+      "deepl": "sl"
+    },
+    {
+      "code": "so",
+      "name": "Somali",
+      "label": "Soomaali",
+      "direction": "ltr",
+      "azure": "so",
+      "deepl": null
+    },
+    {
+      "code": "es",
+      "name": "Spanish",
+      "label": "Español",
+      "direction": "ltr",
+      "azure": "es",
+      "deepl": "es"
+    },
+    {
+      "code": "es-es",
+      "name": "Spanish",
+      "label": "Español de España",
+      "direction": "ltr",
+      "azure": null,
+      "deepl": "es-ES"
+    },
+    {
+      "code": "es-419",
+      "name": "Spanish (Latin American)",
+      "label": "Español latinoamericano",
+      "direction": "ltr",
+      "azure": null,
+      "deepl": "es-419"
+    },
+    {
+      "code": "es-mx",
+      "name": "Spanish (Mexico)",
+      "label": "Español (México)",
+      "direction": "ltr",
+      "azure": "es-MX",
+      "deepl": null
+    },
+    {
+      "code": "su",
+      "name": "Sundanese",
+      "label": "Basa Sunda",
+      "direction": "ltr",
+      "azure": null,
+      "deepl": "su"
+    },
+    {
+      "code": "sw",
+      "name": "Swahili",
+      "label": "Kiswahili",
+      "direction": "ltr",
+      "azure": "sw",
+      "deepl": "sw"
+    },
+    {
+      "code": "sv",
+      "name": "Swedish",
+      "label": "Svenska",
+      "direction": "ltr",
+      "azure": "sv",
+      "deepl": "sv"
+    },
+    {
+      "code": "tl",
+      "name": "Tagalog",
+      "label": "Tagalog",
+      "direction": "ltr",
+      "azure": null,
+      "deepl": "tl"
+    },
+    {
+      "code": "ty",
+      "name": "Tahitian",
+      "label": "Reo Tahiti",
+      "direction": "ltr",
+      "azure": "ty",
+      "deepl": null
+    },
+    {
+      "code": "tg",
+      "name": "Tajik",
+      "label": "тоҷикӣ",
+      "direction": "ltr",
+      "azure": null,
+      "deepl": "tg"
+    },
+    {
+      "code": "ta",
+      "name": "Tamil",
+      "label": "தமிழ்",
+      "direction": "ltr",
+      "azure": "ta",
+      "deepl": "ta"
+    },
+    {
+      "code": "tt",
+      "name": "Tatar",
+      "label": "Татар",
+      "direction": "ltr",
+      "azure": "tt",
+      "deepl": "tt"
+    },
+    {
+      "code": "te",
+      "name": "Telugu",
+      "label": "తెలుగు",
+      "direction": "ltr",
+      "azure": "te",
+      "deepl": "te"
+    },
+    {
+      "code": "th",
+      "name": "Thai",
+      "label": "ไทย",
+      "direction": "ltr",
+      "azure": "th",
+      "deepl": "th"
+    },
+    {
+      "code": "bo",
+      "name": "Tibetan",
+      "label": "བོད་སྐད་",
+      "direction": "ltr",
+      "azure": "bo",
+      "deepl": null
+    },
+    {
+      "code": "ti",
+      "name": "Tigrinya",
+      "label": "ትግር",
+      "direction": "ltr",
+      "azure": "ti",
+      "deepl": null
+    },
+    {
+      "code": "to",
+      "name": "Tongan",
+      "label": "Lea Fakatonga",
+      "direction": "ltr",
+      "azure": "to",
+      "deepl": null
+    },
+    {
+      "code": "ts",
+      "name": "Tsonga",
+      "label": "Xitsonga",
+      "direction": "ltr",
+      "azure": null,
+      "deepl": "ts"
+    },
+    {
+      "code": "tr",
+      "name": "Turkish",
+      "label": "Türkçe",
+      "direction": "ltr",
+      "azure": "tr",
+      "deepl": "tr"
+    },
+    {
+      "code": "tk",
+      "name": "Turkmen",
+      "label": "Türkmen Dili",
+      "direction": "ltr",
+      "azure": "tk",
+      "deepl": "tk"
+    },
+    {
+      "code": "uk",
+      "name": "Ukrainian",
+      "label": "Українська",
+      "direction": "ltr",
+      "azure": "uk",
+      "deepl": "uk"
+    },
+    {
+      "code": "hsb",
+      "name": "Upper Sorbian",
+      "label": "Hornjoserbšćina",
+      "direction": "ltr",
+      "azure": "hsb",
+      "deepl": null
+    },
+    {
+      "code": "ur",
+      "name": "Urdu",
+      "label": "اردو",
+      "direction": "rtl",
+      "azure": "ur",
+      "deepl": "ur"
+    },
+    {
+      "code": "ug",
+      "name": "Uyghur",
+      "label": "ئۇيغۇرچە",
+      "direction": "rtl",
+      "azure": "ug",
+      "deepl": null
+    },
+    {
+      "code": "uz",
+      "name": "Uzbek (Latin)",
+      "label": "O‘Zbek",
+      "direction": "ltr",
+      "azure": "uz",
+      "deepl": "uz"
+    },
+    {
+      "code": "vi",
+      "name": "Vietnamese",
+      "label": "Tiếng Việt",
+      "direction": "ltr",
+      "azure": "vi",
+      "deepl": "vi"
+    },
+    {
+      "code": "cy",
+      "name": "Welsh",
+      "label": "Cymraeg",
+      "direction": "ltr",
+      "azure": "cy",
+      "deepl": "cy"
+    },
+    {
+      "code": "wo",
+      "name": "Wolof",
+      "label": "Wolof",
+      "direction": "ltr",
+      "azure": null,
+      "deepl": "wo"
+    },
+    {
+      "code": "xh",
+      "name": "Xhosa",
+      "label": "isiXhosa",
+      "direction": "ltr",
+      "azure": "xh",
+      "deepl": "xh"
+    },
+    {
+      "code": "yi",
+      "name": "Yiddish",
+      "label": "ייִדיש",
+      "direction": "ltr",
+      "azure": null,
+      "deepl": "yi"
+    },
+    {
+      "code": "yo",
+      "name": "Yoruba",
+      "label": "Èdè Yorùbá",
+      "direction": "ltr",
+      "azure": "yo",
+      "deepl": null
+    },
+    {
+      "code": "yua",
+      "name": "Yucatec Maya",
+      "label": "Yucatec Maya",
+      "direction": "ltr",
+      "azure": "yua",
+      "deepl": null
+    },
+    {
+      "code": "zu",
+      "name": "Zulu",
+      "label": "Isi-Zulu",
+      "direction": "ltr",
+      "azure": "zu",
+      "deepl": "zu"
+    }
+  ]
+}

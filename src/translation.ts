@@ -1,4 +1,5 @@
 import { isLanguage, isProvider, isRecord, type Language, type Provider, type Settings } from "./settings";
+import { getLanguage } from "./languages";
 
 export const MAX_SELECTION_LENGTH = 10_000;
 export type Translation = {
@@ -64,6 +65,8 @@ export function createTranslationService({ readSettings, fetcher = fetch }: {
     const settings = await readSettings();
     const provider = request.provider ?? settings.provider;
     if (!isProvider(provider)) throw new TranslationError("configuration", "Choose a translation provider.");
+    const providerTarget = getLanguage(request.target)?.[provider];
+    if (!providerTarget) throw new TranslationError("configuration", "This language is unavailable with the selected provider. Choose another language or provider.");
     if (!settings[provider].key) {
       throw new TranslationError("configuration", "Add your provider API key in Shvyd settings.");
     }
@@ -82,11 +85,11 @@ export function createTranslationService({ readSettings, fetcher = fetch }: {
       url = "https://api.cognitive.microsofttranslator.com/translate?api-version=2026-06-06";
       headers["Ocp-Apim-Subscription-Key"] = settings.azure.key;
       if (settings.azure.region) headers["Ocp-Apim-Subscription-Region"] = settings.azure.region;
-      body = { inputs: [{ text, targets: [{ language: request.target }] }] };
+      body = { inputs: [{ text, targets: [{ language: providerTarget }] }] };
     } else {
       url = `${settings.deepl.endpoint}/v2/translate`;
       headers.Authorization = `DeepL-Auth-Key ${settings.deepl.key}`;
-      body = { text: [text], target_lang: request.target.toUpperCase(), model_type: "latency_optimized" };
+      body = { text: [text], target_lang: providerTarget.toUpperCase(), model_type: "latency_optimized" };
     }
     const started = performance.now();
     let response: Response;

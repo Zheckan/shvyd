@@ -1,21 +1,13 @@
-export const LANGUAGES = [
-  { code: "uk", label: "Українська" },
-  { code: "en", label: "English" },
-  { code: "pl", label: "Polski" },
-  { code: "de", label: "Deutsch" },
-  { code: "fr", label: "Français" },
-  { code: "es", label: "Español" },
-  { code: "it", label: "Italiano" },
-  { code: "pt", label: "Português" },
-  { code: "ja", label: "日本語" },
-] as const;
-
-export type Language = (typeof LANGUAGES)[number]["code"];
-export type Provider = "azure" | "deepl";
+import { isLanguage, supportsLanguage, type Language, type Provider } from "./languages";
+export { LANGUAGES, isLanguage, type Language, type Provider } from "./languages";
 export type Preferences = {
   provider: Provider;
   target: Language;
   adaptToPage: boolean;
+  favoriteLanguages: Language[];
+  showOtherLanguages: boolean;
+  targetMode: "last" | "fixed";
+  defaultTarget: Language;
 };
 export type Settings = Preferences & {
   azure: { key: string; region: string };
@@ -26,16 +18,16 @@ export const DEFAULT_SETTINGS: Settings = {
   provider: "azure",
   target: "uk",
   adaptToPage: true,
+  favoriteLanguages: ["uk", "en", "pl"],
+  showOtherLanguages: true,
+  targetMode: "last",
+  defaultTarget: "uk",
   azure: { key: "", region: "" },
   deepl: { key: "", endpoint: "https://api-free.deepl.com" },
 };
 
 export function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null && !Array.isArray(value);
-}
-
-export function isLanguage(value: unknown): value is Language {
-  return LANGUAGES.some(language => language.code === value);
 }
 
 export function isProvider(value: unknown): value is Provider {
@@ -47,7 +39,28 @@ export function parsePreferences(value: unknown): Preferences {
     || typeof value.adaptToPage !== "boolean") {
     throw new Error("Invalid translation preferences.");
   }
-  return { provider: value.provider, target: value.target, adaptToPage: value.adaptToPage };
+  const rawFavorites = value.favoriteLanguages ?? DEFAULT_SETTINGS.favoriteLanguages;
+  if (!Array.isArray(rawFavorites) || !rawFavorites.length || rawFavorites.length > 300 || !rawFavorites.every(isLanguage)) {
+    throw new Error("Choose at least one preferred language from the list.");
+  }
+  const favoriteLanguages = [...new Set(rawFavorites)];
+  const showOtherLanguages = value.showOtherLanguages ?? true;
+  const targetMode = value.targetMode ?? "last";
+  const defaultTarget = value.defaultTarget ?? "uk";
+  if (typeof showOtherLanguages !== "boolean" || targetMode !== "last" && targetMode !== "fixed" || !isLanguage(defaultTarget)) {
+    throw new Error("Check the target language preferences.");
+  }
+  const provider = value.provider;
+  const fallback = favoriteLanguages.find(code => supportsLanguage(code, provider)) ?? "uk";
+  return {
+    provider: value.provider, target: supportsLanguage(value.target, value.provider) ? value.target : fallback,
+    adaptToPage: value.adaptToPage, favoriteLanguages, showOtherLanguages, targetMode,
+    defaultTarget: supportsLanguage(defaultTarget, value.provider) ? defaultTarget : fallback,
+  };
+}
+
+export function initialTarget(preferences: Preferences): Language {
+  return preferences.targetMode === "fixed" ? preferences.defaultTarget : preferences.target;
 }
 
 function credential(value: unknown): string {
@@ -79,7 +92,11 @@ export function parseSettings(value: unknown): Settings {
 }
 
 export function publicPreferences(settings: Settings): Preferences {
-  return { provider: settings.provider, target: settings.target, adaptToPage: settings.adaptToPage };
+  return {
+    provider: settings.provider, target: settings.target, adaptToPage: settings.adaptToPage,
+    favoriteLanguages: [...settings.favoriteLanguages], showOtherLanguages: settings.showOtherLanguages,
+    targetMode: settings.targetMode, defaultTarget: settings.defaultTarget,
+  };
 }
 
 export function settingsFromEnv(values: Record<string, string | undefined>): Settings {

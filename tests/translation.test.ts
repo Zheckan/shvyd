@@ -3,6 +3,18 @@ import { DEFAULT_SETTINGS } from "../src/settings";
 import { createTranslationService } from "../src/translation";
 
 describe("selected-text translation", () => {
+  test("uses the provider's script-specific language code for Traditional Chinese", async () => {
+    const requests: Request[] = [];
+    const service = createTranslationService({
+      readSettings: async () => ({ ...DEFAULT_SETTINGS, azure: { key: "test-key", region: "" } }),
+      fetcher: async (input, init) => {
+        requests.push(new Request(input, init));
+        return Response.json({ value: [{ translations: [{ text: "早安", language: "zh-Hant" }] }] });
+      },
+    });
+    expect(await service.translate({ text: "Good morning", target: "zh-hant" })).toMatchObject({ text: "早安", target: "zh-hant" });
+    expect(await requests[0]?.json()).toEqual({ inputs: [{ text: "Good morning", targets: [{ language: "zh-Hant" }] }] });
+  });
   test("receives an automatic-source Azure translation in the selected target language", async () => {
     const requests: Request[] = [];
     const service = createTranslationService({
