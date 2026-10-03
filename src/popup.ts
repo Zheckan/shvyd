@@ -5,6 +5,7 @@ import { createLanguagePicker } from "./language-picker";
 import { applyPageStyle, samplePageStyle } from "./page-style";
 import { MAX_SELECTION_LENGTH, TranslationError } from "./translation";
 import { copyTranslation } from "./clipboard";
+import { captureSelection, renderTranslation } from "./formatted-text";
 
 const CSS = `
 :host { all: initial; }
@@ -33,6 +34,21 @@ button:focus-visible, select:focus-visible { outline: 2px solid var(--shvyd-acce
 .icon:disabled { opacity: .25; cursor: default; }
 svg { display: block; width: 16px; height: 16px; flex-shrink: 0; }
 .translation { padding: 13px 17px 18px; font-size: 15px; line-height: 1.6; white-space: pre-wrap; overflow-wrap: anywhere; text-align: start; user-select: text; max-height: min(55dvh, 480px); overflow: auto; }
+.translation.formatted { white-space: normal; }
+.formatted p, .formatted h1, .formatted h2, .formatted h3, .formatted h4, .formatted h5, .formatted h6, .formatted pre, .formatted table, .formatted dl { margin: 0 0 .8em; }
+.formatted h1, .formatted h2, .formatted h3, .formatted h4, .formatted h5, .formatted h6 { font-size: 1em; font-weight: 650; line-height: 1.5; }
+.formatted strong, .formatted th, .formatted dt { font-weight: 650; }
+.formatted ul, .formatted ol { padding-inline-start: 1.5em; margin: 0 0 .8em; }
+.formatted li + li { margin-block-start: .35em; }
+.formatted li > ul, .formatted li > ol { margin-block: .35em 0; }
+.formatted div + div { margin-block-start: .8em; }
+.formatted blockquote { margin: 0 0 .8em; padding-inline-start: 12px; border-inline-start: 2px solid var(--shvyd-border); }
+.formatted pre, .formatted code { font: inherit; white-space: pre-wrap; }
+.formatted pre { padding: 8px 10px; border: 1px solid var(--shvyd-border); border-radius: 4px; }
+.formatted table { width: 100%; border-collapse: collapse; table-layout: fixed; }
+.formatted td, .formatted th { border: 1px solid var(--shvyd-border); padding: 6px 8px; text-align: start; vertical-align: top; }
+.formatted dd { margin-inline-start: 1em; }
+.formatted :last-child { margin-block-end: 0; }
 .status { padding: 0 17px 16px; font-size: 13px; line-height: 1.5; }
 .actions { padding: 0 17px 16px; display: flex; gap: 14px; }
 .text-button { border: 0; padding: 0; background: transparent; text-decoration: underline; text-underline-offset: 3px; color: var(--shvyd-accent); font-size: 13px; }
@@ -115,7 +131,8 @@ export function mountTranslator(client: TranslationClient): () => void {
   let preferences = publicPreferences(DEFAULT_SETTINGS);
   let sessionTarget: Language | undefined;
   let choiceGeneration = 0;
-  let selected: { text: string; range: Range; element: Element } | undefined;
+  let selected: { text: string; content: ReturnType<typeof captureSelection>; range: Range; element: Element } | undefined;
+  let copiedText = "";
   let pointerDown = false;
   let generation = 0;
   let frame = 0;
@@ -165,9 +182,11 @@ export function mountTranslator(client: TranslationClient): () => void {
     const ancestor = range.commonAncestorContainer;
     const element = ancestor instanceof Element ? ancestor : ancestor.parentElement;
     if (!element || element.closest("input, textarea") || element.getRootNode() === root) return;
-    if (selected?.text === text && !panel.hidden) return;
+    if (selected?.text === text && !panel.hidden
+      && selected.range.compareBoundaryPoints(Range.START_TO_START, range) === 0
+      && selected.range.compareBoundaryPoints(Range.END_TO_END, range) === 0) return;
     dismiss();
-    selected = { text, range, element };
+    selected = { text, content: captureSelection(range, text), range, element };
     applyPageStyle(host, samplePageStyle(element, preferences.adaptToPage));
     bubble.hidden = false;
     reveal();
@@ -180,12 +199,13 @@ export function mountTranslator(client: TranslationClient): () => void {
 
   async function translate(): Promise<void> {
     if (!selected) return;
-    const text = selected.text;
+    const content = selected.content;
     const ticket = ++generation;
     bubble.hidden = true;
     panel.hidden = false;
     output.hidden = true;
     output.textContent = "";
+    copiedText = "";
     copy.disabled = true;
     copy.setAttribute("aria-label", "Copy translation");
     copy.title = "Copy translation";
@@ -205,9 +225,9 @@ export function mountTranslator(client: TranslationClient): () => void {
       sessionTarget = translationTarget;
       picker.update({ preferences, target: translationTarget });
       if (selected) applyPageStyle(host, samplePageStyle(selected.element, preferences.adaptToPage));
-      const translation = await client.translate({ text, target: translationTarget, provider: preferences.provider });
+      const translation = await client.translate({ ...content, target: translationTarget, provider: preferences.provider });
       if (ticket !== generation || destroyed) return;
-      output.textContent = translation.text;
+      copiedText = renderTranslation(output, translation);
       output.lang = translation.target;
       output.dir = getLanguage(translation.target)?.direction ?? "auto";
       output.hidden = false;
@@ -245,7 +265,7 @@ export function mountTranslator(client: TranslationClient): () => void {
     }
   }
   copy.addEventListener("click", async () => {
-    const result = await copyTranslation({ text: output.textContent ?? "", clipboard: navigator.clipboard });
+    const result = await copyTranslation({ text: copiedText, clipboard: navigator.clipboard });
     if (result === "copied") {
       copy.setAttribute("aria-label", "Translation copied");
       copy.title = "Copied";

@@ -42,6 +42,18 @@
         </div>
         <button type="button" data-select="long-text">Select the full passage</button>
       </section>
+      <section class="test-section">
+        <h2>Paragraphs and lists</h2>
+        <div id="formatted-text">
+          <h3>Help me choose the right tool</h3>
+          <p>Keep the first paragraph separate. Preserve <strong>important words</strong> while translating the sentence around them.</p>
+          <p>A second paragraph should have its own space. This is an <em>emphasized phrase</em> inside a complete sentence.</p>
+          <ul><li>Which programming language do you prefer?<ul><li>JavaScript, TypeScript, Python, Go, or Rust.</li></ul></li><li>What are you trying to build?</li></ul>
+          <ol start="3"><li>Choose a target language.</li><li>Read the translation, then close the window.</li></ol>
+          <p>Keep an explicit line break here.<br>Start this sentence on a new line.</p>
+        </div>
+        <button type="button" data-select="formatted-text">Select the formatted passage</button>
+      </section>
       <section class="test-section multilingual">
         <h2>Different scripts and directions</h2>
         <p lang="uk">Швидкий переклад допомагає зрозуміти речення та продовжити читання, не залишаючи сторінку.</p>
@@ -63,11 +75,11 @@
         <div class="sample-card low-contrast"><p id="contrast-text">This deliberately faint text tests whether the translation remains readable even when the source page uses poor contrast.</p><a href="#sample-text">A faint link</a></div>
         <div class="sample-card gradient-card"><div class="glass-card"><p id="glass-text">This translucent card sits over a gradient. Compare its text color and borders, then try a neutral popup by disabling page adaptation.</p><a href="#sample-text">A glass-card link</a></div></div>
       </section>
-      <section class="test-section">
+      <section class="test-section" id="structured-text">
         <h2>Code, tables, and scroll containers</h2>
         <pre><code id="code-text">const message = "Translate this text without changing its meaning.";
 // Keep URLs, variable names, and punctuation readable.</code></pre>
-        <table><thead><tr><th>Item</th><th>Reading sample</th></tr></thead><tbody><tr><td>Release note</td><td>The update fixes a crash when the window is resized.</td></tr><tr><td>Price</td><td>The monthly plan costs €9.99, including local taxes.</td></tr></tbody></table>
+        <table id="table-text"><thead><tr><th>Item</th><th>Reading sample</th></tr></thead><tbody><tr><td>Release note</td><td>The update fixes a crash when the window is resized.</td></tr><tr><td>Price</td><td>The monthly plan costs €9.99, including local taxes.</td></tr></tbody></table>
         <div class="scroll-sample"><p>A scroll container can have a separate background and a narrow line length. Select a sentence close to its edges.</p><p>After translating, scroll the translation itself to read a longer result. Scrolling the original page closes the popup.</p><p>Try selecting text across two paragraphs, changing the target, and copying the translation.</p><p>The toolbar should remain usable when the browser is only 390 pixels wide.</p><a href="#sample-text">Return to the article</a></div>
       </section>
       <section class="test-section">

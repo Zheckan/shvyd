@@ -185,6 +185,15 @@ def main():
                 screenshot(style)
                 print(json.dumps({'check': style, 'target': value['target'], 'fitsViewport': True, 'font': value['font'], 'radius': value['radius']}), flush=True)
 
+            value = translate_selection('formatted-text', 'uk')
+            structure = page.evaluate("""(() => {const o=document.getElementById('shvyd-root').shadowRoot.querySelector('.translation');return {
+              paragraphs:o.querySelectorAll('p').length, bullets:o.querySelectorAll('ul > li').length,
+              numbered:o.querySelectorAll('ol > li').length, heading:!!o.querySelector('h3'),
+              strong:!!o.querySelector('strong'), emphasis:!!o.querySelector('em'), lineBreak:!!o.querySelector('br')};})()""")
+            assert structure == {'paragraphs':3,'bullets':3,'numbered':2,'heading':True,'strong':True,'emphasis':True,'lineBreak':True}, structure
+            record('azure-preserved-paragraphs-and-lists', {**value, **structure})
+            screenshot('formatted-paragraphs')
+
             choose_language('pl')
             navigate('journal')
             value = translate_selection(target='pl')
