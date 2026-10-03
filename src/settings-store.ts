@@ -46,6 +46,10 @@ export function createSettingsStore(storage: {
         provider: value.provider ?? current.provider,
         target: value.target ?? current.target,
         adaptToPage: value.adaptToPage ?? current.adaptToPage,
+        favoriteLanguages: value.favoriteLanguages ?? current.favoriteLanguages,
+        showOtherLanguages: value.showOtherLanguages ?? current.showOtherLanguages,
+        targetMode: value.targetMode ?? current.targetMode,
+        defaultTarget: value.defaultTarget ?? current.defaultTarget,
       })));
     },
   };
