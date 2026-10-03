@@ -9,7 +9,8 @@
     "dev": "bun scripts/dev.ts",
     "test": "bun test tests",
     "typecheck": "tsc --noEmit",
-    "check": "bun run typecheck && bun run test && bun run build"
+    "check": "bun run typecheck && bun run test && bun run build",
+    "languages:update": "bun scripts/update-languages.ts"
   },
   "devDependencies": {
     "@types/bun": "^1.4.2",
