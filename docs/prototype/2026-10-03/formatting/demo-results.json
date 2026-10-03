@@ -1,0 +1,62 @@
+{
+  "passed": true,
+  "browser": "Helium",
+  "isolatedProfile": true,
+  "extensionLoaded": false,
+  "checks": [
+    {
+      "check": "demo-settings-save",
+      "passed": true
+    },
+    {
+      "check": "demo-default-target",
+      "target": "uk",
+      "direction": "ltr",
+      "text": "Найшвидші інструменти зникають у завданні. Виберіть речення, зрозумійте його значення і продовжуйте читати, не залишаючи сторінки.",
+      "error": false
+    },
+    {
+      "check": "demo-temporary-target",
+      "target": "ar",
+      "direction": "rtl",
+      "text": "أسرع الأدوات تختفي داخل المهمة. اختر جملة، احصل على معناها، واستمر في القراءة دون مغادرة الصفحة.",
+      "error": false
+    },
+    {
+      "check": "demo-default-reset-on-close",
+      "target": "uk",
+      "direction": "ltr",
+      "text": "Найшвидші інструменти зникають у завданні. Виберіть речення, зрозумійте його значення і продовжуйте читати, не залишаючи сторінки.",
+      "error": false
+    },
+    {
+      "check": "demo-additional-language-search",
+      "passed": true
+    },
+    {
+      "check": "partial-selection-only-with-paragraph-boundaries",
+      "passed": true,
+      "controlledResponse": true
+    },
+    {
+      "check": "css-block-paragraph-boundaries",
+      "passed": true,
+      "controlledResponse": true
+    },
+    {
+      "check": "provider-html-has-no-active-content-or-page-attributes",
+      "passed": true,
+      "controlledResponse": true
+    },
+    {
+      "check": "copy-preserves-paragraphs-list-markers-and-table-columns",
+      "passed": true,
+      "controlledResponse": true
+    },
+    {
+      "check": "excessive-markup-falls-back-to-bounded-plain-text",
+      "passed": true,
+      "controlledResponse": true
+    }
+  ]
+}

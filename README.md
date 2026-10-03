@@ -4,6 +4,8 @@ A small Chromium extension for translating selected text without leaving the pag
 
 The popup uses consistent SF Pro / system typography with 15 px translation text. On macOS it uses the native system font; other platforms use their system sans-serif fallback. It takes background, text and accent colors, border, corner radius, and shadow from the area around the selection. Text contrast is checked before using the sampled colors. You can switch page adaptation off in settings.
 
+Selected paragraphs, headings, emphasis, lists, and table cells keep their structure in the translation. Code stays unchanged. The Copy button keeps paragraph breaks, list markers, and table columns as plain text. This uses one provider request; see [selection formatting](docs/formatting.md).
+
 ## Load the prototype in Helium
 
 ```sh
@@ -57,7 +59,7 @@ python3 scripts/check-extension.py
 python3 scripts/check-demo.py
 ```
 
-The live check uses a temporary Helium profile, leaving the regular profile alone. It covers both providers, eight page styles, preferred and additional languages, remembered and fixed targets, right-to-left output, long selections, nested cards, viewport bounds, and Escape dismissal. It uses the `websocket-client` Python dependency already required by the local benchmark harness. Screenshots and results are written under the ignored `.preview/extension-check` directory.
+The live check uses a temporary Helium profile, leaving the regular profile alone. It covers both providers, eight page styles, preferred and additional languages, remembered and fixed targets, right-to-left output, formatted paragraphs and lists, table cells, unchanged code, long selections, nested cards, viewport bounds, and Escape dismissal. The demo check also uses controlled provider responses to verify partial selections, safe HTML rendering, and copying. These scripts use the `websocket-client` Python dependency already required by the local benchmark harness. Screenshots and results are written under the ignored `.preview/extension-check` and `.preview/demo-check` directories.
 
 ## Prototype boundaries
 
@@ -74,3 +76,4 @@ The live check uses a temporary Helium profile, leaving the regular profile alon
 - [Benchmark archive](docs/benchmarks/README.md)
 - [Prototype verification and screenshots](docs/prototype/2026-10-03/report.md)
 - [Language settings and playground verification](docs/prototype/2026-10-03/languages/report.md)
+- [Selection formatting verification](docs/prototype/2026-10-03/formatting/report.md)

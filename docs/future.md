@@ -38,4 +38,6 @@ The prototype now samples nearby computed styles for surface and text colors, li
 
 The [HTML playground](../demo/test-page.html) now includes eight page styles, nested cards, faint text, gradient and translucent backgrounds, mixed scripts, long passages, tables, code, and scroll containers. The current language settings include preferred languages, a searchable full provider list, and remembered or fixed starting targets. These are implemented; offline support remains speculative.
 
+The popup also [preserves selected paragraph, list, and table structure](formatting.md), keeping code unchanged and using the same SF Pro / system font.
+
 Further adaptation remains an idea with open questions. Can we recognize a page's component style more reliably? What should happen over image or gradient backgrounds? Does matching an unusual visual treatment help reading, or get in the way? How well does it work with custom web components and embedded frames? The aim is a quiet translation window, with the translated text taking most of the space.
