@@ -1,0 +1,34 @@
+{
+  "passed": true,
+  "browser": "Helium",
+  "isolatedProfile": true,
+  "fixtureProtocol": "file",
+  "checks": [
+    {
+      "check": "movable-single-html-without-asset-or-server-requests",
+      "passed": true
+    },
+    {
+      "check": "eight-local-file-style-controls",
+      "passed": true
+    },
+    {
+      "check": "local-file-selection-helper",
+      "passed": true
+    },
+    {
+      "check": "file-access-confirmed-through-details-in-isolated-profile",
+      "passed": true
+    },
+    {
+      "check": "live-formatted-translation-from-file-url",
+      "passed": true,
+      "error": false,
+      "target": "uk",
+      "text": "\n          Допоможіть обрати правильний інструмент\n          Тримайте перший абзац окремо. Зберігайте важливі слова , перекладаючи речення навколо них.\n          Другий абзац повинен мати власний пробіл. Це підкреслена фраза всередині повного речення.\n          Яку мову програмування ви віддаєте перевагу?JavaScript, TypeScript, Python, Go або Rust.Що ти намагаєшся побудувати?\n          Виберіть цільову мову.Прочитайте переклад, потім закрийте вікно.\n          Залиште чіткий розрив рядка тут.Почніть це речення з нового рядка.\n        ",
+      "paragraphs": 3,
+      "items": 5,
+      "background": "rgb(29, 37, 49)"
+    }
+  ]
+}

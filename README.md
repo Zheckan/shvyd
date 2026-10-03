@@ -26,6 +26,18 @@ The bundled catalog has 173 targets across the two providers. Choose your prefer
 
 The prototype runs directly in the browser. Its background worker makes the provider request, so no application server is needed. Keys are stored in extension-local storage restricted to trusted extension contexts. The page popup receives only public preferences and the translated text.
 
+## Build a standalone test page
+
+```sh
+pnpm build:playground
+```
+
+Open the generated `dist/playground.html` in Helium or another Chromium browser. It is one normal HTML file with all eight themes and selection controls included. You can move or copy it by itself. It needs no test-page server, and this build command uses only Node.js.
+
+To translate on the local file, reload Shvyd in `chrome://extensions`, open its **Details**, enable **Allow access to file URLs**, and refresh the HTML page. Chromium requires this separate grant for local files. See [Chrome's file match-pattern documentation](https://developer.chrome.com/docs/extensions/develop/concepts/match-patterns). Translation uses the extension's saved keys and language settings and still needs a connection to the selected provider.
+
+The extension build is separate. If you need to rebuild it with your configured local keys, run `pnpm build:local` before reloading Shvyd.
+
 ## Try the live demo
 
 ```sh
@@ -36,13 +48,13 @@ Open [the live playground](http://localhost:5173). It has eight styles: editoria
 
 The demo uses a loopback server to call Azure or DeepL using `.env`. Its preferences last until that server restarts. The actual extension stores its preferences across browser restarts. For testing the installed extension rather than the demo's injected UI, use [the extension fixture](http://localhost:5173/fixture?style=editorial).
 
-The HTML page is [demo/test-page.html](demo/test-page.html). It also works with a plain static server and the installed extension:
+The source HTML page is [demo/test-page.html](demo/test-page.html). For a single file, use `pnpm build:playground` above. The source page can also run with a plain static server and the installed extension:
 
 ```sh
 python3 -m http.server 5174 --bind 127.0.0.1 --directory demo
 ```
 
-Open [the static test page](http://localhost:5174/test-page.html). Its theme picker and selection helpers work without Bun or a demo API server. Configure translation through the extension's own settings. Serve it over HTTP so the extension can run on the page.
+Open [the static test page](http://localhost:5174/test-page.html). Its theme picker and selection helpers work without Bun or a demo API server. Configure translation through the extension's own settings.
 
 ## Development and verification
 
@@ -58,6 +70,16 @@ bun run build:local
 python3 scripts/check-extension.py
 python3 scripts/check-demo.py
 ```
+
+To verify the standalone HTML without a test-page server:
+
+```sh
+pnpm build:playground
+pnpm build:local
+python3 scripts/check-file-playground.py
+```
+
+This check copies only the generated HTML to a temporary folder and checks file access through the browser's extension Details control in a disposable profile, enabling it if needed. It verifies theme controls, selection helpers, and a live formatted translation from a file URL.
 
 The live check uses a temporary Helium profile, leaving the regular profile alone. It covers both providers, eight page styles, preferred and additional languages, remembered and fixed targets, right-to-left output, formatted paragraphs and lists, table cells, unchanged code, long selections, nested cards, viewport bounds, and Escape dismissal. The demo check also uses controlled provider responses to verify partial selections, safe HTML rendering, and copying. These scripts use the `websocket-client` Python dependency already required by the local benchmark harness. Screenshots and results are written under the ignored `.preview/extension-check` and `.preview/demo-check` directories.
 
@@ -77,3 +99,4 @@ The live check uses a temporary Helium profile, leaving the regular profile alon
 - [Prototype verification and screenshots](docs/prototype/2026-10-03/report.md)
 - [Language settings and playground verification](docs/prototype/2026-10-03/languages/report.md)
 - [Selection formatting verification](docs/prototype/2026-10-03/formatting/report.md)
+- [Standalone HTML verification](docs/prototype/2026-10-03/standalone/report.md)
