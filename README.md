@@ -22,7 +22,7 @@ bun run build:local
 
 Click the extension's toolbar icon to open settings. There you can change the provider, target language, page adaptation, or keys. You can also import `.env` there. Existing saved settings take precedence over the bootstrap file, including after rebuilding or reloading the extension.
 
-The bundled catalog has 173 targets across the two providers. Choose your preferred languages in settings; the popup shows those first, with a searchable **More languages** menu for the rest. You can hide that menu. Target choices follow provider support, and preferred languages stay saved across provider changes. See [language choices](docs/languages.md) for the default-language modes and catalog details.
+The bundled catalog has 173 targets across the two providers. Choose your preferred languages in settings; the popup shows those first, with a searchable **More languages** menu for the rest. The language menu opens in a separate popover, so expanding or searching it keeps the translation window still. It follows its button when the browser is resized. You can hide the additional-language menu. Target choices follow provider support, and preferred languages stay saved across provider changes. See [language choices](docs/languages.md) for the default-language modes and catalog details.
 
 The prototype runs directly in the browser. Its background worker makes the provider request, so no application server is needed. Keys are stored in extension-local storage restricted to trusted extension contexts. The page popup receives only public preferences and the translated text.
 
@@ -82,3 +82,4 @@ The live check uses a temporary Helium profile, leaving the regular profile alon
 - [Prototype verification and screenshots](docs/prototype/2026-10-03/report.md)
 - [Language settings and playground verification](docs/prototype/2026-10-03/languages/report.md)
 - [Selection formatting verification](docs/prototype/2026-10-03/formatting/report.md)
+- [Language popover and resize verification](docs/prototype/2026-10-03/language-popover/report.md)
