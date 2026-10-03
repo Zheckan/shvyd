@@ -174,7 +174,16 @@ export function captureSelection(
         }
       }
       for (const child of node.childNodes) copy(child, output, depth + 1)
-      if (tag === 'br' || output.textContent?.trim()) parent.appendChild(output)
+      if (tag === 'br' || output.textContent?.trim()) {
+        if (
+          tag !== 'u' &&
+          style.textDecorationLine.split(/\s+/).includes('underline')
+        ) {
+          const underline = document.createElement('u')
+          underline.append(output)
+          parent.appendChild(underline)
+        } else parent.appendChild(output)
+      }
     }
     copy(source, container, 0)
     // A complete wrapper is required by Azure. Excess markup falls back to the bounded plain selection.

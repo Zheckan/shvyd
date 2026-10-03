@@ -95,6 +95,8 @@ with tempfile.TemporaryDirectory(prefix='shvyd-demo-') as profile:
 
         menu_checks=page.evaluate((ROOT/'tests/browser/language-menu.js').read_text())
         checks.extend({'check':check,'passed':True,'controlledResponse':True} for check in menu_checks['checks'])
+        underline_checks=page.evaluate((ROOT/'tests/browser/underline.js').read_text())
+        checks.extend({'check':check,'passed':True,'controlledResponse':True} for check in underline_checks['checks'])
 
         # Controlled provider responses exercise the public popup without sending attack fixtures to a cloud API.
         page.evaluate("""(() => {

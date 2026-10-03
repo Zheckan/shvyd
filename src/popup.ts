@@ -43,6 +43,7 @@ svg { display: block; width: 16px; height: 16px; flex-shrink: 0; }
 .formatted p, .formatted h1, .formatted h2, .formatted h3, .formatted h4, .formatted h5, .formatted h6, .formatted pre, .formatted table, .formatted dl { margin: 0 0 .8em; }
 .formatted h1, .formatted h2, .formatted h3, .formatted h4, .formatted h5, .formatted h6 { font-size: 1em; font-weight: 650; line-height: 1.5; }
 .formatted strong, .formatted th, .formatted dt { font-weight: 650; }
+.formatted u { text-decoration-line: underline; }
 .formatted ul, .formatted ol { padding-inline-start: 1.5em; margin: 0 0 .8em; }
 .formatted li + li { margin-block-start: .35em; }
 .formatted li > ul, .formatted li > ol { margin-block: .35em 0; }
