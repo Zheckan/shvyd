@@ -51,7 +51,7 @@ body[data-style=contrast] { --paper: #fff; --ink: #000; --muted: #222; --accent:
 body[data-style=contrast] article { border: 2px solid #000; padding: 30px; }
 body[data-style=neon] { --paper: #180f29; --ink: #f3e9ff; --muted: #c6abd9; --accent: #76f3cb; --edge: #76558f; --radius: 18px; color-scheme: dark; font-family: "Courier New", monospace; }
 body[data-style=neon] article { background: #281940; padding: 30px; border: 1px solid var(--edge); box-shadow: 0 12px 40px #be5aff22; }
-body[data-style=gradient] { --paper: #e6eaf9; --ink: #263859; --muted: #596985; --accent: #354ecb; --edge: #a8b7d4; --radius: 18px; background: linear-gradient(130deg,#e6eaf9,#f3e6ef,#dff5f0); font-family: Verdana, sans-serif; }
+body[data-style=gradient] { --paper: #e6eaf9; --ink: #263859; --muted: #596985; --accent: #354ecb; --edge: #a8b7d4; --radius: 18px; background: linear-gradient(130deg,#e6eaf9,#f3e6ef,#dff5f0); background-color: var(--paper); font-family: Verdana, sans-serif; }
 body[data-style=gradient] article { background: #ffffffa8; border: 1px solid #ffffff; padding: 30px; box-shadow: 0 15px 50px #52618b20; }
 .test-section { border-top: 1px solid var(--edge); margin-top: 32px; padding-top: 24px; }
 .test-section h2 { font: 600 17px system-ui, sans-serif; margin: 0 0 18px; }

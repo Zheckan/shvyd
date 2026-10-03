@@ -12,6 +12,8 @@ export type PageStyle = {
 
 let context: CanvasRenderingContext2D | null | undefined;
 function color(value: string): RGBA {
+  const rgb = /^rgba?\(\s*(\d*\.?\d+)[,\s]+(\d*\.?\d+)[,\s]+(\d*\.?\d+)\s*(?:[,/]\s*(\d*\.?\d+))?\s*\)$/.exec(value);
+  if (rgb) return [Number(rgb[1]), Number(rgb[2]), Number(rgb[3]), rgb[4] === undefined ? 1 : Number(rgb[4])];
   if (context === undefined) {
     const canvas = document.createElement("canvas");
     canvas.width = canvas.height = 1;
@@ -59,8 +61,10 @@ export function samplePageStyle(element: Element, adapt: boolean): PageStyle {
   let foreground = adapt ? blend(color(source.color), background) : readable;
   if (contrast(foreground, background) < 4.5) foreground = contrast([0, 0, 0], background) >= contrast([255, 255, 255], background) ? [0, 0, 0] : [255, 255, 255];
 
-  const container = element.closest("article, main, section") ?? document.body;
-  const link = container?.querySelector("a[href]");
+  let link: Element | null = null;
+  for (let container: Element | null = element; container && !link; container = container.parentElement) {
+    link = container.querySelector("a[href]");
+  }
   let accent = link && adapt ? blend(color(getComputedStyle(link).color), background) : foreground;
   if (contrast(accent, background) < 3) accent = foreground;
   const rounding = adapt ? ancestors.find(style => parseFloat(style.borderTopLeftRadius) > 0) : undefined;
