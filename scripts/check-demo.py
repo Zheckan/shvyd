@@ -93,6 +93,9 @@ with tempfile.TemporaryDirectory(prefix='shvyd-demo-') as profile:
         screenshot=page.call('Page.captureScreenshot',{'format':'png'})
         (output/'search-menu.png').write_bytes(base64.b64decode(screenshot['data']))
 
+        menu_checks=page.evaluate((ROOT/'tests/browser/language-menu.js').read_text())
+        checks.extend({'check':check,'passed':True,'controlledResponse':True} for check in menu_checks['checks'])
+
         # Controlled provider responses exercise the public popup without sending attack fixtures to a cloud API.
         page.evaluate("""(() => {
           window.shvydTestRequests=[];window.shvydTestReply=null;window.shvydExecuted=0;

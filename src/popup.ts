@@ -20,13 +20,13 @@ const CSS = `
 button, input { font: inherit; color: inherit; }
 button { cursor: pointer; }
 button:focus-visible, select:focus-visible { outline: 2px solid var(--shvyd-accent); outline-offset: 3px; }
-.bubble, .panel { position: fixed; color: var(--shvyd-foreground); background: var(--shvyd-background); border: 1px solid var(--shvyd-border); box-shadow: var(--shvyd-shadow); font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", system-ui, sans-serif; letter-spacing: normal; }
+.bubble, .panel, .language-menu { position: fixed; color: var(--shvyd-foreground); background: var(--shvyd-background); border: 1px solid var(--shvyd-border); box-shadow: var(--shvyd-shadow); font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", system-ui, sans-serif; letter-spacing: normal; }
 .bubble { display: flex; align-items: center; gap: 7px; padding: 7px 11px; border-radius: max(4px, var(--shvyd-radius)); font-size: 13px; line-height: 18px; white-space: nowrap; }
 .bubble svg { color: var(--shvyd-accent); }
 .panel { width: min(410px, calc(100vw - 24px)); max-height: calc(100dvh - 24px); border-radius: var(--shvyd-radius); overflow: auto; overscroll-behavior: contain; }
 .toolbar { display: flex; align-items: center; gap: 8px; padding: 10px 12px 0 15px; }
 .target { min-width: 0; max-width: 250px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; border: 0; background: transparent; font-size: 12px; padding: 4px 2px; color: var(--shvyd-accent); cursor: pointer; }
-.language-menu { margin: 10px 12px 0; padding: 8px; border: 1px solid var(--shvyd-border); border-radius: max(4px, var(--shvyd-radius)); }
+.language-menu { z-index: 1; width: min(280px, calc(100vw - 24px)); max-height: calc(100dvh - 24px); overflow: auto; overscroll-behavior: contain; padding: 8px; border-radius: max(4px, var(--shvyd-radius)); }
 .language-list { max-height: 170px; overflow: auto; overscroll-behavior: contain; font-size: 12px; }
 .language-option { display: block; width: 100%; border: 0; background: transparent; padding: 8px; text-align: start; border-radius: 4px; font-size: 12px; }
 .language-option:hover, .language-option[aria-selected=true] { background: color-mix(in srgb, var(--shvyd-foreground) 8%, transparent); }
@@ -128,9 +128,6 @@ export function mountTranslator(client: TranslationClient): () => void {
     onSelect: (code) => {
       void chooseTarget(code)
     },
-    onResize: () => {
-      if (!panel.hidden) position(panel)
-    },
   })
   const copy = make('button', 'icon')
   copy.type = 'button'
@@ -155,9 +152,9 @@ export function mountTranslator(client: TranslationClient): () => void {
   const settings = make('button', 'text-button', 'Settings')
   retry.type = settings.type = 'button'
   actions.append(retry, settings)
-  panel.append(toolbar, picker.menu, loading, output, status, actions)
+  panel.append(toolbar, loading, output, status, actions)
   bubble.hidden = panel.hidden = true
-  root.append(style, bubble, panel)
+  root.append(style, bubble, panel, picker.menu)
   document.documentElement.append(host)
 
   let preferences = publicPreferences(DEFAULT_SETTINGS)
@@ -175,6 +172,7 @@ export function mountTranslator(client: TranslationClient): () => void {
   let pointerDown = false
   let generation = 0
   let frame = 0
+  let resizeFrame = 0
   let destroyed = false
   picker.update({ preferences, target: initialTarget(preferences) })
   void client
@@ -228,6 +226,7 @@ export function mountTranslator(client: TranslationClient): () => void {
     if (y + height > window.innerHeight - 12) y = anchor.top - height - 9
     element.style.left = `${x}px`
     element.style.top = `${Math.max(12, Math.min(y, window.innerHeight - height - 12))}px`
+    if (element === panel) picker.position()
   }
 
   function readSelection(): void {
@@ -276,6 +275,11 @@ export function mountTranslator(client: TranslationClient): () => void {
 
   function scheduleSelection(): void {
     if (!frame) frame = requestAnimationFrame(readSelection)
+  }
+
+  function positionVisible(): void {
+    if (!panel.hidden) position(panel)
+    else if (!bubble.hidden) position(bubble)
   }
 
   async function translate(): Promise<void> {
@@ -395,7 +399,12 @@ export function mountTranslator(client: TranslationClient): () => void {
   document.addEventListener(
     'pointerdown',
     (event) => {
-      if (isInside(event)) return
+      if (isInside(event)) {
+        const path = event.composedPath()
+        if (!path.includes(picker.menu) && !path.includes(picker.button))
+          picker.close()
+        return
+      }
       pointerDown = true
       dismiss()
     },
@@ -419,22 +428,35 @@ export function mountTranslator(client: TranslationClient): () => void {
   document.addEventListener(
     'keydown',
     (event) => {
-      if (event.key === 'Escape') dismiss()
+      if (event.key === 'Escape') {
+        if (!picker.menu.hidden) {
+          event.preventDefault()
+          picker.close()
+          picker.button.focus()
+        } else dismiss()
+      }
     },
     { signal: events.signal }
   )
   document.addEventListener(
     'scroll',
     (event) => {
-      if (!isInside(event)) dismiss()
+      if (!isInside(event)) {
+        // Reflow can scroll the page during the same frame as a window resize.
+        if (resizeFrame) positionVisible()
+        else dismiss()
+      } else if (event.composedPath().includes(panel)) picker.position()
     },
     { capture: true, passive: true, signal: events.signal }
   )
   window.addEventListener(
     'resize',
     () => {
-      if (!panel.hidden) position(panel)
-      else if (!bubble.hidden) position(bubble)
+      cancelAnimationFrame(resizeFrame)
+      resizeFrame = requestAnimationFrame(() => {
+        resizeFrame = 0
+      })
+      positionVisible()
     },
     { signal: events.signal }
   )
@@ -442,6 +464,7 @@ export function mountTranslator(client: TranslationClient): () => void {
     destroyed = true
     dismiss()
     cancelAnimationFrame(frame)
+    cancelAnimationFrame(resizeFrame)
     events.abort()
     host.remove()
   }
