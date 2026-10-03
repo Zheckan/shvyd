@@ -57,4 +57,6 @@ const server = Bun.serve({
     return new Response(html, { headers: { "Content-Type": "text/html; charset=utf-8" } });
   },
 });
-console.info(`Shvyd live demo: ${server.url}`);
+console.info(`Shvyd playground: http://localhost:${server.port}`);
+console.info(`Installed extension test page: http://localhost:${server.port}/fixture`);
+console.info("Keep this terminal running while you test. Press Ctrl+C to stop the playground.");
