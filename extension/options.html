@@ -17,10 +17,9 @@
         <h2>Preferences</h2>
         <div class="row">
           <label>Translate with<select name="provider"><option value="azure">Azure · fastest complete results in our tests</option><option value="deepl">DeepL · alternative wording</option></select></label>
-          <label>Translate to<select name="target" id="target"></select></label>
         </div>
         <label class="toggle"><input type="checkbox" name="adaptToPage"><span>Match the page's style<small>Use nearby colors, borders, and corners. Keep SF Pro / system typography.</small></span></label>
-        <p class="hint">The popup remembers your last target language.</p>
+        <div id="language-settings"></div>
       </section>
       <details id="credentials">
         <summary>API keys <span class="hint" id="key-summary"></span></summary>

@@ -1,5 +1,7 @@
 import type { TranslationClient } from "./client";
-import { DEFAULT_SETTINGS, LANGUAGES, isLanguage, publicPreferences } from "./settings";
+import { DEFAULT_SETTINGS, initialTarget, publicPreferences, type Language } from "./settings";
+import { getLanguage, supportsLanguage } from "./languages";
+import { createLanguagePicker } from "./language-picker";
 import { applyPageStyle, samplePageStyle } from "./page-style";
 import { MAX_SELECTION_LENGTH, TranslationError } from "./translation";
 import { copyTranslation } from "./clipboard";
@@ -9,7 +11,7 @@ const CSS = `
 :host::backdrop { background: transparent; pointer-events: none; }
 * { box-sizing: border-box; }
 [hidden] { display: none !important; }
-button, select { font: inherit; color: inherit; }
+button, input { font: inherit; color: inherit; }
 button { cursor: pointer; }
 button:focus-visible, select:focus-visible { outline: 2px solid var(--shvyd-accent); outline-offset: 3px; }
 .bubble, .panel { position: fixed; color: var(--shvyd-foreground); background: var(--shvyd-background); border: 1px solid var(--shvyd-border); box-shadow: var(--shvyd-shadow); font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", system-ui, sans-serif; letter-spacing: normal; }
@@ -17,8 +19,14 @@ button:focus-visible, select:focus-visible { outline: 2px solid var(--shvyd-acce
 .bubble svg { color: var(--shvyd-accent); }
 .panel { width: min(410px, calc(100vw - 24px)); max-height: calc(100dvh - 24px); border-radius: var(--shvyd-radius); overflow: auto; overscroll-behavior: contain; }
 .toolbar { display: flex; align-items: center; gap: 8px; padding: 10px 12px 0 15px; }
-.target { min-width: 0; max-width: 200px; border: 0; background: transparent; font-size: 12px; padding: 4px 2px; color: var(--shvyd-accent); cursor: pointer; }
-.target option { color: var(--shvyd-foreground); background: var(--shvyd-background); }
+.target { min-width: 0; max-width: 250px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; border: 0; background: transparent; font-size: 12px; padding: 4px 2px; color: var(--shvyd-accent); cursor: pointer; }
+.language-menu { margin: 10px 12px 0; padding: 8px; border: 1px solid var(--shvyd-border); border-radius: max(4px, var(--shvyd-radius)); }
+.language-list { max-height: 170px; overflow: auto; overscroll-behavior: contain; font-size: 12px; }
+.language-option { display: block; width: 100%; border: 0; background: transparent; padding: 8px; text-align: start; border-radius: 4px; font-size: 12px; }
+.language-option:hover, .language-option[aria-selected=true] { background: color-mix(in srgb, var(--shvyd-foreground) 8%, transparent); }
+.more-languages { border: 0; border-top: 1px solid var(--shvyd-border); width: 100%; text-align: start; padding: 10px 8px 2px; background: transparent; color: var(--shvyd-accent); font-size: 12px; }
+.language-search { width: 100%; border: 1px solid var(--shvyd-border); background: var(--shvyd-background); padding: 8px; border-radius: 4px; font-size: 12px; margin: 8px 0; }
+.language-search:focus-visible { outline: 2px solid var(--shvyd-accent); outline-offset: 1px; }
 .spacer { flex: 1; }
 .icon { width: 28px; height: 28px; display: grid; place-items: center; background: transparent; border: 0; border-radius: 4px; padding: 4px; opacity: .65; }
 .icon:hover { opacity: 1; background: color-mix(in srgb, var(--shvyd-foreground) 7%, transparent); }
@@ -75,14 +83,7 @@ export function mountTranslator(client: TranslationClient): () => void {
   panel.setAttribute("role", "dialog");
   panel.setAttribute("aria-label", "Selected text translation");
   const toolbar = make("div", "toolbar");
-  const target = make("select", "target");
-  target.setAttribute("aria-label", "Translate to");
-  for (const language of LANGUAGES) {
-    const option = document.createElement("option");
-    option.value = language.code;
-    option.textContent = language.label;
-    target.append(option);
-  }
+  const picker = createLanguagePicker({ onSelect: code => { void chooseTarget(code); }, onResize: () => { if (!panel.hidden) position(panel); } });
   const copy = make("button", "icon");
   copy.type = "button";
   copy.setAttribute("aria-label", "Copy translation");
@@ -93,7 +94,7 @@ export function mountTranslator(client: TranslationClient): () => void {
   closeButton.setAttribute("aria-label", "Close translation");
   closeButton.title = "Close";
   closeButton.append(icon("M6 6l12 12M18 6 6 18"));
-  toolbar.append(target, make("span", "spacer"), copy, closeButton);
+  toolbar.append(picker.button, make("span", "spacer"), copy, closeButton);
   const output = make("div", "translation");
   output.setAttribute("aria-live", "polite");
   const loading = make("div", "loading");
@@ -106,18 +107,23 @@ export function mountTranslator(client: TranslationClient): () => void {
   const settings = make("button", "text-button", "Settings");
   retry.type = settings.type = "button";
   actions.append(retry, settings);
-  panel.append(toolbar, loading, output, status, actions);
+  panel.append(toolbar, picker.menu, loading, output, status, actions);
   bubble.hidden = panel.hidden = true;
   root.append(style, bubble, panel);
   document.documentElement.append(host);
 
   let preferences = publicPreferences(DEFAULT_SETTINGS);
+  let sessionTarget: Language | undefined;
+  let choiceGeneration = 0;
   let selected: { text: string; range: Range; element: Element } | undefined;
   let pointerDown = false;
   let generation = 0;
   let frame = 0;
   let destroyed = false;
-  void client.preferences().then(value => { if (panel.hidden) { preferences = value; target.value = value.target; } }).catch(() => undefined);
+  picker.update({ preferences, target: initialTarget(preferences) });
+  void client.preferences().then(value => {
+    if (panel.hidden) { preferences = value; picker.update({ preferences, target: initialTarget(preferences) }); }
+  }).catch(() => undefined);
 
   function isInside(event: Event): boolean { return event.composedPath().includes(host); }
   function reveal(): void {
@@ -128,6 +134,9 @@ export function mountTranslator(client: TranslationClient): () => void {
   function dismiss(): void {
     generation++;
     bubble.hidden = panel.hidden = true;
+    picker.close();
+    sessionTarget = undefined;
+    choiceGeneration++;
     selected = undefined;
     try { if (host.matches(":popover-open")) host.hidePopover(); } catch { /* No popover support. */ }
   }
@@ -185,18 +194,22 @@ export function mountTranslator(client: TranslationClient): () => void {
     status.className = "status sr-only";
     status.textContent = "Translating…";
     actions.hidden = true;
-    target.value = preferences.target;
+    picker.update({ preferences, target: sessionTarget ?? initialTarget(preferences) });
     panel.setAttribute("aria-busy", "true");
     reveal();
     position(panel);
     try {
       preferences = await client.preferences();
       if (ticket !== generation || destroyed) return;
-      target.value = preferences.target;
-      const translation = await client.translate({ text, target: preferences.target, provider: preferences.provider });
+      const translationTarget = sessionTarget && supportsLanguage(sessionTarget, preferences.provider) ? sessionTarget : initialTarget(preferences);
+      sessionTarget = translationTarget;
+      picker.update({ preferences, target: translationTarget });
+      if (selected) applyPageStyle(host, samplePageStyle(selected.element, preferences.adaptToPage));
+      const translation = await client.translate({ text, target: translationTarget, provider: preferences.provider });
       if (ticket !== generation || destroyed) return;
       output.textContent = translation.text;
       output.lang = translation.target;
+      output.dir = getLanguage(translation.target)?.direction ?? "auto";
       output.hidden = false;
       loading.hidden = status.hidden = true;
       copy.disabled = false;
@@ -218,17 +231,19 @@ export function mountTranslator(client: TranslationClient): () => void {
   retry.addEventListener("click", () => { void translate(); });
   settings.addEventListener("click", () => { void client.openSettings().catch(() => undefined); });
   closeButton.addEventListener("click", dismiss);
-  target.addEventListener("change", async () => {
-    if (!isLanguage(target.value)) return;
+  async function chooseTarget(code: Language): Promise<void> {
+    const choice = ++choiceGeneration;
     try {
-      preferences = await client.updatePreferences({ target: target.value });
+      if (preferences.targetMode === "last") preferences = await client.updatePreferences({ target: code });
+      if (choice !== choiceGeneration || !selected) return;
+      sessionTarget = code;
       await translate();
     } catch {
       status.textContent = "The target language could not be saved. Reload this page.";
       status.className = "status";
       status.hidden = false;
     }
-  });
+  }
   copy.addEventListener("click", async () => {
     const result = await copyTranslation({ text: output.textContent ?? "", clipboard: navigator.clipboard });
     if (result === "copied") {
