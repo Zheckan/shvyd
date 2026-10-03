@@ -2,7 +2,7 @@
 
 A small Chromium extension for translating selected text without leaving the page. Azure is the default provider; DeepL is available in settings. Ukrainian is the initial target, and the last chosen language is remembered.
 
-The popup takes its font, background, text and accent colors, border, corner radius, and shadow from the area around the selection. Text contrast is checked before using the sampled colors. You can switch page adaptation off in settings.
+The popup uses consistent SF Pro / system typography with 15 px translation text. On macOS it uses the native system font; other platforms use their system sans-serif fallback. It takes background, text and accent colors, border, corner radius, and shadow from the area around the selection. Text contrast is checked before using the sampled colors. You can switch page adaptation off in settings.
 
 ## Load the prototype in Helium
 

@@ -108,7 +108,8 @@ def main():
                   const p=root.querySelector('.panel'), o=root.querySelector('.translation');
                   const r=p.getBoundingClientRect(), style=getComputedStyle(p);
                   return {text:o.textContent, target:o.lang, error:!root.querySelector('.actions').hidden,
-                    font:getComputedStyle(o).fontFamily, background:style.backgroundColor, color:style.color,
+                    font:getComputedStyle(o).fontFamily, fontSize:getComputedStyle(o).fontSize,
+                    letterSpacing:getComputedStyle(o).letterSpacing, background:style.backgroundColor, color:style.color,
                     border:style.borderColor, radius:style.borderRadius,
                     fitsViewport:r.left>=0 && r.top>=0 && r.right<=innerWidth && r.bottom<=innerHeight};
                 })()""")
@@ -130,9 +131,11 @@ def main():
                 navigate(style)
                 value = translate_selection()
                 assert value['target'] == 'uk', 'Ukrainian was not the default.'
-                if style == 'editorial': assert 'Georgia' in value['font'] and value['background'] == 'rgb(246, 240, 228)'
-                if style == 'technical': assert 'Mono' in value['font'] and value['radius'] == '16px'
-                if style == 'journal': assert 'Arial' in value['font'] and value['background'] == 'rgb(255, 255, 255)'
+                assert '-apple-system' in value['font'] and 'SF Pro Text' in value['font'], 'Popup did not use system typography.'
+                assert value['fontSize'] == '15px' and value['letterSpacing'] == 'normal', 'Popup typography changed with the page.'
+                if style == 'editorial': assert value['background'] == 'rgb(246, 240, 228)'
+                if style == 'technical': assert value['radius'] == '16px'
+                if style == 'journal': assert value['background'] == 'rgb(255, 255, 255)'
                 if style == 'warm': assert value['radius'] == '20px'
                 value['style'] = style
                 results['checks'].append(value)

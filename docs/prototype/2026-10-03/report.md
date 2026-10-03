@@ -2,6 +2,8 @@
 
 The unpacked Manifest V3 extension ran successfully in an isolated, headless Helium profile on this Mac. Both Azure and DeepL returned translations through the extension's background worker. The normal browser profile was not changed.
 
+This records the initial prototype before the later switch to fixed SF Pro / system typography. The font observations and screenshots below are historical. The current popup keeps its font, 15 px translation size, and letter spacing consistent across pages; the repeatable harness now checks that behavior. See the separate [typography follow-up](typography.md) for its validation.
+
 ## Checks completed
 
 | Check | Observed result |

@@ -12,7 +12,7 @@ const CSS = `
 button, select { font: inherit; color: inherit; }
 button { cursor: pointer; }
 button:focus-visible, select:focus-visible { outline: 2px solid var(--shvyd-accent); outline-offset: 3px; }
-.bubble, .panel { position: fixed; color: var(--shvyd-foreground); background: var(--shvyd-background); border: 1px solid var(--shvyd-border); box-shadow: var(--shvyd-shadow); font-family: var(--shvyd-font); letter-spacing: var(--shvyd-letterSpacing); }
+.bubble, .panel { position: fixed; color: var(--shvyd-foreground); background: var(--shvyd-background); border: 1px solid var(--shvyd-border); box-shadow: var(--shvyd-shadow); font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", system-ui, sans-serif; letter-spacing: normal; }
 .bubble { display: flex; align-items: center; gap: 7px; padding: 7px 11px; border-radius: max(4px, var(--shvyd-radius)); font-size: 13px; line-height: 18px; white-space: nowrap; }
 .bubble svg { color: var(--shvyd-accent); }
 .panel { width: min(410px, calc(100vw - 24px)); max-height: calc(100dvh - 24px); border-radius: var(--shvyd-radius); overflow: auto; overscroll-behavior: contain; }
@@ -24,7 +24,7 @@ button:focus-visible, select:focus-visible { outline: 2px solid var(--shvyd-acce
 .icon:hover { opacity: 1; background: color-mix(in srgb, var(--shvyd-foreground) 7%, transparent); }
 .icon:disabled { opacity: .25; cursor: default; }
 svg { display: block; width: 16px; height: 16px; flex-shrink: 0; }
-.translation { padding: 13px 17px 18px; font-size: var(--shvyd-fontSize); line-height: 1.6; white-space: pre-wrap; overflow-wrap: anywhere; text-align: start; user-select: text; max-height: min(55dvh, 480px); overflow: auto; }
+.translation { padding: 13px 17px 18px; font-size: 15px; line-height: 1.6; white-space: pre-wrap; overflow-wrap: anywhere; text-align: start; user-select: text; max-height: min(55dvh, 480px); overflow: auto; }
 .status { padding: 0 17px 16px; font-size: 13px; line-height: 1.5; }
 .actions { padding: 0 17px 16px; display: flex; gap: 14px; }
 .text-button { border: 0; padding: 0; background: transparent; text-decoration: underline; text-underline-offset: 3px; color: var(--shvyd-accent); font-size: 13px; }
