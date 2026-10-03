@@ -24,7 +24,8 @@ button:focus-visible, select:focus-visible { outline: 2px solid var(--shvyd-acce
 .bubble { display: flex; align-items: center; gap: 7px; padding: 7px 11px; border-radius: max(4px, var(--shvyd-radius)); font-size: 13px; line-height: 18px; white-space: nowrap; }
 .bubble svg { color: var(--shvyd-accent); }
 .panel { width: min(410px, calc(100vw - 24px)); max-height: calc(100dvh - 24px); border-radius: var(--shvyd-radius); overflow: auto; overscroll-behavior: contain; }
-.toolbar { display: flex; align-items: center; gap: 8px; padding: 10px 12px 0 15px; }
+.toolbar { display: flex; align-items: center; gap: 8px; padding: 10px 12px 0 15px; cursor: grab; user-select: none; touch-action: none; }
+.toolbar.dragging { cursor: grabbing; }
 .target { min-width: 0; max-width: 250px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; border: 0; background: transparent; font-size: 12px; padding: 4px 2px; color: var(--shvyd-accent); cursor: pointer; }
 .language-menu { z-index: 1; width: min(280px, calc(100vw - 24px)); max-height: calc(100dvh - 24px); overflow: auto; overscroll-behavior: contain; padding: 8px; border-radius: max(4px, var(--shvyd-radius)); }
 .language-list { max-height: 170px; overflow: auto; overscroll-behavior: contain; font-size: 12px; }
@@ -33,7 +34,7 @@ button:focus-visible, select:focus-visible { outline: 2px solid var(--shvyd-acce
 .more-languages { border: 0; border-top: 1px solid var(--shvyd-border); width: 100%; text-align: start; padding: 10px 8px 2px; background: transparent; color: var(--shvyd-accent); font-size: 12px; }
 .language-search { width: 100%; border: 1px solid var(--shvyd-border); background: var(--shvyd-background); padding: 8px; border-radius: 4px; font-size: 12px; margin: 8px 0; }
 .language-search:focus-visible { outline: 2px solid var(--shvyd-accent); outline-offset: 1px; }
-.spacer { flex: 1; }
+.spacer { flex: 1; min-width: 24px; align-self: stretch; }
 .icon { width: 28px; height: 28px; display: grid; place-items: center; background: transparent; border: 0; border-radius: 4px; padding: 4px; opacity: .65; }
 .icon:hover { opacity: 1; background: color-mix(in srgb, var(--shvyd-foreground) 7%, transparent); }
 .icon:disabled { opacity: .25; cursor: default; }
@@ -140,7 +141,9 @@ export function mountTranslator(client: TranslationClient): () => void {
   closeButton.setAttribute('aria-label', 'Close translation')
   closeButton.title = 'Close'
   closeButton.append(icon('M6 6l12 12M18 6 6 18'))
-  toolbar.append(picker.button, make('span', 'spacer'), copy, closeButton)
+  const dragHandle = make('span', 'spacer')
+  dragHandle.title = 'Drag to move translation'
+  toolbar.append(picker.button, dragHandle, copy, closeButton)
   const output = make('div', 'translation')
   output.setAttribute('aria-live', 'polite')
   const loading = make('div', 'loading')
@@ -175,6 +178,16 @@ export function mountTranslator(client: TranslationClient): () => void {
   let frame = 0
   let resizeFrame = 0
   let destroyed = false
+  let panelPosition: { x: number; y: number } | undefined
+  let dragOrigin:
+    | {
+        pointerId: number
+        pointerX: number
+        pointerY: number
+        left: number
+        top: number
+      }
+    | undefined
   picker.update({ preferences, target: initialTarget(preferences) })
   void client
     .preferences()
@@ -199,6 +212,8 @@ export function mountTranslator(client: TranslationClient): () => void {
     }
   }
   function dismiss(): void {
+    endDrag()
+    panelPosition = undefined
     generation++
     bubble.hidden = panel.hidden = true
     picker.close()
@@ -219,15 +234,30 @@ export function mountTranslator(client: TranslationClient): () => void {
       rects[rects.length - 1] ?? selected.range.getBoundingClientRect()
     const width = element.offsetWidth,
       height = element.offsetHeight
-    const x = Math.max(
-      12,
-      Math.min(anchor.right - width, window.innerWidth - width - 12)
-    )
+    let x = anchor.right - width
     let y = anchor.bottom + 9
     if (y + height > window.innerHeight - 12) y = anchor.top - height - 9
+    if (element === panel && panelPosition) {
+      x = panelPosition.x
+      y = panelPosition.y
+    }
+    x = Math.max(12, Math.min(x, window.innerWidth - width - 12))
+    y = Math.max(12, Math.min(y, window.innerHeight - height - 12))
     element.style.left = `${x}px`
-    element.style.top = `${Math.max(12, Math.min(y, window.innerHeight - height - 12))}px`
-    if (element === panel) picker.position()
+    element.style.top = `${y}px`
+    if (element === panel) {
+      if (panelPosition) panelPosition = { x, y }
+      picker.position()
+    }
+  }
+
+  function endDrag(): void {
+    if (!dragOrigin) return
+    const { pointerId } = dragOrigin
+    dragOrigin = undefined
+    toolbar.classList.remove('dragging')
+    if (toolbar.hasPointerCapture(pointerId))
+      toolbar.releasePointerCapture(pointerId)
   }
 
   function readSelection(): void {
@@ -397,12 +427,58 @@ export function mountTranslator(client: TranslationClient): () => void {
   })
 
   const events = new AbortController()
+  toolbar.addEventListener(
+    'pointerdown',
+    (event) => {
+      if (
+        event.button !== 0 ||
+        !event.isPrimary ||
+        panel.hidden ||
+        (event.target instanceof Element &&
+          event.target.closest('button, input'))
+      )
+        return
+      event.preventDefault()
+      const bounds = panel.getBoundingClientRect()
+      panelPosition = { x: bounds.left, y: bounds.top }
+      dragOrigin = {
+        pointerId: event.pointerId,
+        pointerX: event.clientX,
+        pointerY: event.clientY,
+        left: bounds.left,
+        top: bounds.top,
+      }
+      toolbar.classList.add('dragging')
+      toolbar.setPointerCapture(event.pointerId)
+    },
+    { signal: events.signal }
+  )
+  toolbar.addEventListener(
+    'pointermove',
+    (event) => {
+      if (!dragOrigin || event.pointerId !== dragOrigin.pointerId) return
+      panelPosition = {
+        x: dragOrigin.left + event.clientX - dragOrigin.pointerX,
+        y: dragOrigin.top + event.clientY - dragOrigin.pointerY,
+      }
+      position(panel)
+    },
+    { signal: events.signal }
+  )
+  for (const name of ['pointerup', 'pointercancel', 'lostpointercapture']) {
+    toolbar.addEventListener(name, endDrag, { signal: events.signal })
+  }
+  window.addEventListener('blur', endDrag, { signal: events.signal })
   document.addEventListener(
     'pointerdown',
     (event) => {
       if (isInside(event)) {
         const path = event.composedPath()
-        if (!path.includes(picker.menu) && !path.includes(picker.button))
+        if (
+          !dragOrigin &&
+          !path.includes(picker.menu) &&
+          !path.includes(picker.button)
+        )
           picker.close()
         return
       }

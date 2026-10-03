@@ -190,6 +190,60 @@ def main():
                 screenshot(style)
                 print(json.dumps({'check': style, 'target': value['target'], 'fitsViewport': True, 'font': value['font'], 'radius': value['radius']}), flush=True)
 
+            def panel_bounds():
+                return page.evaluate("document.getElementById('shvyd-root').shadowRoot.querySelector('.panel').getBoundingClientRect().toJSON()")
+
+            def drag_header(dx,dy):
+                point=page.evaluate("(() => {const b=document.getElementById('shvyd-root').shadowRoot.querySelector('.toolbar').getBoundingClientRect();return {x:b.x+b.width/2,y:b.y+b.height/2};})()")
+                destination={'x':point['x']+dx,'y':point['y']+dy}
+                page.call('Input.dispatchMouseEvent',{'type':'mouseMoved',**point})
+                page.call('Input.dispatchMouseEvent',{'type':'mousePressed','button':'left','buttons':1,'clickCount':1,**point})
+                page.call('Input.dispatchMouseEvent',{'type':'mouseMoved','button':'left','buttons':1,**destination})
+                time.sleep(.05)
+                page.call('Input.dispatchMouseEvent',{'type':'mouseReleased','button':'left','buttons':0,'clickCount':1,**destination})
+
+            before=panel_bounds()
+            drag_header(80,-50)
+            after=panel_bounds()
+            assert abs(after['x']-before['x']-80)<1 and abs(after['y']-before['y']+50)<1, 'Dragging the header did not move the translation window.'
+            assert page.evaluate("!document.getElementById('shvyd-root').shadowRoot.querySelector('.toolbar').classList.contains('dragging')")
+            record('translation-window-drags-from-header',{'passed':True})
+            screenshot('dragged-window')
+
+            choose_language('en')
+            changed=panel_bounds()
+            assert all(abs(changed[key]-after[key])<1 for key in ['x','y']), 'Changing languages lost the dragged position.'
+            record('dragged-position-survives-language-change',{'passed':True})
+            choose_language('uk')
+
+            drag_header(-2000,-2000)
+            edge=panel_bounds()
+            assert abs(edge['left']-12)<1 and abs(edge['top']-12)<1, 'Dragging past the top-left edge hid the header.'
+            drag_header(2000,2000)
+            edge=panel_bounds()
+            assert abs(edge['right']-1268)<1 and abs(edge['bottom']-888)<1, 'Dragging past the bottom-right edge exceeded the viewport.'
+            record('dragged-window-clamps-to-viewport',{'passed':True})
+
+            click('button[aria-label="Close translation"]')
+            translate_selection(target='uk')
+            reopened=panel_bounds()
+            assert abs(reopened['left']-edge['left'])>10 or abs(reopened['top']-edge['top'])>10, 'A new popup retained the previous manual placement.'
+            record('new-popup-resets-dragged-position',{'passed':True})
+
+            def check_underline(provider):
+                page.evaluate("document.querySelector('a[href=\"#long-text\"]').parentElement.id='underline-live'")
+                value=translate_selection('underline-live','uk')
+                structure=page.evaluate("""(() => {
+                  const o=document.getElementById('shvyd-root').shadowRoot.querySelector('.translation'),u=o.querySelector('u');
+                  return {underlined:!!u&&getComputedStyle(u).textDecorationLine.includes('underline'),
+                    underlineText:u?.textContent,sourceAttributesAbsent:!o.querySelector('a,[href],[style],[onclick]')};
+                })()""")
+                assert structure['underlined'] and structure['underlineText'] and structure['sourceAttributesAbsent'], structure
+                record(f'{provider}-preserved-underlined-link',{**value,**structure})
+                screenshot(f'{provider}-underlined-link')
+
+            check_underline('azure')
+
             value = translate_selection('formatted-text', 'uk')
             structure = page.evaluate("""(() => {const o=document.getElementById('shvyd-root').shadowRoot.querySelector('.translation');return {
               paragraphs:o.querySelectorAll('p').length, bullets:o.querySelectorAll('ul > li').length,
@@ -261,6 +315,12 @@ def main():
 
             click('.target')
             click('.more-languages')
+            before=panel_bounds()
+            drag_header(80,-50)
+            after=panel_bounds()
+            assert abs(after['x']-before['x']-80)<1 and abs(after['y']-before['y']+50)<1
+            assert ready_menu(), 'The language menu detached while dragging the translation.'
+            record('language-popover-follows-dragged-window',{'passed':True})
             screenshot('language-popover-desktop')
             for width,height in [(390,520),(320,240),(1280,900)]:
                 page.call('Emulation.setDeviceMetricsOverride', {'width':width,'height':height,'deviceScaleFactor':1,'mobile':False})
@@ -316,6 +376,7 @@ def main():
             assert page.evaluate("document.getElementById('shvyd-root').shadowRoot.querySelectorAll('.translation li').length") == 5
             record('deepl-preserved-paragraphs-and-lists', value)
             screenshot('deepl-formatted-paragraphs')
+            check_underline('deepl')
             record('deepl-expanded-target-hindi', choose_language('hi', 'Hindi'))
 
             options()

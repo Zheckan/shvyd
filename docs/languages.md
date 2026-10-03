@@ -10,7 +10,7 @@ Open the extension's settings and choose **Your preferred languages**. Search by
 
 Click the target language in the popup to open the menu. It shows your available preferred languages and the current target. **More languages** opens a searchable list of every target available with the current provider. Disable **Show More languages in the popup** if you want to keep the menu limited to your preferred choices and the current target.
 
-The language menu is a separate popover anchored to the target button. Opening it, expanding **More languages**, searching, or closing it keeps the translation window's size and position unchanged. It follows the button when the browser is resized, opens above or below according to available space, and scrolls in a short window.
+The language menu is a separate popover anchored to the target button. Opening it, expanding **More languages**, searching, or closing it keeps the translation window's size and position unchanged. It follows the button when you drag the translation window or resize the browser, opens above or below according to available space, and scrolls in a short window.
 
 Arrow keys, Home, and End move through language choices. Escape closes the language menu first and returns focus to the target button. A second Escape closes the translation window. Clicking the translated text closes only the language menu; clicking outside the translation or deliberately scrolling the page closes both.
 
