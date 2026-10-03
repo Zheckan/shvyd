@@ -14,10 +14,10 @@ Preferred languages stay saved across provider changes. Unavailable preferences 
 
 ## Starting language
 
-| Setting | Next popup | Changing the target inside a popup |
-|---|---|---|
-| Remember last used | Starts with your last chosen target | Saves the choice for later popups |
-| Always use a default | Starts with the configured default | Applies only until that popup closes |
+| Setting              | Next popup                          | Changing the target inside a popup   |
+| -------------------- | ----------------------------------- | ------------------------------------ |
+| Remember last used   | Starts with your last chosen target | Saves the choice for later popups    |
+| Always use a default | Starts with the configured default  | Applies only until that popup closes |
 
 In default mode, closing the popup through its close button, Escape, outside click, or page navigation ends the temporary choice. The next popup starts with the default. The previous remembered target remains separate, so switching back to Remember last used restores it.
 

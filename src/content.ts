@@ -1,4 +1,4 @@
-import { createClient } from "./client";
-import { mountTranslator } from "./popup";
+import { createClient } from './client'
+import { mountTranslator } from './popup'
 
-mountTranslator(createClient(request => chrome.runtime.sendMessage(request)));
+mountTranslator(createClient((request) => chrome.runtime.sendMessage(request)))

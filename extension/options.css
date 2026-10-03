@@ -1,47 +1,270 @@
-* { box-sizing: border-box; }
-:root { color-scheme: light dark; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; color: #24282e; background: #f5f6f4; }
-body { margin: 0; }
-main { max-width: 720px; margin: 52px auto; padding: 0 24px 40px; }
-.brand { display: flex; align-items: center; gap: 8px; font-weight: 650; font-size: 18px; }
-.mark { display: grid; place-items: center; width: 28px; height: 28px; border-radius: 8px; background: #275f53; color: white; }
-.badge { margin-left: 5px; font-size: 11px; font-weight: 500; padding: 4px 7px; border: 1px solid #d9dfdb; border-radius: 5px; color: #6a716c; }
-h1 { margin: 32px 0 10px; font-size: 30px; font-weight: 600; letter-spacing: -.8px; }
-.intro { color: #67706a; margin-bottom: 28px; }
-section, details { border: 1px solid #dfe4df; background: #fff; border-radius: 12px; margin: 14px 0; }
-section { padding: 24px; }
-h2 { font-size: 15px; margin: 0 0 20px; font-weight: 650; }
-h3 { font-size: 14px; margin: 24px 0 14px; }
-.row { display: grid; grid-template-columns: 1.65fr 1fr; gap: 16px; }
-label { display: flex; flex-direction: column; gap: 8px; font-size: 13px; margin-bottom: 16px; }
-input, select, button { font: inherit; }
-input:not([type=checkbox]), select { width: 100%; padding: 11px 12px; border: 1px solid #d6ddd7; border-radius: 6px; color: inherit; background: #fff; min-width: 0; }
-input:focus-visible, select:focus-visible, button:focus-visible, summary:focus-visible, .import-button:focus-within { outline: 2px solid #357865; outline-offset: 3px; }
-.toggle { flex-direction: row; gap: 12px; margin: 12px 0 4px; line-height: 1.5; cursor: pointer; }
-input[type=checkbox] { width: 16px; height: 16px; accent-color: #275f53; margin: 2px 0; }
-small { display: block; color: #69736c; font-size: 12px; margin-top: 3px; }
-.hint { font-size: 12px; color: #727a75; }
-summary { padding: 20px 24px; cursor: pointer; font-size: 14px; font-weight: 600; }
-summary .hint { margin-left: 10px; font-weight: 400; }
-.keys { padding: 0 24px 12px; }
-.import-row { display: flex; align-items: center; justify-content: space-between; gap: 16px; color: #69736c; font-size: 12px; }
-.import-button { display: block; flex-shrink: 0; cursor: pointer; padding: 9px 12px; border: 1px solid #d6ddd7; border-radius: 6px; margin: 0; color: #275f53; }
-.save-row { display: flex; align-items: center; gap: 16px; margin-top: 22px; }
-button { border: 0; border-radius: 7px; background: #275f53; color: #fff; padding: 12px 18px; font-size: 13px; cursor: pointer; flex-shrink: 0; }
-button:disabled { opacity: .5; }
-output { color: #275f53; font-size: 12px; }
-.privacy { font-size: 12px; line-height: 1.7; color: #727a75; margin-top: 24px; }
-.favorite-list { max-height: 240px; overflow: auto; border: 1px solid #d6ddd7; border-radius: 6px; padding: 8px; margin-bottom: 16px; }
-.favorite-choice { flex-direction: row; align-items: start; gap: 10px; margin: 0; padding: 9px 6px; cursor: pointer; }
-.preferred-chips { display: flex; flex-wrap: wrap; gap: 6px; margin: 12px 0 18px; }
-.language-chip { padding: 6px 9px; background: #e8f0eb; color: #275f53; font-size: 11px; }
-.language-mode-row { margin-top: 24px; }
-@media (max-width: 600px) { main { margin-top: 28px; } .row { grid-template-columns: 1fr; gap: 0; } h1 { font-size: 25px; } .import-row { align-items: start; } }
+* {
+  box-sizing: border-box;
+}
+:root {
+  color-scheme: light dark;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  color: #24282e;
+  background: #f5f6f4;
+}
+body {
+  margin: 0;
+}
+main {
+  max-width: 720px;
+  margin: 52px auto;
+  padding: 0 24px 40px;
+}
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 650;
+  font-size: 18px;
+}
+.mark {
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 8px;
+  background: #275f53;
+  color: white;
+}
+.badge {
+  margin-left: 5px;
+  font-size: 11px;
+  font-weight: 500;
+  padding: 4px 7px;
+  border: 1px solid #d9dfdb;
+  border-radius: 5px;
+  color: #6a716c;
+}
+h1 {
+  margin: 32px 0 10px;
+  font-size: 30px;
+  font-weight: 600;
+  letter-spacing: -0.8px;
+}
+.intro {
+  color: #67706a;
+  margin-bottom: 28px;
+}
+section,
+details {
+  border: 1px solid #dfe4df;
+  background: #fff;
+  border-radius: 12px;
+  margin: 14px 0;
+}
+section {
+  padding: 24px;
+}
+h2 {
+  font-size: 15px;
+  margin: 0 0 20px;
+  font-weight: 650;
+}
+h3 {
+  font-size: 14px;
+  margin: 24px 0 14px;
+}
+.row {
+  display: grid;
+  grid-template-columns: 1.65fr 1fr;
+  gap: 16px;
+}
+label {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  font-size: 13px;
+  margin-bottom: 16px;
+}
+input,
+select,
+button {
+  font: inherit;
+}
+input:not([type='checkbox']),
+select {
+  width: 100%;
+  padding: 11px 12px;
+  border: 1px solid #d6ddd7;
+  border-radius: 6px;
+  color: inherit;
+  background: #fff;
+  min-width: 0;
+}
+input:focus-visible,
+select:focus-visible,
+button:focus-visible,
+summary:focus-visible,
+.import-button:focus-within {
+  outline: 2px solid #357865;
+  outline-offset: 3px;
+}
+.toggle {
+  flex-direction: row;
+  gap: 12px;
+  margin: 12px 0 4px;
+  line-height: 1.5;
+  cursor: pointer;
+}
+input[type='checkbox'] {
+  width: 16px;
+  height: 16px;
+  accent-color: #275f53;
+  margin: 2px 0;
+}
+small {
+  display: block;
+  color: #69736c;
+  font-size: 12px;
+  margin-top: 3px;
+}
+.hint {
+  font-size: 12px;
+  color: #727a75;
+}
+summary {
+  padding: 20px 24px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 600;
+}
+summary .hint {
+  margin-left: 10px;
+  font-weight: 400;
+}
+.keys {
+  padding: 0 24px 12px;
+}
+.import-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  color: #69736c;
+  font-size: 12px;
+}
+.import-button {
+  display: block;
+  flex-shrink: 0;
+  cursor: pointer;
+  padding: 9px 12px;
+  border: 1px solid #d6ddd7;
+  border-radius: 6px;
+  margin: 0;
+  color: #275f53;
+}
+.save-row {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-top: 22px;
+}
+button {
+  border: 0;
+  border-radius: 7px;
+  background: #275f53;
+  color: #fff;
+  padding: 12px 18px;
+  font-size: 13px;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+button:disabled {
+  opacity: 0.5;
+}
+output {
+  color: #275f53;
+  font-size: 12px;
+}
+.privacy {
+  font-size: 12px;
+  line-height: 1.7;
+  color: #727a75;
+  margin-top: 24px;
+}
+.favorite-list {
+  max-height: 240px;
+  overflow: auto;
+  border: 1px solid #d6ddd7;
+  border-radius: 6px;
+  padding: 8px;
+  margin-bottom: 16px;
+}
+.favorite-choice {
+  flex-direction: row;
+  align-items: start;
+  gap: 10px;
+  margin: 0;
+  padding: 9px 6px;
+  cursor: pointer;
+}
+.preferred-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 12px 0 18px;
+}
+.language-chip {
+  padding: 6px 9px;
+  background: #e8f0eb;
+  color: #275f53;
+  font-size: 11px;
+}
+.language-mode-row {
+  margin-top: 24px;
+}
+@media (max-width: 600px) {
+  main {
+    margin-top: 28px;
+  }
+  .row {
+    grid-template-columns: 1fr;
+    gap: 0;
+  }
+  h1 {
+    font-size: 25px;
+  }
+  .import-row {
+    align-items: start;
+  }
+}
 @media (prefers-color-scheme: dark) {
-  :root { background: #171b19; color: #e6eae7; }
-  section, details, input:not([type=checkbox]), select { background: #202722; border-color: #354238; }
-  .badge, .import-button { border-color: #354238; }
-  .intro, .privacy, small, .hint, .import-row { color: #a2aea5; }
-  .import-button, output { color: #a4d6bd; }
-  .favorite-list { border-color: #354238; }
-  .language-chip { background: #2c4032; color: #c5dfcc; }
+  :root {
+    background: #171b19;
+    color: #e6eae7;
+  }
+  section,
+  details,
+  input:not([type='checkbox']),
+  select {
+    background: #202722;
+    border-color: #354238;
+  }
+  .badge,
+  .import-button {
+    border-color: #354238;
+  }
+  .intro,
+  .privacy,
+  small,
+  .hint,
+  .import-row {
+    color: #a2aea5;
+  }
+  .import-button,
+  output {
+    color: #a4d6bd;
+  }
+  .favorite-list {
+    border-color: #354238;
+  }
+  .language-chip {
+    background: #2c4032;
+    color: #c5dfcc;
+  }
 }

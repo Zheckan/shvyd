@@ -12,14 +12,14 @@ The choice is about the API contract as well as the model. A dedicated service a
 
 ## What our practical choices are
 
-| Choice | Proposed role | Why consider it | Main limitation observed |
-|---|---|---|---|
-| Azure Translator, standard NMT | Default for the prototype | Fast completed results across the tested sizes; automatic source detection in the translation request | Some idiom wording was awkward |
-| DeepL, latency optimized | Selectable alternative | More natural wording on our small idiom sample; completed the full realistic repeated corpus | Slower than Azure; the configured free allowance is finite |
-| Groq, Qwen3.8 27B, reasoning off | Optional short-text streaming experiment | Fastest observed first text for the matched paragraph; competitive completion time | Account output limits prevented reliable repeated large-text tests |
-| Gemini 3.5 Flash-Lite, minimal thinking | General LLM alternative if needed | All 18 selected warm requests completed, covering all six sizes | Slower complete translations than Azure and DeepL in the matched samples |
-| Cohere North Small Translate | Translation-focused LLM alternative | Starts text quickly; natural handling of the sampled idioms | Long translations take much longer to finish; trial and production terms need to fit usage |
-| OpenCode Go, DeepSeek V4 Flash, reasoning off | Recorded experiment | Strongest tested Go route across the text sizes after correcting reasoning settings | Slower completion than the dedicated APIs; Go is intended for coding-agent use rather than being our translation service |
+| Choice                                        | Proposed role                            | Why consider it                                                                                       | Main limitation observed                                                                                                 |
+| --------------------------------------------- | ---------------------------------------- | ----------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------ |
+| Azure Translator, standard NMT                | Default for the prototype                | Fast completed results across the tested sizes; automatic source detection in the translation request | Some idiom wording was awkward                                                                                           |
+| DeepL, latency optimized                      | Selectable alternative                   | More natural wording on our small idiom sample; completed the full realistic repeated corpus          | Slower than Azure; the configured free allowance is finite                                                               |
+| Groq, Qwen3.8 27B, reasoning off              | Optional short-text streaming experiment | Fastest observed first text for the matched paragraph; competitive completion time                    | Account output limits prevented reliable repeated large-text tests                                                       |
+| Gemini 3.5 Flash-Lite, minimal thinking       | General LLM alternative if needed        | All 18 selected warm requests completed, covering all six sizes                                       | Slower complete translations than Azure and DeepL in the matched samples                                                 |
+| Cohere North Small Translate                  | Translation-focused LLM alternative      | Starts text quickly; natural handling of the sampled idioms                                           | Long translations take much longer to finish; trial and production terms need to fit usage                               |
+| OpenCode Go, DeepSeek V4 Flash, reasoning off | Recorded experiment                      | Strongest tested Go route across the text sizes after correcting reasoning settings                   | Slower completion than the dedicated APIs; Go is intended for coding-agent use rather than being our translation service |
 
 North Small Translate is a purpose-built generative translation model, between the usual dedicated NMT service and a general chat model. Its [official documentation](https://docs.cohere.com/docs/north-small-translate-1.0) describes free-tier access and separate commercial terms. The working model ID in our account was `north-small-translate-09-2026`.
 
@@ -29,15 +29,15 @@ OpenCode Go's intended use and subscription limits are described in its [officia
 
 Seconds, medians of three successful warm repeats of each identical source. The sentence has 21 words, the paragraph 90 words, and the large passage 623 words. Earlier and later providers ran in different batches; service load and provider caching were not controlled.
 
-| Route | Sentence complete | Paragraph first text | Paragraph complete | Large passage complete |
-|---|---:|---:|---:|---:|
-| Azure, automatic source | 0.157 | 0.481, complete response | 0.481 | 0.398 |
-| DeepL speed, automatic source | 0.242 | 0.758, complete response | 0.758 | 1.007 |
-| DeepL quality, automatic source | 0.281 | 1.003, complete response | 1.003 | 1.315 |
-| Groq Qwen3.8 27B | 0.261 | 0.064 | 0.444 | Not measured reliably |
-| North Small Translate | 0.331 | 0.216 | 1.023 | 6.303 |
-| Gemini 3.5 Flash-Lite | 0.641 | 0.677 | 1.199 | 3.884 |
-| Go DeepSeek V4 Flash, reasoning off | 0.587 | 0.544 | 1.030 | 5.218 |
+| Route                               | Sentence complete |     Paragraph first text | Paragraph complete | Large passage complete |
+| ----------------------------------- | ----------------: | -----------------------: | -----------------: | ---------------------: |
+| Azure, automatic source             |             0.157 | 0.481, complete response |              0.481 |                  0.398 |
+| DeepL speed, automatic source       |             0.242 | 0.758, complete response |              0.758 |                  1.007 |
+| DeepL quality, automatic source     |             0.281 | 1.003, complete response |              1.003 |                  1.315 |
+| Groq Qwen3.8 27B                    |             0.261 |                    0.064 |              0.444 |  Not measured reliably |
+| North Small Translate               |             0.331 |                    0.216 |              1.023 |                  6.303 |
+| Gemini 3.5 Flash-Lite               |             0.641 |                    0.677 |              1.199 |                  3.884 |
+| Go DeepSeek V4 Flash, reasoning off |             0.587 |                    0.544 |              1.030 |                  5.218 |
 
 Azure and DeepL return complete responses on the tested routes; the other rows stream. Starting text quickly can make a popup feel responsive, but it does not mean the translation is finished. Groq shows that LLMs are not universally slower. Its paragraph completion was slightly faster than Azure's in these batches, while the account's 1,000-output-token restriction blocked the largest repeated request.
 

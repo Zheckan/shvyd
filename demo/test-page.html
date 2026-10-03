@@ -1,111 +1,370 @@
 <!doctype html>
 <html lang="en">
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Shvyd · Translation playground</title>
-  <link rel="stylesheet" href="demo.css">
-  <script src="playground.js" defer></script>
-</head>
-<body data-style="editorial">
-  <header class="demo-bar">
-    <a class="brand" href="?style=editorial">↗ Shvyd <span>Translation playground</span></a>
-    <label class="provider-label">Page style<select id="page-style"><option value="editorial">Editorial · cream paper</option><option value="technical">Technical · dark cards</option><option value="journal">Journal · white & blue</option><option value="warm">Warm · rounded peach</option><option value="forest">Forest · green surfaces</option><option value="contrast">Contrast · black & white</option><option value="neon">Neon · violet night</option><option value="gradient">Gradient · layered glass</option></select></label>
-    <div class="demo-only" hidden><label class="provider-label">Provider<select id="demo-provider"><option value="azure">Azure</option><option value="deepl">DeepL</option></select></label><button id="open-demo-settings" type="button">Language settings</button></div>
-  </header>
-  <div class="instruction"><span class="dot"></span>Select any passage, then click Translate. Colors and corners adapt; SF Pro / system typography stays consistent.</div>
-  <main>
-    <article>
-      <div class="eyebrow">Selection playground <span>Short / long / mixed scripts</span></div>
-      <h1>A quieter way<br>to read.</h1>
-      <p class="subtitle">A small tool should fit into the place where you already work.</p>
-      <div class="byline">Start with one paragraph <button type="button" data-select="sample-text">Select this passage</button></div>
-      <p id="sample-text">The quickest tools disappear into the task. Select a sentence, get its meaning, and continue reading without leaving the page.</p>
-      <p id="second-text">A translation window can borrow more than a light or dark theme. Paper color, subtle borders, and corner shapes can help it feel like part of the article while its text stays easy to read.</p>
-      <p id="idiom-text">I am feeling blue. This new laptop costs an arm and a leg, so I will wait until the end of the month before buying it.</p>
-      <blockquote>Good tools give you the answer, then give you your attention back.</blockquote>
-      <p id="last-text">Keep the translation close to the sentence. Remember the last chosen language. Make the next interaction just as simple as the first.</p>
-      <a class="article-link" href="#sample-text">Back to the first paragraph ↗</a>
-      <section class="test-section">
-        <h2>One word, one sentence</h2>
-        <p id="short-text">Serendipity.</p>
-        <p>Quick translators keep you reading. <a href="#long-text">Continue to the long passage</a>.</p>
-        <button type="button" data-select="short-text">Select one word</button>
-      </section>
-      <section class="test-section">
-        <h2>A longer selection</h2>
-        <div id="long-text">
-          <p>Reading in another language is often a series of small interruptions. You understand most of a paragraph, but one expression makes you pause. You copy the sentence, open a different tab, find the language selector, and then try to remember where you were. By the time you return, the point of the paragraph may have slipped away.</p>
-          <p>A useful translation tool should let you stay with the original passage. The result can sit beside the words you selected, using enough context to make the sentence clear. You should be able to read it, change the target language when necessary, copy a phrase, and close the window without disturbing the page beneath it.</p>
-          <p>This is also a useful place to check longer outputs. A translation may occupy more space than its source. The popup should stay within the viewport and let its own text scroll. Names such as Odesa, dates such as 3 October 2026, prices such as €49.90, and links such as example.com should remain understandable. Technical terms, quotations, and idioms can reveal different choices made by translation providers.</p>
-          <p>She said the release was a piece of cake, but the team still had to break the ice with a new customer. We should not count our chickens before they hatch. Those expressions are meant to test meaning in context, rather than simply replacing each word with a word from another language.</p>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Shvyd · Translation playground</title>
+    <link rel="stylesheet" href="demo.css" />
+    <script src="playground.js" defer></script>
+  </head>
+  <body data-style="editorial">
+    <header class="demo-bar">
+      <a class="brand" href="?style=editorial"
+        >↗ Shvyd <span>Translation playground</span></a
+      >
+      <label class="provider-label"
+        >Page style<select id="page-style">
+          <option value="editorial">Editorial · cream paper</option>
+          <option value="technical">Technical · dark cards</option>
+          <option value="journal">Journal · white & blue</option>
+          <option value="warm">Warm · rounded peach</option>
+          <option value="forest">Forest · green surfaces</option>
+          <option value="contrast">Contrast · black & white</option>
+          <option value="neon">Neon · violet night</option>
+          <option value="gradient">Gradient · layered glass</option>
+        </select></label
+      >
+      <div class="demo-only" hidden>
+        <label class="provider-label"
+          >Provider<select id="demo-provider">
+            <option value="azure">Azure</option>
+            <option value="deepl">DeepL</option>
+          </select></label
+        ><button id="open-demo-settings" type="button">
+          Language settings
+        </button>
+      </div>
+    </header>
+    <div class="instruction">
+      <span class="dot"></span>Select any passage, then click Translate. Colors
+      and corners adapt; SF Pro / system typography stays consistent.
+    </div>
+    <main>
+      <article>
+        <div class="eyebrow">
+          Selection playground <span>Short / long / mixed scripts</span>
         </div>
-        <button type="button" data-select="long-text">Select the full passage</button>
-      </section>
-      <section class="test-section">
-        <h2>Paragraphs and lists</h2>
-        <div id="formatted-text">
-          <h3>Help me choose the right tool</h3>
-          <p>Keep the first paragraph separate. Preserve <strong>important words</strong> while translating the sentence around them.</p>
-          <p>A second paragraph should have its own space. This is an <em>emphasized phrase</em> inside a complete sentence.</p>
-          <ul><li>Which programming language do you prefer?<ul><li>JavaScript, TypeScript, Python, Go, or Rust.</li></ul></li><li>What are you trying to build?</li></ul>
-          <ol start="3"><li>Choose a target language.</li><li>Read the translation, then close the window.</li></ol>
-          <p>Keep an explicit line break here.<br>Start this sentence on a new line.</p>
+        <h1>A quieter way<br />to read.</h1>
+        <p class="subtitle">
+          A small tool should fit into the place where you already work.
+        </p>
+        <div class="byline">
+          Start with one paragraph
+          <button type="button" data-select="sample-text">
+            Select this passage
+          </button>
         </div>
-        <button type="button" data-select="formatted-text">Select the formatted passage</button>
-      </section>
-      <section class="test-section multilingual">
-        <h2>Different scripts and directions</h2>
-        <p lang="uk">Швидкий переклад допомагає зрозуміти речення та продовжити читання, не залишаючи сторінку.</p>
-        <p lang="pl">Wybierz fragment tekstu, sprawdź tłumaczenie i wróć do czytania bez otwierania kolejnej karty.</p>
-        <p lang="de">Ein gutes Werkzeug beantwortet die Frage und lässt uns anschließend in Ruhe weiterlesen.</p>
-        <p lang="ja">短い文章を選択して翻訳すると、ページを離れずに読み続けることができます。</p>
-        <p lang="zh-Hant">選取一段文字並查看翻譯，就能繼續閱讀，不必離開目前的頁面。</p>
-        <p lang="ko">문장을 선택하고 번역을 읽은 뒤 페이지를 떠나지 않고 계속 읽을 수 있습니다.</p>
-        <p lang="hi">पाठ का अनुवाद पढ़कर आप पृष्ठ छोड़े बिना पढ़ना जारी रख सकते हैं।</p>
-        <p id="arabic-text" lang="ar" dir="rtl">يمكنك تحديد جملة وقراءة ترجمتها ثم متابعة القراءة دون مغادرة الصفحة.</p>
-        <p lang="he" dir="rtl">בחרו משפט, קראו את התרגום והמשיכו לקרוא בלי לעזוב את העמוד.</p>
-        <p dir="auto">Mixed text: Україна, 日本語, العربية, a price of €49.90, and a URL https://example.com/articles?id=42.</p>
-      </section>
-      <section class="test-section">
-        <h2>Local styles inside one page</h2>
-        <div class="sample-card blue-card"><p id="blue-text">This blue card has its own white surface, blue links, border, and small corners. Select this text and compare the popup with the surrounding card.</p><a href="#sample-text">A blue link</a></div>
-        <div class="sample-card rose-card"><p>This rose card uses larger corners and a warm shadow. Its parent page may have a completely different palette.</p><a href="#sample-text">A rose link</a></div>
-        <div class="sample-card dark-card"><p id="dark-text">A dark card within a bright page should still produce readable translated text. The popup uses the selected area as its color reference.</p><a href="#sample-text">A mint link</a></div>
-        <div class="sample-card low-contrast"><p id="contrast-text">This deliberately faint text tests whether the translation remains readable even when the source page uses poor contrast.</p><a href="#sample-text">A faint link</a></div>
-        <div class="sample-card gradient-card"><div class="glass-card"><p id="glass-text">This translucent card sits over a gradient. Compare its text color and borders, then try a neutral popup by disabling page adaptation.</p><a href="#sample-text">A glass-card link</a></div></div>
-      </section>
-      <section class="test-section" id="structured-text">
-        <h2>Code, tables, and scroll containers</h2>
-        <pre><code id="code-text">const message = "Translate this text without changing its meaning.";
+        <p id="sample-text">
+          The quickest tools disappear into the task. Select a sentence, get its
+          meaning, and continue reading without leaving the page.
+        </p>
+        <p id="second-text">
+          A translation window can borrow more than a light or dark theme. Paper
+          color, subtle borders, and corner shapes can help it feel like part of
+          the article while its text stays easy to read.
+        </p>
+        <p id="idiom-text">
+          I am feeling blue. This new laptop costs an arm and a leg, so I will
+          wait until the end of the month before buying it.
+        </p>
+        <blockquote>
+          Good tools give you the answer, then give you your attention back.
+        </blockquote>
+        <p id="last-text">
+          Keep the translation close to the sentence. Remember the last chosen
+          language. Make the next interaction just as simple as the first.
+        </p>
+        <a class="article-link" href="#sample-text"
+          >Back to the first paragraph ↗</a
+        >
+        <section class="test-section">
+          <h2>One word, one sentence</h2>
+          <p id="short-text">Serendipity.</p>
+          <p>
+            Quick translators keep you reading.
+            <a href="#long-text">Continue to the long passage</a>.
+          </p>
+          <button type="button" data-select="short-text">
+            Select one word
+          </button>
+        </section>
+        <section class="test-section">
+          <h2>A longer selection</h2>
+          <div id="long-text">
+            <p>
+              Reading in another language is often a series of small
+              interruptions. You understand most of a paragraph, but one
+              expression makes you pause. You copy the sentence, open a
+              different tab, find the language selector, and then try to
+              remember where you were. By the time you return, the point of the
+              paragraph may have slipped away.
+            </p>
+            <p>
+              A useful translation tool should let you stay with the original
+              passage. The result can sit beside the words you selected, using
+              enough context to make the sentence clear. You should be able to
+              read it, change the target language when necessary, copy a phrase,
+              and close the window without disturbing the page beneath it.
+            </p>
+            <p>
+              This is also a useful place to check longer outputs. A translation
+              may occupy more space than its source. The popup should stay
+              within the viewport and let its own text scroll. Names such as
+              Odesa, dates such as 3 October 2026, prices such as €49.90, and
+              links such as example.com should remain understandable. Technical
+              terms, quotations, and idioms can reveal different choices made by
+              translation providers.
+            </p>
+            <p>
+              She said the release was a piece of cake, but the team still had
+              to break the ice with a new customer. We should not count our
+              chickens before they hatch. Those expressions are meant to test
+              meaning in context, rather than simply replacing each word with a
+              word from another language.
+            </p>
+          </div>
+          <button type="button" data-select="long-text">
+            Select the full passage
+          </button>
+        </section>
+        <section class="test-section">
+          <h2>Paragraphs and lists</h2>
+          <div id="formatted-text">
+            <h3>Help me choose the right tool</h3>
+            <p>
+              Keep the first paragraph separate. Preserve
+              <strong>important words</strong> while translating the sentence
+              around them.
+            </p>
+            <p>
+              A second paragraph should have its own space. This is an
+              <em>emphasized phrase</em> inside a complete sentence.
+            </p>
+            <ul>
+              <li>
+                Which programming language do you prefer?
+                <ul>
+                  <li>JavaScript, TypeScript, Python, Go, or Rust.</li>
+                </ul>
+              </li>
+              <li>What are you trying to build?</li>
+            </ul>
+            <ol start="3">
+              <li>Choose a target language.</li>
+              <li>Read the translation, then close the window.</li>
+            </ol>
+            <p>
+              Keep an explicit line break here.<br />Start this sentence on a
+              new line.
+            </p>
+          </div>
+          <button type="button" data-select="formatted-text">
+            Select the formatted passage
+          </button>
+        </section>
+        <section class="test-section multilingual">
+          <h2>Different scripts and directions</h2>
+          <p lang="uk">
+            Швидкий переклад допомагає зрозуміти речення та продовжити читання,
+            не залишаючи сторінку.
+          </p>
+          <p lang="pl">
+            Wybierz fragment tekstu, sprawdź tłumaczenie i wróć do czytania bez
+            otwierania kolejnej karty.
+          </p>
+          <p lang="de">
+            Ein gutes Werkzeug beantwortet die Frage und lässt uns anschließend
+            in Ruhe weiterlesen.
+          </p>
+          <p lang="ja">
+            短い文章を選択して翻訳すると、ページを離れずに読み続けることができます。
+          </p>
+          <p lang="zh-Hant">
+            選取一段文字並查看翻譯，就能繼續閱讀，不必離開目前的頁面。
+          </p>
+          <p lang="ko">
+            문장을 선택하고 번역을 읽은 뒤 페이지를 떠나지 않고 계속 읽을 수
+            있습니다.
+          </p>
+          <p lang="hi">
+            पाठ का अनुवाद पढ़कर आप पृष्ठ छोड़े बिना पढ़ना जारी रख सकते हैं।
+          </p>
+          <p id="arabic-text" lang="ar" dir="rtl">
+            يمكنك تحديد جملة وقراءة ترجمتها ثم متابعة القراءة دون مغادرة الصفحة.
+          </p>
+          <p lang="he" dir="rtl">
+            בחרו משפט, קראו את התרגום והמשיכו לקרוא בלי לעזוב את העמוד.
+          </p>
+          <p dir="auto">
+            Mixed text: Україна, 日本語, العربية, a price of €49.90, and a URL
+            https://example.com/articles?id=42.
+          </p>
+        </section>
+        <section class="test-section">
+          <h2>Local styles inside one page</h2>
+          <div class="sample-card blue-card">
+            <p id="blue-text">
+              This blue card has its own white surface, blue links, border, and
+              small corners. Select this text and compare the popup with the
+              surrounding card.
+            </p>
+            <a href="#sample-text">A blue link</a>
+          </div>
+          <div class="sample-card rose-card">
+            <p>
+              This rose card uses larger corners and a warm shadow. Its parent
+              page may have a completely different palette.
+            </p>
+            <a href="#sample-text">A rose link</a>
+          </div>
+          <div class="sample-card dark-card">
+            <p id="dark-text">
+              A dark card within a bright page should still produce readable
+              translated text. The popup uses the selected area as its color
+              reference.
+            </p>
+            <a href="#sample-text">A mint link</a>
+          </div>
+          <div class="sample-card low-contrast">
+            <p id="contrast-text">
+              This deliberately faint text tests whether the translation remains
+              readable even when the source page uses poor contrast.
+            </p>
+            <a href="#sample-text">A faint link</a>
+          </div>
+          <div class="sample-card gradient-card">
+            <div class="glass-card">
+              <p id="glass-text">
+                This translucent card sits over a gradient. Compare its text
+                color and borders, then try a neutral popup by disabling page
+                adaptation.
+              </p>
+              <a href="#sample-text">A glass-card link</a>
+            </div>
+          </div>
+        </section>
+        <section class="test-section" id="structured-text">
+          <h2>Code, tables, and scroll containers</h2>
+          <pre><code id="code-text">const message = "Translate this text without changing its meaning.";
 // Keep URLs, variable names, and punctuation readable.</code></pre>
-        <table id="table-text"><thead><tr><th>Item</th><th>Reading sample</th></tr></thead><tbody><tr><td>Release note</td><td>The update fixes a crash when the window is resized.</td></tr><tr><td>Price</td><td>The monthly plan costs €9.99, including local taxes.</td></tr></tbody></table>
-        <div class="scroll-sample"><p>A scroll container can have a separate background and a narrow line length. Select a sentence close to its edges.</p><p>After translating, scroll the translation itself to read a longer result. Scrolling the original page closes the popup.</p><p>Try selecting text across two paragraphs, changing the target, and copying the translation.</p><p>The toolbar should remain usable when the browser is only 390 pixels wide.</p><a href="#sample-text">Return to the article</a></div>
-      </section>
-      <section class="test-section">
-        <h2>Inputs and expandable content</h2>
-        <label class="test-input-label">Text input<input type="text" value="Selection inside inputs is outside this prototype."></label>
-        <details class="sample-card"><summary>Open another reading sample</summary><p>This paragraph lives inside expandable content. Select it after opening the section, then close the popup with Escape.</p></details>
-      </section>
-      <section class="test-section edge-sample"><h2>Near the bottom edge</h2><p id="edge-text">Select this sentence near the bottom of your window. The popup should move above it if there is not enough room below.</p><button type="button" data-select="edge-text">Select the edge sample</button></section>
-    </article>
-    <aside>
-      <span class="aside-number">01</span>
-      <h2>Try the popup</h2>
-      <p>Select a sentence or paragraph in this test article. Nothing is sent until you click Translate.</p>
-      <hr>
-      <span class="aside-number">02</span>
-      <h2>Change the setting</h2>
-      <p>Choose one of eight styles above. The popup borrows its colors and corners, keeping its system font.</p>
-      <hr>
-      <span class="aside-number">03</span>
-      <h2>Keep reading</h2>
-      <p>Open the language menu for your preferred languages. Use More languages to search the full provider list.</p>
-      <hr><span class="aside-number">04</span><h2>Check the starting language</h2><p>Try Remember last used, then Always use a default. In default mode, changing the popup's target should reset after closing it.</p>
-      <div class="note" id="playground-mode">This page is a fixture for the installed extension. Load the extension, then select any text here.</div>
-    </aside>
-  </main>
-  <footer>Shvyd · Translation playground <span>Try a narrow window, keyboard navigation, and long translations.</span></footer>
-  <dialog id="demo-settings"><form id="demo-preferences"><div class="dialog-heading"><h2>Demo language settings</h2><button type="button" id="close-demo-settings">Close</button></div><div id="demo-language-settings"></div><label class="toggle"><input name="adaptToPage" type="checkbox"><span>Match the page's colors and corners</span></label><button type="submit">Save demo settings</button><output id="demo-settings-status" aria-live="polite"></output></form></dialog>
-</body>
+          <table id="table-text">
+            <thead>
+              <tr>
+                <th>Item</th>
+                <th>Reading sample</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Release note</td>
+                <td>The update fixes a crash when the window is resized.</td>
+              </tr>
+              <tr>
+                <td>Price</td>
+                <td>The monthly plan costs €9.99, including local taxes.</td>
+              </tr>
+            </tbody>
+          </table>
+          <div class="scroll-sample">
+            <p>
+              A scroll container can have a separate background and a narrow
+              line length. Select a sentence close to its edges.
+            </p>
+            <p>
+              After translating, scroll the translation itself to read a longer
+              result. Scrolling the original page closes the popup.
+            </p>
+            <p>
+              Try selecting text across two paragraphs, changing the target, and
+              copying the translation.
+            </p>
+            <p>
+              The toolbar should remain usable when the browser is only 390
+              pixels wide.
+            </p>
+            <a href="#sample-text">Return to the article</a>
+          </div>
+        </section>
+        <section class="test-section">
+          <h2>Inputs and expandable content</h2>
+          <label class="test-input-label"
+            >Text input<input
+              type="text"
+              value="Selection inside inputs is outside this prototype."
+          /></label>
+          <details class="sample-card">
+            <summary>Open another reading sample</summary>
+            <p>
+              This paragraph lives inside expandable content. Select it after
+              opening the section, then close the popup with Escape.
+            </p>
+          </details>
+        </section>
+        <section class="test-section edge-sample">
+          <h2>Near the bottom edge</h2>
+          <p id="edge-text">
+            Select this sentence near the bottom of your window. The popup
+            should move above it if there is not enough room below.
+          </p>
+          <button type="button" data-select="edge-text">
+            Select the edge sample
+          </button>
+        </section>
+      </article>
+      <aside>
+        <span class="aside-number">01</span>
+        <h2>Try the popup</h2>
+        <p>
+          Select a sentence or paragraph in this test article. Nothing is sent
+          until you click Translate.
+        </p>
+        <hr />
+        <span class="aside-number">02</span>
+        <h2>Change the setting</h2>
+        <p>
+          Choose one of eight styles above. The popup borrows its colors and
+          corners, keeping its system font.
+        </p>
+        <hr />
+        <span class="aside-number">03</span>
+        <h2>Keep reading</h2>
+        <p>
+          Open the language menu for your preferred languages. Use More
+          languages to search the full provider list.
+        </p>
+        <hr />
+        <span class="aside-number">04</span>
+        <h2>Check the starting language</h2>
+        <p>
+          Try Remember last used, then Always use a default. In default mode,
+          changing the popup's target should reset after closing it.
+        </p>
+        <div class="note" id="playground-mode">
+          This page is a fixture for the installed extension. Load the
+          extension, then select any text here.
+        </div>
+      </aside>
+    </main>
+    <footer>
+      Shvyd · Translation playground
+      <span
+        >Try a narrow window, keyboard navigation, and long translations.</span
+      >
+    </footer>
+    <dialog id="demo-settings">
+      <form id="demo-preferences">
+        <div class="dialog-heading">
+          <h2>Demo language settings</h2>
+          <button type="button" id="close-demo-settings">Close</button>
+        </div>
+        <div id="demo-language-settings"></div>
+        <label class="toggle"
+          ><input name="adaptToPage" type="checkbox" /><span
+            >Match the page's colors and corners</span
+          ></label
+        ><button type="submit">Save demo settings</button
+        ><output id="demo-settings-status" aria-live="polite"></output>
+      </form>
+    </dialog>
+  </body>
 </html>
