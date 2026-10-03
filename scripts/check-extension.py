@@ -65,6 +65,7 @@ def main():
     with tempfile.TemporaryDirectory(prefix='shvyd-extension-') as profile:
         process = subprocess.Popen([
             BROWSER, '--headless=new', '--no-first-run', '--no-default-browser-check',
+            '--disable-background-timer-throttling', '--disable-renderer-backgrounding',
             '--user-data-dir=' + profile, '--remote-debugging-port=0',
             '--disable-extensions-except=' + str(ROOT / 'dist'),
             '--load-extension=' + str(ROOT / 'dist'), 'about:blank',
@@ -82,7 +83,10 @@ def main():
             page = CDP(tab['webSocketDebuggerUrl'])
             connections.append(page)
             page.call('Runtime.enable')
+            page.call('Page.enable')
+            page.call('Page.bringToFront')
             page.call('Emulation.setDeviceMetricsOverride', {'width': 1280, 'height': 900, 'deviceScaleFactor': 1, 'mobile': False})
+            time.sleep(2)
 
             navigation = 0
             def navigate(style):
@@ -91,32 +95,70 @@ def main():
                 page.call('Page.navigate', {'url': f'http://127.0.0.1:5173/fixture?style={style}&check={navigation}'})
                 wait_for(lambda: page.evaluate(f"document.readyState === 'complete' && document.body?.dataset.style === {json.dumps(style)} && new URL(location.href).searchParams.get('check') === '{navigation}' && !!document.getElementById('shvyd-root')"), 'content script startup')
 
-            def translate_selection():
-                page.evaluate("""(() => {
-                  const p = document.getElementById('sample-text'); p.scrollIntoView({block:'center'});
-                  const range = document.createRange(); range.selectNodeContents(p);
-                  const selection = getSelection(); selection.removeAllRanges(); selection.addRange(range);
-                })()""")
-                wait_for(lambda: page.evaluate("document.getElementById('shvyd-root')?.shadowRoot.querySelector('.bubble')?.hidden === false"), 'selection button')
-                coords = page.evaluate("(() => {const r=document.getElementById('shvyd-root').shadowRoot.querySelector('.bubble').getBoundingClientRect();return {x:r.x+r.width/2,y:r.y+r.height/2};})()")
-                started = time.monotonic()
+            def click(selector, shadow=True):
+                prefix = "document.getElementById('shvyd-root').shadowRoot" if shadow else "document"
+                coords = page.evaluate(f"(() => {{const e={prefix}.querySelector({json.dumps(selector)});e.scrollIntoView({{block:'nearest'}});const r=e.getBoundingClientRect();return {{x:r.x+r.width/2,y:r.y+r.height/2}};}})()")
                 page.call('Input.dispatchMouseEvent', {'type': 'mousePressed', 'button': 'left', 'clickCount': 1, **coords})
                 page.call('Input.dispatchMouseEvent', {'type': 'mouseReleased', 'button': 'left', 'clickCount': 1, **coords})
-                wait_for(lambda: page.evaluate("(() => {const p=document.getElementById('shvyd-root')?.shadowRoot.querySelector('.panel');return p && !p.hidden && p.getAttribute('aria-busy')==='false';})()"), 'completed translation')
-                value = page.evaluate("""(() => {
+
+            def completed(target=None):
+                expected = f" && r.querySelector('.translation').lang === {json.dumps(target)}" if target else ''
+                wait_for(lambda: page.evaluate("(() => {const r=document.getElementById('shvyd-root')?.shadowRoot,p=r?.querySelector('.panel');return p && !p.hidden && p.getAttribute('aria-busy')==='false'" + expected + ";})()"), 'completed translation')
+                return page.evaluate("""(() => {
                   const root=document.getElementById('shvyd-root').shadowRoot;
                   const p=root.querySelector('.panel'), o=root.querySelector('.translation');
                   const r=p.getBoundingClientRect(), style=getComputedStyle(p);
-                  return {text:o.textContent, target:o.lang, error:!root.querySelector('.actions').hidden,
+                  return {text:o.textContent, target:o.lang, direction:o.dir, error:!root.querySelector('.actions').hidden,
                     font:getComputedStyle(o).fontFamily, fontSize:getComputedStyle(o).fontSize,
                     letterSpacing:getComputedStyle(o).letterSpacing, background:style.backgroundColor, color:style.color,
+                    accent:getComputedStyle(root.querySelector('.target')).color,
                     border:style.borderColor, radius:style.borderRadius,
                     fitsViewport:r.left>=0 && r.top>=0 && r.right<=innerWidth && r.bottom<=innerHeight};
                 })()""")
+
+            def translate_selection(passage='sample-text', target=None):
+                page.evaluate("""(() => {
+                  const p = document.getElementById(PASSAGE); p.scrollIntoView({block:'center'});
+                  const range = document.createRange(); range.selectNodeContents(p);
+                  const selection = getSelection(); selection.removeAllRanges(); selection.addRange(range);
+                })()""".replace('PASSAGE', json.dumps(passage)))
+                wait_for(lambda: page.evaluate("document.getElementById('shvyd-root')?.shadowRoot.querySelector('.bubble')?.hidden === false"), 'selection button')
+                started = time.monotonic()
+                click('.bubble')
+                value = completed(target)
                 assert value['text'] and not value['error'], 'The actual extension did not receive a translation.'
                 assert value['fitsViewport'], 'Popup exceeded the viewport.'
                 value['observedClickToCompleteMs'] = round((time.monotonic() - started) * 1000, 1)
                 return value
+
+            def choose_language(code, search=None):
+                click('.target')
+                if search:
+                    click('.more-languages')
+                    page.evaluate("(() => {const s=document.getElementById('shvyd-root').shadowRoot.querySelector('.language-search');s.value=QUERY;s.dispatchEvent(new Event('input'));})()".replace('QUERY', json.dumps(search)))
+                    selector = f'.language-menu > div:last-child button[data-language="{code}"]'
+                else:
+                    selector = f'.language-menu button[data-language="{code}"]'
+                click(selector)
+                value = completed(code)
+                assert value['text'] and not value['error'] and value['fitsViewport']
+                return value
+
+            def options():
+                page.call('Page.navigate', {'url': f'chrome-extension://{extension_id}/options.html'})
+                wait_for(lambda: page.evaluate("!!document.querySelector('[name=provider]') && document.getElementById('key-summary').textContent.includes('Azure ready')"), 'settings bootstrap')
+
+            def save_options():
+                page.evaluate("document.getElementById('settings').requestSubmit()")
+                wait_for(lambda: page.evaluate("document.getElementById('status').textContent.startsWith('Saved.')"), 'saved provider setting')
+
+            def screenshot(name):
+                shot = page.call('Page.captureScreenshot', {'format': 'png'})
+                (OUTPUT / f'{name}.png').write_bytes(base64.b64decode(shot['data']))
+
+            def record(name, value):
+                results['checks'].append({'check': name, **value})
+                print(json.dumps({'check': name, 'passed': True}), flush=True)
 
             navigate('editorial')
             worker_info = wait_for(lambda: next((item for item in targets() if item['type'] == 'service_worker' and item['url'].endswith('/background.js')), None), 'extension worker')
@@ -127,9 +169,10 @@ def main():
             assert readiness['azure'] and readiness['deepl'], 'Use build:local with both provider keys configured.'
             results['providerKeysPresent'] = readiness
 
-            for style in ['editorial', 'technical', 'journal', 'warm']:
+            for style in ['editorial', 'technical', 'journal', 'warm', 'forest', 'contrast', 'neon', 'gradient']:
                 navigate(style)
                 value = translate_selection()
+                print(json.dumps({'observedStyle': style, 'background': value['background'], 'color': value['color'], 'accent': value['accent'], 'radius': value['radius']}), flush=True)
                 assert value['target'] == 'uk', 'Ukrainian was not the default.'
                 assert '-apple-system' in value['font'] and 'SF Pro Text' in value['font'], 'Popup did not use system typography.'
                 assert value['fontSize'] == '15px' and value['letterSpacing'] == 'normal', 'Popup typography changed with the page.'
@@ -139,28 +182,77 @@ def main():
                 if style == 'warm': assert value['radius'] == '20px'
                 value['style'] = style
                 results['checks'].append(value)
-                screenshot = page.call('Page.captureScreenshot', {'format': 'png'})
-                (OUTPUT / f'{style}.png').write_bytes(base64.b64decode(screenshot['data']))
+                screenshot(style)
                 print(json.dumps({'check': style, 'target': value['target'], 'fitsViewport': True, 'font': value['font'], 'radius': value['radius']}), flush=True)
 
-            page.evaluate("(() => {const s=document.getElementById('shvyd-root').shadowRoot.querySelector('.target');s.value='pl';s.dispatchEvent(new Event('change'));})()")
-            wait_for(lambda: page.evaluate("document.getElementById('shvyd-root').shadowRoot.querySelector('.translation').lang==='pl'"), 'target language change')
+            choose_language('pl')
             navigate('journal')
-            value = translate_selection()
+            value = translate_selection(target='pl')
             assert value['target'] == 'pl', 'Target was not remembered across page navigation.'
             results['checks'].append({'check': 'remembered-target', 'target': value['target']})
 
-            page.call('Page.navigate', {'url': f'chrome-extension://{extension_id}/options.html'})
-            wait_for(lambda: page.evaluate("!!document.querySelector('[name=provider]') && document.getElementById('key-summary').textContent.includes('Azure ready')"), 'settings bootstrap')
-            page.evaluate("(() => {document.querySelector('[name=provider]').value='deepl';document.querySelector('[name=target]').value='uk';document.getElementById('settings').requestSubmit();})()")
-            wait_for(lambda: page.evaluate("document.getElementById('status').textContent.startsWith('Saved.')"), 'saved provider setting')
+            options()
+            page.evaluate("""(() => {
+              const mode=document.querySelector('[name=targetMode]');mode.value='fixed';mode.dispatchEvent(new Event('change'));
+              const target=document.querySelector('[name=target]');target.value='uk';target.dispatchEvent(new Event('change'));
+              for(const code of ['en','ar']) {const c=document.querySelector('.favorite-list input[value="'+code+'"]');c.checked=code==='ar';c.dispatchEvent(new Event('change'));}
+            })()""")
+            save_options()
+            screenshot('language-settings')
+            navigate('editorial')
+            translate_selection(target='uk')
+            value = choose_language('ar')
+            assert value['direction'] == 'rtl'
+            record('temporary-arabic-target', value)
+            screenshot('arabic-target')
+            click('button[aria-label="Close translation"]')
+            record('fixed-default-reset-on-close', translate_selection(target='uk'))
+            choose_language('zh-hant', 'Chinese')
+            screenshot('additional-languages')
+            record('additional-language-search', completed('zh-hant'))
             navigate('warm')
-            value = translate_selection()
-            results['checks'].append({'check': 'deepl-direct-request', **value})
+            record('fixed-default-reset-on-navigation', translate_selection(target='uk'))
+
+            options()
+            assert page.evaluate("[...document.querySelectorAll('.favorite-list input:checked')].map(x=>x.value).sort().join(',')") == 'ar,pl,uk'
+            record('preferred-language-persistence', {'languages': ['uk','pl','ar']})
+            page.evaluate("document.querySelector('[name=showOtherLanguages]').checked=false")
+            save_options()
+            navigate('journal')
+            translate_selection(target='uk')
+            click('.target')
+            assert page.evaluate("document.getElementById('shvyd-root').shadowRoot.querySelector('.more-languages').hidden")
+            record('hide-additional-languages', {'passed': True})
+            page.call('Input.dispatchKeyEvent', {'type': 'keyDown', 'key': 'Escape', 'code': 'Escape'})
+            assert page.evaluate("!document.getElementById('shvyd-root').shadowRoot.querySelector('.panel').hidden")
+            record('escape-closes-language-menu-first', {'passed': True})
+
+            value = translate_selection('long-text', 'uk')
+            record('long-selection-viewport', value)
+            screenshot('long-translation')
+            value = translate_selection('contrast-text', 'uk')
+            assert value['color'] == 'rgb(0, 0, 0)'
+            record('faint-source-readable-translation', value)
+            value = translate_selection('dark-text', 'uk')
+            assert value['background'] == 'rgb(21, 40, 55)' and value['accent'] == 'rgb(142, 224, 198)'
+            record('nested-dark-card-adaptation', value)
+
+            options()
+            page.evaluate("""(() => {const p=document.querySelector('[name=provider]');p.value='deepl';p.dispatchEvent(new Event('change'));document.querySelector('[name=showOtherLanguages]').checked=true;})()""")
+            save_options()
+            navigate('warm')
+            value = translate_selection(target='uk')
+            record('deepl-direct-request', value)
+            record('deepl-expanded-target-hindi', choose_language('hi', 'Hindi'))
+
+            options()
+            count = page.evaluate("document.querySelector('[name=target]').options.length")
+            assert count == 126
+            record('provider-filtered-targets', {'provider': 'deepl', 'count': count})
 
             page.call('Emulation.setDeviceMetricsOverride', {'width': 390, 'height': 844, 'deviceScaleFactor': 1, 'mobile': False})
             navigate('technical')
-            value = translate_selection()
+            value = translate_selection(target='uk')
             results['checks'].append({'check': 'narrow-viewport', **value})
 
             page.call('Input.dispatchKeyEvent', {'type': 'keyDown', 'key': 'Escape', 'code': 'Escape'})
