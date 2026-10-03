@@ -1,8 +1,10 @@
 # Selection formatting
 
-Updated 2026-10-03. Formatting is automatic when you select text and click Translate. Paragraph boundaries come from the selected page elements, rather than guesses based on translated sentences.
+Updated 2026-10-04. Formatting is automatic when you select text and click Translate. Paragraph boundaries come from the selected page elements, rather than guesses based on translated sentences.
 
-The popup keeps paragraphs, headings, explicit line breaks, bold and italic emphasis, bullet lists, numbered lists, nested lists, quotations, and table rows and cells. Selecting part of a numbered list retains its starting number. Selecting one table cell translates only that cell. Code blocks and inline code keep their original text and line breaks.
+The popup keeps paragraphs, headings, explicit line breaks, bold and italic emphasis, underlining, bullet lists, numbered lists, nested lists, quotations, and table rows and cells. Selecting part of a numbered list retains its starting number. Selecting one table cell translates only that cell. Code blocks and inline code keep their original text and line breaks.
+
+Underline tags and CSS underlining on selected elements become safe underline markup. An underlined link keeps that emphasis in the translation while its destination and other page attributes are discarded. Nested bold or italic text keeps both kinds of emphasis.
 
 Typography stays SF Pro / the system sans-serif font at the popup's normal text size. Paragraph spacing, list indentation, borders, and emphasis use the popup's own styles. Source fonts, exact pixel spacing, link destinations, and page controls are not copied. Long formatted results still scroll inside the popup.
 
