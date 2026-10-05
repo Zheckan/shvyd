@@ -1,6 +1,16 @@
 # Future ideas
 
-Updated 2026-10-03. This file records ideas we discussed and their open questions. Speculative items are not committed features. The first prototype stays focused on fast cloud translation of selected text. The current provider recommendation is in [translation-options.md](translation-options.md).
+Updated 2026-10-05. This file records ideas we discussed and their open questions. Speculative items are not committed features. The first prototype stays focused on fast cloud translation of selected text. The current provider recommendation is in [translation-options.md](translation-options.md). The [first stable release plan](release-plan.md) separates release work from these ideas, and the [settings design brief](settings-design-brief.md) is ready for the next design pass.
+
+## Central usage reporting?
+
+Local usage summaries and bounded, exportable diagnostics are proposed in the release plan. Seeing other people's usage remotely would require a separate opt-in reporting feature and ingestion service. Direct Azure and DeepL requests do not pass through a Shvyd server.
+
+Would local diagnostic exports from one or two friends answer the useful questions? If we need remote reports, which counts or error categories actually help? Can we answer them without storing text, page URLs, or stable user identifiers? Who will operate the endpoint, review its logs, and maintain retention and deletion? Central reporting remains outside the first stable release until those questions have concrete answers.
+
+## Persistent translations or a database?
+
+The current 32-entry memory cache already saves repeat provider calls while the worker stays alive. Disk caching, translation history, synchronization, and a server database would add retained data and maintenance. Do repeated selections happen often enough to justify more storage? Would session storage address worker eviction without keeping translations after browser restart? Measure cache hits before deciding.
 
 ## Offline mode? Maybe useful, maybe unnecessary
 
