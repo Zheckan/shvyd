@@ -1,0 +1,1804 @@
+{
+  "metadata": {
+    "started_at": "2026-10-02T21:28:15.132847+00:00",
+    "pair": "en->uk",
+    "transport": "Python http.client HTTP/1.1",
+    "rounds": 3,
+    "seed": 42,
+    "local_cache": false,
+    "measurement_mode": "repeated",
+    "input_file": "docs/benchmarks/inputs-groq-paced-en-uk.json",
+    "llm_output_limit": "max(512, source characters), capped at 4000 tokens; Groq also capped by GROQ_MAX_OUTPUT_TOKENS",
+    "groq_max_output_tokens": 1000,
+    "timing": "request start to entire response body; network included",
+    "cohere_minimum_start_interval_seconds": 3.2,
+    "deepl_minimum_start_interval_seconds": 2.0,
+    "new_provider_pacing": {
+      "groq": "30 RPM and conservative 8000 TPM reservation",
+      "groq_output_tokens_per_minute": 1000,
+      "gemini_minimum_seconds": 15.0,
+      "cerebras_minimum_seconds": 2.1,
+      "azure_characters_per_second": 500
+    },
+    "harness_sha256": "689217b81626bb8c24d9d55f20c2ffe5da4af15e424a84213b916a84dca4f15c",
+    "input_sha256": "6754f9ede48659704044aa1fa2130a795df37a424b882eef30860df8c61e4181",
+    "configuration": {
+      "providers": {
+        "azure": {
+          "configured": true,
+          "region": "",
+          "endpoint": "https://api.cognitive.microsofttranslator.com",
+          "api_version": "2026-06-06"
+        },
+        "deepl": {
+          "configured": true,
+          "endpoint": "https://api-free.deepl.com"
+        },
+        "cohere": {
+          "configured": true,
+          "endpoint": "https://api.cohere.com",
+          "model": "north-small-translate-09-2026"
+        },
+        "google": {
+          "configured": false,
+          "endpoint": "https://translation.googleapis.com"
+        },
+        "groq": {
+          "configured": true,
+          "endpoint": "https://api.groq.com",
+          "model": "qwen/qwen3.8-27b"
+        },
+        "gemini": {
+          "configured": true,
+          "endpoint": "https://generativelanguage.googleapis.com",
+          "model": "gemini-3.1-flash-lite"
+        },
+        "cerebras": {
+          "configured": false,
+          "endpoint": "https://api.cerebras.ai",
+          "model": "qwen-3.8-27b"
+        },
+        "cloudflare": {
+          "configured": true,
+          "endpoint": "https://api.cloudflare.com",
+          "model": "@cf/meta/m2m100-1.2b",
+          "token_present": true,
+          "account_id_present": true
+        }
+      }
+    },
+    "finished_at": "2026-10-02T21:39:00.536788+00:00"
+  },
+  "inputs": [
+    {
+      "id": "word-1",
+      "size": "word",
+      "text": "bank"
+    },
+    {
+      "id": "short-1",
+      "size": "short",
+      "text": "Open the settings."
+    },
+    {
+      "id": "sentence-1",
+      "size": "sentence",
+      "text": "You can select a different language from the menu. Your choice will be remembered the next time you open the browser."
+    },
+    {
+      "id": "paragraph-1",
+      "size": "paragraph",
+      "text": "When you select text on a web page, a small translation button appears beside it. Click the button to open a panel with the translation. You can change the target language in that panel, and the browser will remember your choice for the next session. Press Escape or click outside the panel to close it. The selected text should remain highlighted so that you can compare the original with the translated version. If the request fails, the panel should explain what happened and offer a retry without losing your selection."
+    },
+    {
+      "id": "long-1",
+      "size": "long",
+      "text": "A reliable translation panel starts with a clear connection between the selected text and the request that represents it. The browser can generate several selection events while a person drags across a paragraph. Sending a request for every event wastes time and makes the interface feel unstable. Wait until the selection is complete, keep the source text in memory, and send the request when the translation button is clicked.\n\nThe user should see the panel immediately after clicking. Its position depends on the visible selection rectangle and the available space around it. Near the right edge of the page, the panel may need to move to the left. Near the bottom, it may need to open above the selection. Scrolling should not leave the panel floating over unrelated content. These adjustments should happen locally and should not delay the translation request.\n\nA second selection may be made before the first translation finishes. Give each request a unique identifier and compare it with the current selection before displaying the result. Cancel a request when the transport supports cancellation. If cancellation is unavailable, discard the stale response. The important behavior is that the result always belongs to the text the person most recently asked to translate.\n\nPersist the target language after it changes. For a person who normally translates into Ukrainian, a remembered preference removes an extra action from every request. The source language can be detected by the provider in the same translation call. Very short words are sometimes ambiguous, so the panel may also need an optional way to choose a source language when automatic detection produces the wrong result."
+    },
+    {
+      "id": "large-1",
+      "size": "large",
+      "text": "A reliable translation panel starts with a clear connection between the selected text and the request that represents it. The browser can generate several selection events while a person drags across a paragraph. Sending a request for every event wastes time and makes the interface feel unstable. Wait until the selection is complete, keep the source text in memory, and send the request when the translation button is clicked.\n\nThe user should see the panel immediately after clicking. Its position depends on the visible selection rectangle and the available space around it. Near the right edge of the page, the panel may need to move to the left. Near the bottom, it may need to open above the selection. Scrolling should not leave the panel floating over unrelated content. These adjustments should happen locally and should not delay the translation request.\n\nA second selection may be made before the first translation finishes. Give each request a unique identifier and compare it with the current selection before displaying the result. Cancel a request when the transport supports cancellation. If cancellation is unavailable, discard the stale response. The important behavior is that the result always belongs to the text the person most recently asked to translate.\n\nPersist the target language after it changes. For a person who normally translates into Ukrainian, a remembered preference removes an extra action from every request. The source language can be detected by the provider in the same translation call. Very short words are sometimes ambiguous, so the panel may also need an optional way to choose a source language when automatic detection produces the wrong result.\n\nNetwork connections make a measurable difference. The first request can include DNS lookup, a TCP connection, and a TLS handshake before the service receives any text. Later requests may reuse that connection. A benchmark should show both cases and should record the time until the entire translation is available. For a streamed response, also record when the first translated characters arrive.\n\nTranslation quality depends on context. A river bank and a financial bank share the same English spelling but require different Ukrainian words. Idioms such as feeling blue and spilling the beans should preserve their intended meaning. A fast engine that translates these expressions literally can make a paragraph harder to understand. Evaluate complete passages as well as isolated labels.\n\nLong passages need enough space in the panel to remain readable. Set a maximum height and allow the text to scroll inside it. Preserve paragraph boundaries where possible, and keep the close button accessible while scrolling. Keyboard users should be able to move focus into the panel, copy the translation, and return to the original page without losing their place.\n\nFailures should leave the source selection intact. A temporary network error, an exhausted allowance, and an invalid key require different recovery actions. Show a concise message with the relevant action. A retry should use the same source text and target language. Avoid repeatedly retrying a rejected credential because another request will not fix the configuration.\n\nMeasurements should describe the environment in which they were collected. Browser version, hardware, network connection, input length, model identifier, and source-language settings can all affect the result. Keep the raw timings together with the actual translations so that a later run can be compared against the same inputs. A single unusually fast request does not establish the normal experience.\n\nThe first prototype can concentrate on selection, translation, language preference, and closing the panel. Additional actions should be added only when they remove a frequent obstacle. A small interface can still be dependable if it handles stale requests, keyboard focus, page boundaries, and clear errors. These details matter more to everyday speed than a long list of optional features."
+    }
+  ],
+  "variants": [
+    {
+      "id": "gemini-3.5-flash-lite-stream",
+      "provider": "gemini",
+      "endpoint": "https://generativelanguage.googleapis.com",
+      "model": "gemini-3.5-flash-lite",
+      "thinking_level": "MINIMAL",
+      "stream": true,
+      "detect": true
+    },
+    {
+      "id": "gemini-3.8-flash-stream",
+      "provider": "gemini",
+      "endpoint": "https://generativelanguage.googleapis.com",
+      "model": "gemini-3.8-flash",
+      "thinking_level": "LOW",
+      "stream": true,
+      "detect": true
+    }
+  ],
+  "preflight": [],
+  "samples": [
+    {
+      "started_at": "2026-10-02T21:28:15.133038+00:00",
+      "ok": true,
+      "protocol": "HTTP/1.1",
+      "first_text_ms": 672.746,
+      "status": 200,
+      "headers_ms": 672.638,
+      "retry_after": null,
+      "returned_model": "gemini-3.5-flash-lite",
+      "reasoning_characters": 0,
+      "stream_events": 3,
+      "connection_reused": false,
+      "milliseconds": 724.25,
+      "variant": "gemini-3.5-flash-lite-stream",
+      "text": "Open the settings.",
+      "characters": 18,
+      "translation": "Відкрийте налаштування.",
+      "finish_reason": "STOP",
+      "usage": {
+        "promptTokenCount": 21,
+        "candidatesTokenCount": 7,
+        "totalTokenCount": 28,
+        "promptTokensDetails": [
+          {
+            "modality": "TEXT",
+            "tokenCount": 21
+          }
+        ],
+        "serviceTier": "standard"
+      },
+      "phase": "cold-first",
+      "round": -1
+    },
+    {
+      "started_at": "2026-10-02T21:28:30.133767+00:00",
+      "ok": true,
+      "protocol": "HTTP/1.1",
+      "first_text_ms": 4554.243,
+      "status": 200,
+      "headers_ms": 4554.196,
+      "retry_after": null,
+      "returned_model": "gemini-3.8-flash",
+      "reasoning_characters": 0,
+      "stream_events": 2,
+      "connection_reused": false,
+      "milliseconds": 4560.207,
+      "variant": "gemini-3.8-flash-stream",
+      "text": "Open the settings.",
+      "characters": 18,
+      "translation": "Відкрийте налаштування.",
+      "finish_reason": "STOP",
+      "usage": {
+        "promptTokenCount": 21,
+        "candidatesTokenCount": 7,
+        "totalTokenCount": 28,
+        "promptTokensDetails": [
+          {
+            "modality": "TEXT",
+            "tokenCount": 21
+          }
+        ],
+        "serviceTier": "standard"
+      },
+      "phase": "cold-first",
+      "round": -1
+    },
+    {
+      "started_at": "2026-10-02T21:28:45.136880+00:00",
+      "ok": true,
+      "protocol": "HTTP/1.1",
+      "first_text_ms": 3850.998,
+      "status": 200,
+      "headers_ms": 3850.96,
+      "retry_after": null,
+      "returned_model": "gemini-3.8-flash",
+      "reasoning_characters": 0,
+      "stream_events": 2,
+      "connection_reused": true,
+      "milliseconds": 3858.713,
+      "variant": "gemini-3.8-flash-stream",
+      "text": "Open the settings.",
+      "characters": 18,
+      "translation": "Відкрийте налаштування.",
+      "finish_reason": "STOP",
+      "usage": {
+        "promptTokenCount": 21,
+        "candidatesTokenCount": 7,
+        "totalTokenCount": 28,
+        "promptTokensDetails": [
+          {
+            "modality": "TEXT",
+            "tokenCount": 21
+          }
+        ],
+        "serviceTier": "standard"
+      },
+      "phase": "warm",
+      "round": 0,
+      "input_index": 1,
+      "input_id": "short-1",
+      "size": "short"
+    },
+    {
+      "started_at": "2026-10-02T21:29:00.141907+00:00",
+      "ok": true,
+      "protocol": "HTTP/1.1",
+      "first_text_ms": 625.925,
+      "status": 200,
+      "headers_ms": 625.889,
+      "retry_after": null,
+      "returned_model": "gemini-3.5-flash-lite",
+      "reasoning_characters": 0,
+      "stream_events": 50,
+      "connection_reused": true,
+      "milliseconds": 3759.945,
+      "variant": "gemini-3.5-flash-lite-stream",
+      "text": "A reliable translation panel starts with a clear connection between the selected text and the request that represents it. The browser can generate several selection events while a person drags across a paragraph. Sending a request for every event wastes time and makes the interface feel unstable. Wait until the selection is complete, keep the source text in memory, and send the request when the translation button is clicked.\n\nThe user should see the panel immediately after clicking. Its position depends on the visible selection rectangle and the available space around it. Near the right edge of the page, the panel may need to move to the left. Near the bottom, it may need to open above the selection. Scrolling should not leave the panel floating over unrelated content. These adjustments should happen locally and should not delay the translation request.\n\nA second selection may be made before the first translation finishes. Give each request a unique identifier and compare it with the current selection before displaying the result. Cancel a request when the transport supports cancellation. If cancellation is unavailable, discard the stale response. The important behavior is that the result always belongs to the text the person most recently asked to translate.\n\nPersist the target language after it changes. For a person who normally translates into Ukrainian, a remembered preference removes an extra action from every request. The source language can be detected by the provider in the same translation call. Very short words are sometimes ambiguous, so the panel may also need an optional way to choose a source language when automatic detection produces the wrong result.\n\nNetwork connections make a measurable difference. The first request can include DNS lookup, a TCP connection, and a TLS handshake before the service receives any text. Later requests may reuse that connection. A benchmark should show both cases and should record the time until the entire translation is available. For a streamed response, also record when the first translated characters arrive.\n\nTranslation quality depends on context. A river bank and a financial bank share the same English spelling but require different Ukrainian words. Idioms such as feeling blue and spilling the beans should preserve their intended meaning. A fast engine that translates these expressions literally can make a paragraph harder to understand. Evaluate complete passages as well as isolated labels.\n\nLong passages need enough space in the panel to remain readable. Set a maximum height and allow the text to scroll inside it. Preserve paragraph boundaries where possible, and keep the close button accessible while scrolling. Keyboard users should be able to move focus into the panel, copy the translation, and return to the original page without losing their place.\n\nFailures should leave the source selection intact. A temporary network error, an exhausted allowance, and an invalid key require different recovery actions. Show a concise message with the relevant action. A retry should use the same source text and target language. Avoid repeatedly retrying a rejected credential because another request will not fix the configuration.\n\nMeasurements should describe the environment in which they were collected. Browser version, hardware, network connection, input length, model identifier, and source-language settings can all affect the result. Keep the raw timings together with the actual translations so that a later run can be compared against the same inputs. A single unusually fast request does not establish the normal experience.\n\nThe first prototype can concentrate on selection, translation, language preference, and closing the panel. Additional actions should be added only when they remove a frequent obstacle. A small interface can still be dependable if it handles stale requests, keyboard focus, page boundaries, and clear errors. These details matter more to everyday speed than a long list of optional features.",
+      "characters": 4023,
+      "translation": "Надійна панель перекладу починається з чіткого зв'язку між вибраним текстом і запитом, який його представляє. Браузер може генерувати кілька подій виділення, поки користувач перетягує курсор по абзацу. Надсилання запиту для кожної події марнує час і робить інтерфейс нестабільним. Зачекайте, поки виділення буде завершено, збережіть вихідний текст у пам'яті та надішліть запит, коли буде натиснуто кнопку перекладу.\n\nКористувач повинен бачити панель одразу після натискання. Її положення залежить від прямокутника видимого виділення та вільного простору навколо нього. Поблизу правого краю сторінки панель може знадобитися змістити вліво. Біля нижнього краю вона може відкриватися над виділенням. Прокручування не повинно залишати панель плаваючою над стороннім контентом. Ці коригування мають відбуватися локально і не повинні затримувати запит на переклад.\n\nДруге виділення може бути зроблене до завершення першого перекладу. Надайте кожному запиту унікальний ідентифікатор і порівняйте його з поточним виділенням перед відображенням результату. Скасуйте запит, якщо транспортний протокол підтримує скасування. Якщо скасування недоступне, відкиньте застарілу відповідь. Важлива поведінка полягає в тому, щоб результат завжди належав тексту, який користувач попросив перекласти востаннє.\n\nЗберігайте цільову мову після її зміни. Для користувача, який зазвичай перекладає українською, збережена в пам'яті перевага позбавляє від зайвої дії в кожному запиті. Вихідна мова може бути визначена провайдером у тому ж виклику перекладу. Дуже короткі слова іноді є двозначними, тому панель може також потребувати необов'язкового способу вибору вихідної мови, коли автоматичне визначення дає хибний результат.\n\nМережеві з'єднання відіграють помітну роль. Перший запит може включати пошук DNS, TCP-з'єднання та TLS-рукостискання до того, як служба отримає будь-який текст. Подальші запити можуть повторно використовувати це з'єднання. Тест продуктивності повинен показувати обидва випадки та фіксувати час до появи всього перекладу. Для потокової відповіді також фіксуйте час прибуття перших перекладених символів.\n\nЯкість перекладу залежить від контексту. Берег річки та фінансовий банк пишуться однаково англійською мовою, але вимагають різних українських слів. Ідіоми, такі як почуватися сумно (feeling blue) та видати секрет (spilling the beans), повинні зберігати своє початкове значення. Швидкий двигун, який перекладає ці вирази дослівно, може ускладнити розуміння абзацу. Оцінюйте повні уривки, а також ізольовані мітки.\n\nДовгі уривки потребують достатньо місця на панелі, щоб залишатися читабельними. Встановіть максимальну висоту та дозвольте тексту прокручуватися всередині неї. Зберігайте межі абзаців, де це можливо, і тримайте кнопку закриття доступною під час прокручування. Користувачі клавіатури повинні мати можливість перевести фокус на панель, скопіювати переклад і повернутися на оригінальну сторінку, не втрачаючи свого місця.\n\nПомилки повинні залишати вихідне виділення незмінним. Тимчасова мережева помилка, вичерпаний ліміт та недійсний ключ вимагають різних дій з відновлення. Покажіть коротке повідомлення з відповідною дією. Повторна спроба повинна використовувати той самий вихідний текст і цільову мову. Уникайте повторних спроб використання відхилених облікових даних, оскільки ще один запит не виправить конфігурацію.\n\nВимірювання повинні описувати середовище, в якому вони були зібрані. Версія браузера, апаратне забезпечення, мережеве з'єднання, довжина вхідних даних, ідентифікатор моделі та налаштування вихідної мови можуть впливати на результат. Зберігайте необроблені показники часу разом із реальними перекладами, щоб пізніший запуск можна було порівняти з тими самими вхідними даними. Один незвичайно швидкий запит не відображає звичайний досвід використання.\n\nПерший прототип може зосередитися на виділенні, перекладі, мовних налаштуваннях та закритті панелі. Додаткові дії слід додавати лише тоді, коли вони усувають часту перешкоду. Маленький інтерфейс все одно може бути надійним, якщо він обробляє застарілі запити, фокус клавіатури, межі сторінки та чіткі помилки. Ці деталі важливіші для повсякденної швидкості, ніж довгий список необов'язкових функцій.",
+      "finish_reason": "STOP",
+      "usage": {
+        "promptTokenCount": 727,
+        "candidatesTokenCount": 1232,
+        "totalTokenCount": 1959,
+        "promptTokensDetails": [
+          {
+            "modality": "TEXT",
+            "tokenCount": 727
+          }
+        ],
+        "serviceTier": "standard"
+      },
+      "phase": "warm",
+      "round": 0,
+      "input_index": 5,
+      "input_id": "large-1",
+      "size": "large"
+    },
+    {
+      "started_at": "2026-10-02T21:29:15.143226+00:00",
+      "ok": true,
+      "protocol": "HTTP/1.1",
+      "first_text_ms": 543.666,
+      "status": 200,
+      "headers_ms": 542.842,
+      "retry_after": null,
+      "returned_model": "gemini-3.5-flash-lite",
+      "reasoning_characters": 0,
+      "stream_events": 4,
+      "connection_reused": true,
+      "milliseconds": 640.762,
+      "variant": "gemini-3.5-flash-lite-stream",
+      "text": "You can select a different language from the menu. Your choice will be remembered the next time you open the browser.",
+      "characters": 117,
+      "translation": "Ви можете вибрати іншу мову з меню. Ваш вибір буде збережено під час наступного відкриття браузера.",
+      "finish_reason": "STOP",
+      "usage": {
+        "promptTokenCount": 40,
+        "candidatesTokenCount": 26,
+        "totalTokenCount": 66,
+        "promptTokensDetails": [
+          {
+            "modality": "TEXT",
+            "tokenCount": 40
+          }
+        ],
+        "serviceTier": "standard"
+      },
+      "phase": "warm",
+      "round": 0,
+      "input_index": 2,
+      "input_id": "sentence-1",
+      "size": "sentence"
+    },
+    {
+      "started_at": "2026-10-02T21:29:30.147411+00:00",
+      "ok": true,
+      "protocol": "HTTP/1.1",
+      "first_text_ms": 5948.962,
+      "status": 200,
+      "headers_ms": 5948.892,
+      "retry_after": null,
+      "returned_model": "gemini-3.8-flash",
+      "reasoning_characters": 0,
+      "stream_events": 3,
+      "connection_reused": true,
+      "milliseconds": 5962.666,
+      "variant": "gemini-3.8-flash-stream",
+      "text": "You can select a different language from the menu. Your choice will be remembered the next time you open the browser.",
+      "characters": 117,
+      "translation": "Ви можете вибрати іншу мову в меню. Ваш вибір буде збережено до наступного відкриття браузера.",
+      "finish_reason": "STOP",
+      "usage": {
+        "promptTokenCount": 40,
+        "candidatesTokenCount": 25,
+        "totalTokenCount": 65,
+        "promptTokensDetails": [
+          {
+            "modality": "TEXT",
+            "tokenCount": 40
+          }
+        ],
+        "serviceTier": "standard"
+      },
+      "phase": "warm",
+      "round": 0,
+      "input_index": 2,
+      "input_id": "sentence-1",
+      "size": "sentence"
+    },
+    {
+      "started_at": "2026-10-02T21:29:45.152384+00:00",
+      "ok": true,
+      "protocol": "HTTP/1.1",
+      "first_text_ms": 4242.059,
+      "status": 200,
+      "headers_ms": 4242.014,
+      "retry_after": null,
+      "returned_model": "gemini-3.8-flash",
+      "reasoning_characters": 0,
+      "stream_events": 8,
+      "connection_reused": true,
+      "milliseconds": 4253.828,
+      "variant": "gemini-3.8-flash-stream",
+      "text": "When you select text on a web page, a small translation button appears beside it. Click the button to open a panel with the translation. You can change the target language in that panel, and the browser will remember your choice for the next session. Press Escape or click outside the panel to close it. The selected text should remain highlighted so that you can compare the original with the translated version. If the request fails, the panel should explain what happened and offer a retry without losing your selection.",
+      "characters": 523,
+      "translation": "Коли ви виділяєте текст на вебсторінці, поруч із ним з'являється невелика кнопка перекладу. Натисніть кнопку, щоб відкрити панель із перекладом. На цій панелі ви можете змінити мову перекладу, і браузер запам'ятає ваш вибір для наступного сеансу. Натисніть Escape або клацніть за межами панелі, щоб закрити її. Виділений текст має залишатися підсвіченим, щоб ви могли порівняти оригінал із перекладеною версією. Якщо запит не вдасться виконати, на панелі має з'явитися пояснення того, що сталося, та пропозиція спробувати ще раз без втрати виділеного тексту.",
+      "finish_reason": "STOP",
+      "usage": {
+        "promptTokenCount": 116,
+        "candidatesTokenCount": 177,
+        "totalTokenCount": 293,
+        "promptTokensDetails": [
+          {
+            "modality": "TEXT",
+            "tokenCount": 116
+          }
+        ],
+        "serviceTier": "standard"
+      },
+      "phase": "warm",
+      "round": 0,
+      "input_index": 3,
+      "input_id": "paragraph-1",
+      "size": "paragraph"
+    },
+    {
+      "started_at": "2026-10-02T21:30:00.154184+00:00",
+      "ok": false,
+      "protocol": "HTTP/1.1",
+      "first_text_ms": null,
+      "status": 503,
+      "headers_ms": 5484.425,
+      "retry_after": null,
+      "connection_reused": true,
+      "milliseconds": 5484.466,
+      "variant": "gemini-3.8-flash-stream",
+      "text": "bank",
+      "characters": 4,
+      "provider_error": {
+        "error": {
+          "code": 503,
+          "message": "This model is currently experiencing high demand. Spikes in demand are usually temporary. Please try again later.",
+          "status": "UNAVAILABLE"
+        }
+      },
+      "phase": "warm",
+      "round": 0,
+      "input_index": 0,
+      "input_id": "word-1",
+      "size": "word"
+    },
+    {
+      "started_at": "2026-10-02T21:30:15.157752+00:00",
+      "ok": true,
+      "protocol": "HTTP/1.1",
+      "first_text_ms": 1968.209,
+      "status": 200,
+      "headers_ms": 1968.144,
+      "retry_after": null,
+      "returned_model": "gemini-3.8-flash",
+      "reasoning_characters": 0,
+      "stream_events": 49,
+      "connection_reused": true,
+      "milliseconds": 5001.049,
+      "variant": "gemini-3.8-flash-stream",
+      "text": "A reliable translation panel starts with a clear connection between the selected text and the request that represents it. The browser can generate several selection events while a person drags across a paragraph. Sending a request for every event wastes time and makes the interface feel unstable. Wait until the selection is complete, keep the source text in memory, and send the request when the translation button is clicked.\n\nThe user should see the panel immediately after clicking. Its position depends on the visible selection rectangle and the available space around it. Near the right edge of the page, the panel may need to move to the left. Near the bottom, it may need to open above the selection. Scrolling should not leave the panel floating over unrelated content. These adjustments should happen locally and should not delay the translation request.\n\nA second selection may be made before the first translation finishes. Give each request a unique identifier and compare it with the current selection before displaying the result. Cancel a request when the transport supports cancellation. If cancellation is unavailable, discard the stale response. The important behavior is that the result always belongs to the text the person most recently asked to translate.\n\nPersist the target language after it changes. For a person who normally translates into Ukrainian, a remembered preference removes an extra action from every request. The source language can be detected by the provider in the same translation call. Very short words are sometimes ambiguous, so the panel may also need an optional way to choose a source language when automatic detection produces the wrong result.\n\nNetwork connections make a measurable difference. The first request can include DNS lookup, a TCP connection, and a TLS handshake before the service receives any text. Later requests may reuse that connection. A benchmark should show both cases and should record the time until the entire translation is available. For a streamed response, also record when the first translated characters arrive.\n\nTranslation quality depends on context. A river bank and a financial bank share the same English spelling but require different Ukrainian words. Idioms such as feeling blue and spilling the beans should preserve their intended meaning. A fast engine that translates these expressions literally can make a paragraph harder to understand. Evaluate complete passages as well as isolated labels.\n\nLong passages need enough space in the panel to remain readable. Set a maximum height and allow the text to scroll inside it. Preserve paragraph boundaries where possible, and keep the close button accessible while scrolling. Keyboard users should be able to move focus into the panel, copy the translation, and return to the original page without losing their place.\n\nFailures should leave the source selection intact. A temporary network error, an exhausted allowance, and an invalid key require different recovery actions. Show a concise message with the relevant action. A retry should use the same source text and target language. Avoid repeatedly retrying a rejected credential because another request will not fix the configuration.\n\nMeasurements should describe the environment in which they were collected. Browser version, hardware, network connection, input length, model identifier, and source-language settings can all affect the result. Keep the raw timings together with the actual translations so that a later run can be compared against the same inputs. A single unusually fast request does not establish the normal experience.\n\nThe first prototype can concentrate on selection, translation, language preference, and closing the panel. Additional actions should be added only when they remove a frequent obstacle. A small interface can still be dependable if it handles stale requests, keyboard focus, page boundaries, and clear errors. These details matter more to everyday speed than a long list of optional features.",
+      "characters": 4023,
+      "translation": "Надійна панель перекладу починається з чіткого зв’язку між виділеним текстом і запитом, який його представляє. Браузер може генерувати кілька подій виділення, поки людина веде курсор по абзацу. Надсилання запиту на кожну подію марнує час і створює враження нестабільності інтерфейсу. Зачекайте, доки виділення завершиться, збережіть вихідний текст у пам’яті та надішліть запит після натискання кнопки перекладу.\n\nКористувач має бачити панель одразу після кліку. Її положення залежить від видимого прямокутника виділення та вільного простору навколо нього. Біля правого краю сторінки панелі може знадобитися зміститися ліворуч. Біля нижнього краю їй може знадобитися відкритися над виділенням. Прокручування не повинно залишати панель завислою над стороннім вмістом. Ці коригування мають відбуватися локально й не повинні затримувати запит на переклад.\n\nДруге виділення може бути зроблене до того, як завершиться перший переклад. Надавайте кожному запиту унікальний ідентифікатор і порівнюйте його з поточним виділенням перед відображенням результату. Скасовуйте запит, якщо транспорт підтримує скасування. Якщо скасування недоступне, відкидайте застарілу відповідь. Важливо забезпечити таку поведінку, за якої результат завжди відповідатиме тексту, який людина востаннє надіслала на переклад.\n\nЗберігайте цільову мову після її зміни. Для людини, яка зазвичай перекладає українською, збережене налаштування усуває зайву дію з кожного запиту. Вихідна мова може бути визначена постачальником послуги в тому самому виклику перекладу. Дуже короткі слова іноді є неоднозначними, тому в панелі також може знадобитися додаткова можливість вибору вихідної мови, якщо автоматичне визначення дає неправильний результат.\n\nМережеві з’єднання мають відчутний вплив. Перший запит може включати пошук DNS, встановлення TCP-з’єднання та рукостискання TLS, перш ніж служба отримає будь-який текст. Наступні запити можуть використовувати це з’єднання повторно. Тест продуктивності повинен показувати обидва випадки та фіксувати час до отримання повного перекладу. Для потокової відповіді також фіксуйте момент надходження перших перекладених символів.\n\nЯкість перекладу залежить від контексту. Англійські слова «river bank» (берег річки) та «financial bank» (фінансовий банк) мають однакове написання, але вимагають різних українських слів. Такі ідіоми, як «feeling blue» (сумувати) та «spilling the beans» (проговоритися), повинні зберігати свій первинний зміст. Швидкий рушій, який перекладає ці вирази буквально, може ускладнити розуміння абзацу. Оцінюйте як цілісні уривки, так і окремі написи.\n\nДовгі уривки потребують достатньо простору на панелі, щоб залишатися зручними для читання. Встановіть максимальну висоту та дозвольте прокручування тексту всередині неї. За можливості зберігайте межі абзаців і тримайте кнопку закриття доступною під час прокручування. Користувачі, які працюють із клавіатури, повинні мати змогу перемістити фокус на панель, скопіювати переклад і повернутися до початкової сторінки, не втрачаючи свого місця.\n\nЗбої мають залишати виділення вихідного тексту недоторканим. Тимчасова помилка мережі, вичерпаний ліміт і недійсний ключ вимагають різних дій для відновлення. Покажіть лаконічне повідомлення з відповідною дією. Повторна спроба має використовувати той самий вихідний текст і цільову мову. Уникайте повторних спроб із відхиленими обліковими даними, оскільки ще один запит не виправить конфігурацію.\n\nВимірювання мають описувати середовище, у якому вони збиралися. Версія браузера, апаратне забезпечення, мережеве з’єднання, довжина вхідних даних, ідентифікатор моделі та налаштування вихідної мови можуть впливати на результат. Зберігайте необроблені дані про час разом із самими перекладами, щоб пізніший запуск можна було порівняти з тими самими вхідними даними. Один надзвичайно швидкий запит не свідчить про стабільну роботу в звичайних умовах.\n\nПерший прототип може зосередитися на виділенні, перекладі, виборі мови та закритті панелі. Додаткові дії слід додавати лише тоді, коли вони усувають часту перешкоду. Невеликий інтерфейс все одно може бути надійним, якщо він коректно обробляє застарілі запити, фокус клавіатури, межі сторінки та зрозумілі помилки. Ці деталі мають більше значення для щоденної швидкості, ніж довгий перелік необов’язкових функцій.",
+      "finish_reason": "STOP",
+      "usage": {
+        "promptTokenCount": 727,
+        "candidatesTokenCount": 1254,
+        "totalTokenCount": 1981,
+        "promptTokensDetails": [
+          {
+            "modality": "TEXT",
+            "tokenCount": 727
+          }
+        ],
+        "serviceTier": "standard"
+      },
+      "phase": "warm",
+      "round": 0,
+      "input_index": 5,
+      "input_id": "large-1",
+      "size": "large"
+    },
+    {
+      "started_at": "2026-10-02T21:30:30.160036+00:00",
+      "ok": true,
+      "protocol": "HTTP/1.1",
+      "first_text_ms": 697.265,
+      "status": 200,
+      "headers_ms": 697.219,
+      "retry_after": null,
+      "returned_model": "gemini-3.5-flash-lite",
+      "reasoning_characters": 0,
+      "stream_events": 9,
+      "connection_reused": true,
+      "milliseconds": 1216.863,
+      "variant": "gemini-3.5-flash-lite-stream",
+      "text": "When you select text on a web page, a small translation button appears beside it. Click the button to open a panel with the translation. You can change the target language in that panel, and the browser will remember your choice for the next session. Press Escape or click outside the panel to close it. The selected text should remain highlighted so that you can compare the original with the translated version. If the request fails, the panel should explain what happened and offer a retry without losing your selection.",
+      "characters": 523,
+      "translation": "Коли ви виділяєте текст на вебсторінці, біля нього з'являється невелика кнопка перекладу. Натисніть кнопку, щоб відкрити панель із перекладом. Ви можете змінити цільову мову на цій панелі, і браузер запам'ятає ваш вибір для наступного сеансу. Натисніть Escape або клацніть поза панеллю, щоб закрити її. Виділений текст має залишитися підсвіченим, щоб ви могли порівняти оригінал із перекладеною версією. Якщо запит не вдасться виконати, панель має пояснити, що сталося, і запропонувати повторну спробу, не втрачаючи вашого виділення.",
+      "finish_reason": "STOP",
+      "usage": {
+        "promptTokenCount": 116,
+        "candidatesTokenCount": 170,
+        "totalTokenCount": 286,
+        "promptTokensDetails": [
+          {
+            "modality": "TEXT",
+            "tokenCount": 116
+          }
+        ],
+        "serviceTier": "standard"
+      },
+      "phase": "warm",
+      "round": 0,
+      "input_index": 3,
+      "input_id": "paragraph-1",
+      "size": "paragraph"
+    },
+    {
+      "started_at": "2026-10-02T21:30:45.162263+00:00",
+      "ok": true,
+      "protocol": "HTTP/1.1",
+      "first_text_ms": 546.902,
+      "status": 200,
+      "headers_ms": 546.856,
+      "retry_after": null,
+      "returned_model": "gemini-3.5-flash-lite",
+      "reasoning_characters": 0,
+      "stream_events": 22,
+      "connection_reused": true,
+      "milliseconds": 1819.376,
+      "variant": "gemini-3.5-flash-lite-stream",
+      "text": "A reliable translation panel starts with a clear connection between the selected text and the request that represents it. The browser can generate several selection events while a person drags across a paragraph. Sending a request for every event wastes time and makes the interface feel unstable. Wait until the selection is complete, keep the source text in memory, and send the request when the translation button is clicked.\n\nThe user should see the panel immediately after clicking. Its position depends on the visible selection rectangle and the available space around it. Near the right edge of the page, the panel may need to move to the left. Near the bottom, it may need to open above the selection. Scrolling should not leave the panel floating over unrelated content. These adjustments should happen locally and should not delay the translation request.\n\nA second selection may be made before the first translation finishes. Give each request a unique identifier and compare it with the current selection before displaying the result. Cancel a request when the transport supports cancellation. If cancellation is unavailable, discard the stale response. The important behavior is that the result always belongs to the text the person most recently asked to translate.\n\nPersist the target language after it changes. For a person who normally translates into Ukrainian, a remembered preference removes an extra action from every request. The source language can be detected by the provider in the same translation call. Very short words are sometimes ambiguous, so the panel may also need an optional way to choose a source language when automatic detection produces the wrong result.",
+      "characters": 1694,
+      "translation": "Надійна панель перекладу починається з чіткого зв'язку між виділеним текстом і запитом, який його представляє. Браузер може генерувати кілька подій виділення, поки користувач перетягує вказівник уздовж абзацу. Надсилання запиту на кожну подію марнує час і створює відчуття нестабільності інтерфейсу. Зачекайте, доки виділення завершиться, збережіть вихідний текст у пам'яті та надішліть запит після натискання кнопки перекладу.\n\nКористувач має бачити панель одразу після натискання. Її положення залежить від прямокутника видимого виділення та вільного простору навколо нього. Ближче до правого краю сторінки панель може знадобитися змістити вліво. Біля нижнього краю вона може відкриватися над виділенням. Прокручування не повинно залишати панель плаваючою поверх стороннього вмісту. Ці коригування мають відбуватися локально й не затримувати запит на переклад.\n\nДруге виділення може бути зроблене до завершення першого перекладу. Надайте кожному запиту унікальний ідентифікатор і порівнюйте його з поточним виділенням перед відображенням результату. Скасовуйте запит, якщо транспортний протокол підтримує скасування. Якщо скасування недоступне, відкидайте застарілу відповідь. Важливою поведінкою є те, щоб результат завжди належав тому тексту, який користувач попросив перекласти востаннє.\n\nЗберігайте цільову мову після її зміни. Для того, хто зазвичай перекладає українською, запам'ятована вподобання усуває зайву дію з кожного запиту. Вихідну мову може визначити провайдер у межах того самого викликý перекладу. Дуже короткі слова іноді бувають двозначними, тому панель може також потребувати необов'язкового способу вибору вихідної мови, коли автоматичне визначення дає хибний результат.",
+      "finish_reason": "STOP",
+      "usage": {
+        "promptTokenCount": 317,
+        "candidatesTokenCount": 500,
+        "totalTokenCount": 817,
+        "promptTokensDetails": [
+          {
+            "modality": "TEXT",
+            "tokenCount": 317
+          }
+        ],
+        "serviceTier": "standard"
+      },
+      "phase": "warm",
+      "round": 0,
+      "input_index": 4,
+      "input_id": "long-1",
+      "size": "long"
+    },
+    {
+      "started_at": "2026-10-02T21:31:00.163430+00:00",
+      "ok": true,
+      "protocol": "HTTP/1.1",
+      "first_text_ms": 2032.226,
+      "status": 200,
+      "headers_ms": 2032.187,
+      "retry_after": null,
+      "returned_model": "gemini-3.5-flash-lite",
+      "reasoning_characters": 0,
+      "stream_events": 2,
+      "connection_reused": true,
+      "milliseconds": 2039.464,
+      "variant": "gemini-3.5-flash-lite-stream",
+      "text": "bank",
+      "characters": 4,
+      "translation": "банк",
+      "finish_reason": "STOP",
+      "usage": {
+        "promptTokenCount": 18,
+        "candidatesTokenCount": 1,
+        "totalTokenCount": 19,
+        "promptTokensDetails": [
+          {
+            "modality": "TEXT",
+            "tokenCount": 18
+          }
+        ],
+        "serviceTier": "standard"
+      },
+      "phase": "warm",
+      "round": 0,
+      "input_index": 0,
+      "input_id": "word-1",
+      "size": "word"
+    },
+    {
+      "started_at": "2026-10-02T21:31:15.166813+00:00",
+      "ok": true,
+      "protocol": "HTTP/1.1",
+      "first_text_ms": 584.62,
+      "status": 200,
+      "headers_ms": 584.575,
+      "retry_after": null,
+      "returned_model": "gemini-3.5-flash-lite",
+      "reasoning_characters": 0,
+      "stream_events": 3,
+      "connection_reused": true,
+      "milliseconds": 624.523,
+      "variant": "gemini-3.5-flash-lite-stream",
+      "text": "Open the settings.",
+      "characters": 18,
+      "translation": "Відкрийте налаштування.",
+      "finish_reason": "STOP",
+      "usage": {
+        "promptTokenCount": 21,
+        "candidatesTokenCount": 7,
+        "totalTokenCount": 28,
+        "promptTokensDetails": [
+          {
+            "modality": "TEXT",
+            "tokenCount": 21
+          }
+        ],
+        "serviceTier": "standard"
+      },
+      "phase": "warm",
+      "round": 0,
+      "input_index": 1,
+      "input_id": "short-1",
+      "size": "short"
+    },
+    {
+      "started_at": "2026-10-02T21:31:30.171712+00:00",
+      "ok": true,
+      "protocol": "HTTP/1.1",
+      "first_text_ms": 2646.088,
+      "status": 200,
+      "headers_ms": 2646.03,
+      "retry_after": null,
+      "returned_model": "gemini-3.8-flash",
+      "reasoning_characters": 0,
+      "stream_events": 21,
+      "connection_reused": true,
+      "milliseconds": 3087.862,
+      "variant": "gemini-3.8-flash-stream",
+      "text": "A reliable translation panel starts with a clear connection between the selected text and the request that represents it. The browser can generate several selection events while a person drags across a paragraph. Sending a request for every event wastes time and makes the interface feel unstable. Wait until the selection is complete, keep the source text in memory, and send the request when the translation button is clicked.\n\nThe user should see the panel immediately after clicking. Its position depends on the visible selection rectangle and the available space around it. Near the right edge of the page, the panel may need to move to the left. Near the bottom, it may need to open above the selection. Scrolling should not leave the panel floating over unrelated content. These adjustments should happen locally and should not delay the translation request.\n\nA second selection may be made before the first translation finishes. Give each request a unique identifier and compare it with the current selection before displaying the result. Cancel a request when the transport supports cancellation. If cancellation is unavailable, discard the stale response. The important behavior is that the result always belongs to the text the person most recently asked to translate.\n\nPersist the target language after it changes. For a person who normally translates into Ukrainian, a remembered preference removes an extra action from every request. The source language can be detected by the provider in the same translation call. Very short words are sometimes ambiguous, so the panel may also need an optional way to choose a source language when automatic detection produces the wrong result.",
+      "characters": 1694,
+      "translation": "Надійна панель перекладу починається з чіткого зв'язку між виділеним текстом і запитом, який його представляє. Браузер може генерувати кілька подій виділення, поки людина веде курсор по абзацу. Надсилання запиту на кожну подію марнує час і робить інтерфейс нестабільним. Зачекайте, поки виділення завершиться, збережіть вихідний текст у пам'яті та надішліть запит, коли буде натиснуто кнопку перекладу.\n\nКористувач має побачити панель одразу після кліку. Її положення залежить від видимого прямокутника виділення та вільного простору навколо нього. Біля правого краю сторінки панель, можливо, доведеться змістити вліво. Біля нижнього краю вона може відкриватися над виділенням. Прокручування не повинно залишати панель завислою над непов'язаним контентом. Ці коригування мають відбуватися локально і не повинні затримувати запит на переклад.\n\nДруге виділення може бути зроблене до того, як завершиться перший переклад. Присвоюйте кожному запиту унікальний ідентифікатор і порівнюйте його з поточним виділенням перед відображенням результату. Скасовуйте запит, якщо транспортний протокол підтримує скасування. Якщо скасування недоступне, відкидайте застарілу відповідь. Важливо, щоб результат завжди стосувався того тексту, переклад якого користувач запросив останнім.\n\nЗберігайте цільову мову після її зміни. Для людини, яка зазвичай перекладає українською, збережене налаштування усуває зайву дію під час кожного запиту. Мова оригіналу може визначатися провайдером під час того самого виклику перекладу. Дуже короткі слова іноді є неоднозначними, тому панель може також потребувати необов'язкової можливості вибору мови оригіналу, коли автоматичне визначення дає неправильний результат.",
+      "finish_reason": "STOP",
+      "usage": {
+        "promptTokenCount": 317,
+        "candidatesTokenCount": 478,
+        "totalTokenCount": 795,
+        "promptTokensDetails": [
+          {
+            "modality": "TEXT",
+            "tokenCount": 317
+          }
+        ],
+        "serviceTier": "standard"
+      },
+      "phase": "warm",
+      "round": 0,
+      "input_index": 4,
+      "input_id": "long-1",
+      "size": "long"
+    },
+    {
+      "started_at": "2026-10-02T21:31:45.175937+00:00",
+      "ok": true,
+      "protocol": "HTTP/1.1",
+      "first_text_ms": 533.927,
+      "status": 200,
+      "headers_ms": 533.874,
+      "retry_after": null,
+      "returned_model": "gemini-3.5-flash-lite",
+      "reasoning_characters": 0,
+      "stream_events": 50,
+      "connection_reused": true,
+      "milliseconds": 3884.036,
+      "variant": "gemini-3.5-flash-lite-stream",
+      "text": "A reliable translation panel starts with a clear connection between the selected text and the request that represents it. The browser can generate several selection events while a person drags across a paragraph. Sending a request for every event wastes time and makes the interface feel unstable. Wait until the selection is complete, keep the source text in memory, and send the request when the translation button is clicked.\n\nThe user should see the panel immediately after clicking. Its position depends on the visible selection rectangle and the available space around it. Near the right edge of the page, the panel may need to move to the left. Near the bottom, it may need to open above the selection. Scrolling should not leave the panel floating over unrelated content. These adjustments should happen locally and should not delay the translation request.\n\nA second selection may be made before the first translation finishes. Give each request a unique identifier and compare it with the current selection before displaying the result. Cancel a request when the transport supports cancellation. If cancellation is unavailable, discard the stale response. The important behavior is that the result always belongs to the text the person most recently asked to translate.\n\nPersist the target language after it changes. For a person who normally translates into Ukrainian, a remembered preference removes an extra action from every request. The source language can be detected by the provider in the same translation call. Very short words are sometimes ambiguous, so the panel may also need an optional way to choose a source language when automatic detection produces the wrong result.\n\nNetwork connections make a measurable difference. The first request can include DNS lookup, a TCP connection, and a TLS handshake before the service receives any text. Later requests may reuse that connection. A benchmark should show both cases and should record the time until the entire translation is available. For a streamed response, also record when the first translated characters arrive.\n\nTranslation quality depends on context. A river bank and a financial bank share the same English spelling but require different Ukrainian words. Idioms such as feeling blue and spilling the beans should preserve their intended meaning. A fast engine that translates these expressions literally can make a paragraph harder to understand. Evaluate complete passages as well as isolated labels.\n\nLong passages need enough space in the panel to remain readable. Set a maximum height and allow the text to scroll inside it. Preserve paragraph boundaries where possible, and keep the close button accessible while scrolling. Keyboard users should be able to move focus into the panel, copy the translation, and return to the original page without losing their place.\n\nFailures should leave the source selection intact. A temporary network error, an exhausted allowance, and an invalid key require different recovery actions. Show a concise message with the relevant action. A retry should use the same source text and target language. Avoid repeatedly retrying a rejected credential because another request will not fix the configuration.\n\nMeasurements should describe the environment in which they were collected. Browser version, hardware, network connection, input length, model identifier, and source-language settings can all affect the result. Keep the raw timings together with the actual translations so that a later run can be compared against the same inputs. A single unusually fast request does not establish the normal experience.\n\nThe first prototype can concentrate on selection, translation, language preference, and closing the panel. Additional actions should be added only when they remove a frequent obstacle. A small interface can still be dependable if it handles stale requests, keyboard focus, page boundaries, and clear errors. These details matter more to everyday speed than a long list of optional features.",
+      "characters": 4023,
+      "translation": "Надійна панель перекладу починається з чіткого зв'язку між виділеним текстом і запитом, який його представляє. Браузер може генерувати кілька подій виділення, поки користувач перетягує вказівник уздовж абзацу. Надсилання запиту на кожну подію марнує час і робить інтерфейс нестабільним. Зачекайте, доки виділення завершиться, збережіть вихідний текст у пам'яті та надішліть запит після натискання кнопки перекладу.\n\nКористувач має бачити панель одразу після натискання. Її положення залежить від прямокутника видимого виділення та вільного простору навколо нього. Поблизу правого краю сторінки панель може знадобитися зрушити ліворуч. Ближче до низу вона може відкриватися над виділенням. Прокручування не повинно залишати панель плаваючою над стороннім вмістом. Ці коригування мають відбуватися локально й не затримувати запит на переклад.\n\nДруге виділення може бути зроблене до завершення першого перекладу. Надайте кожному запиту унікальний ідентифікатор і порівняйте його з поточним виділенням перед відображенням результату. Скасовуйте запит, якщо транспортний протокол підтримує скасування. Якщо скасування недоступне, відкиньте застарілу відповідь. Важлива поведінка полягає в тому, щоб результат завжди належав тексту, який користувач просив перекласти востаннє.\n\nЗберігайте цільову мову після її зміни. Для людини, яка зазвичай перекладає українською, збережена в пам'яті вподобання усуває зайву дію з кожного запиту. Вихідну мову може визначати постачальник у тому ж виклику перекладу. Дуже короткі слова іноді є неоднозначними, тому панелі також може знадобитися додатковий спосіб вибору вихідної мови, коли автоматичне визначення дає хибний результат.\n\nМережеві з'єднання відіграють помітну роль. Перший запит може включати пошук DNS, з'єднання TCP і крок рукостискання TLS, перш ніж служба отримає будь-який текст. Подальші запити можуть повторно використовувати це з'єднання. Тест продуктивності має демонструвати обидва випадки та фіксувати час до доступності всього перекладу. Для потокової відповіді також фіксуйте момент надходження перших перекладених символів.\n\nЯкість перекладу залежить від контексту. Берег річки та фінансовий банк пишуться однаково англійською мовою, але вимагають різних українських слів. Ідіоми, такі як відчуття смутку чи розкриття таємниці, мають зберігати своє початкове значення. Швидкий рушій, який перекладає такі вирази дослівно, може ускладнити розуміння абзацу. Оцінюйте цілі уривки, а не лише ізольовані мітки.\n\nДовгі уривки потребують достатньо простору в панелі, щоб залишатися читабельними. Встановіть максимальну висоту та дозвольте тексту прокручуватися всередині неї. По можливості зберігайте межі абзаців і тримайте кнопку закриття доступною під час прокручування. Користувачі клавіатури повинні мати змогу перемістити фокус у панель, скопіювати переклад і повернутися на вихідну сторінку, не втрачаючи свого місця.\n\nЗвітування про помилки повинно залишати вихідне виділення недоторканим. Тимчасова мережева помилка, вичерпаний ліміт і недійсний ключ вимагають різних дій для відновлення. Покажіть лаконічне повідомлення з відповідною дією. Повторна спроба має використовувати той самий вихідний текст і цільову мову. Уникайте багаторазових спроб для відхилених облікових даних, оскільки ще один запит не виправить конфігурацію.\n\nВимірювання повинні описувати середовище, у якому вони збиралися. Версія браузера, апаратне забезпечення, мережеве з'єднання, довжина введених даних, ідентифікатор моделі та налаштування вихідної мови — усе це може вплинути на результат. Зберігайте сирі дані часу разом із реальними перекладами, щоб пізніший запуск можна було порівняти з тими самими вхідними даними. Один незвичайно швидкий запит не відображає звичний досвід.\n\nПерший прототип може зосередитися на виділенні, перекладі, виборі мови та закритті панелі. Додаткові дії слід додавати лише тоді, коли вони усувають часту перешкоду. Маленький інтерфейс усе одно може бути надійним, якщо він обробляє застарілі запити, фокус клавіатури, межі сторінки та чіткі помилки. Ці деталі важливіші для повсякденної швидкості, ніж довгий список необов'язкових функцій.",
+      "finish_reason": "STOP",
+      "usage": {
+        "promptTokenCount": 727,
+        "candidatesTokenCount": 1231,
+        "totalTokenCount": 1958,
+        "promptTokensDetails": [
+          {
+            "modality": "TEXT",
+            "tokenCount": 727
+          }
+        ],
+        "serviceTier": "standard"
+      },
+      "phase": "warm",
+      "round": 1,
+      "input_index": 5,
+      "input_id": "large-1",
+      "size": "large"
+    },
+    {
+      "started_at": "2026-10-02T21:32:00.177262+00:00",
+      "ok": true,
+      "protocol": "HTTP/1.1",
+      "first_text_ms": 4080.755,
+      "status": 200,
+      "headers_ms": 4080.711,
+      "retry_after": null,
+      "returned_model": "gemini-3.8-flash",
+      "reasoning_characters": 0,
+      "stream_events": 2,
+      "connection_reused": true,
+      "milliseconds": 4092.878,
+      "variant": "gemini-3.8-flash-stream",
+      "text": "Open the settings.",
+      "characters": 18,
+      "translation": "Відкрийте налаштування.",
+      "finish_reason": "STOP",
+      "usage": {
+        "promptTokenCount": 21,
+        "candidatesTokenCount": 7,
+        "totalTokenCount": 28,
+        "promptTokensDetails": [
+          {
+            "modality": "TEXT",
+            "tokenCount": 21
+          }
+        ],
+        "serviceTier": "standard"
+      },
+      "phase": "warm",
+      "round": 1,
+      "input_index": 1,
+      "input_id": "short-1",
+      "size": "short"
+    },
+    {
+      "started_at": "2026-10-02T21:32:15.182307+00:00",
+      "ok": true,
+      "protocol": "HTTP/1.1",
+      "first_text_ms": 534.126,
+      "status": 200,
+      "headers_ms": 534.04,
+      "retry_after": null,
+      "returned_model": "gemini-3.5-flash-lite",
+      "reasoning_characters": 0,
+      "stream_events": 4,
+      "connection_reused": true,
+      "milliseconds": 615.852,
+      "variant": "gemini-3.5-flash-lite-stream",
+      "text": "You can select a different language from the menu. Your choice will be remembered the next time you open the browser.",
+      "characters": 117,
+      "translation": "Ви можете вибрати іншу мову з меню. Ваш вибір буде збережено під час наступного відкриття браузера.",
+      "finish_reason": "STOP",
+      "usage": {
+        "promptTokenCount": 40,
+        "candidatesTokenCount": 26,
+        "totalTokenCount": 66,
+        "promptTokensDetails": [
+          {
+            "modality": "TEXT",
+            "tokenCount": 40
+          }
+        ],
+        "serviceTier": "standard"
+      },
+      "phase": "warm",
+      "round": 1,
+      "input_index": 2,
+      "input_id": "sentence-1",
+      "size": "sentence"
+    },
+    {
+      "started_at": "2026-10-02T21:32:30.183043+00:00",
+      "ok": true,
+      "protocol": "HTTP/1.1",
+      "first_text_ms": 892.126,
+      "status": 200,
+      "headers_ms": 892.067,
+      "retry_after": null,
+      "returned_model": "gemini-3.8-flash",
+      "reasoning_characters": 0,
+      "stream_events": 9,
+      "connection_reused": true,
+      "milliseconds": 1341.654,
+      "variant": "gemini-3.8-flash-stream",
+      "text": "When you select text on a web page, a small translation button appears beside it. Click the button to open a panel with the translation. You can change the target language in that panel, and the browser will remember your choice for the next session. Press Escape or click outside the panel to close it. The selected text should remain highlighted so that you can compare the original with the translated version. If the request fails, the panel should explain what happened and offer a retry without losing your selection.",
+      "characters": 523,
+      "translation": "Коли ви виділяєте текст на вебсторінці, поруч із ним з'являється невелика кнопка перекладу. Натисніть цю кнопку, щоб відкрити панель із перекладом. У цій панелі ви можете змінити мову перекладу, і браузер запам'ятає ваш вибір для наступного сеансу. Натисніть клавішу Escape або клацніть за межами панелі, щоб закрити її. Виділений текст має залишатися підсвіченим, аби ви могли порівняти оригінал із перекладеною версією. Якщо запит не вдасться виконати, на панелі має з'явитися пояснення того, що сталося, і пропозиція повторити спробу без втрати виділеного тексту.",
+      "finish_reason": "STOP",
+      "usage": {
+        "promptTokenCount": 116,
+        "candidatesTokenCount": 181,
+        "totalTokenCount": 297,
+        "promptTokensDetails": [
+          {
+            "modality": "TEXT",
+            "tokenCount": 116
+          }
+        ],
+        "serviceTier": "standard"
+      },
+      "phase": "warm",
+      "round": 1,
+      "input_index": 3,
+      "input_id": "paragraph-1",
+      "size": "paragraph"
+    },
+    {
+      "started_at": "2026-10-02T21:32:45.187688+00:00",
+      "ok": false,
+      "protocol": "HTTP/1.1",
+      "first_text_ms": 7268.227,
+      "status": 200,
+      "headers_ms": 7268.185,
+      "retry_after": null,
+      "returned_model": "gemini-3.8-flash",
+      "reasoning_characters": 0,
+      "stream_error": {
+        "code": 503,
+        "message": "This model is currently experiencing high demand. Spikes in demand are usually temporary. Please try again later.",
+        "status": "UNAVAILABLE"
+      },
+      "stream_events": 12,
+      "connection_reused": true,
+      "milliseconds": 7274.864,
+      "variant": "gemini-3.8-flash-stream",
+      "text": "A reliable translation panel starts with a clear connection between the selected text and the request that represents it. The browser can generate several selection events while a person drags across a paragraph. Sending a request for every event wastes time and makes the interface feel unstable. Wait until the selection is complete, keep the source text in memory, and send the request when the translation button is clicked.\n\nThe user should see the panel immediately after clicking. Its position depends on the visible selection rectangle and the available space around it. Near the right edge of the page, the panel may need to move to the left. Near the bottom, it may need to open above the selection. Scrolling should not leave the panel floating over unrelated content. These adjustments should happen locally and should not delay the translation request.\n\nA second selection may be made before the first translation finishes. Give each request a unique identifier and compare it with the current selection before displaying the result. Cancel a request when the transport supports cancellation. If cancellation is unavailable, discard the stale response. The important behavior is that the result always belongs to the text the person most recently asked to translate.\n\nPersist the target language after it changes. For a person who normally translates into Ukrainian, a remembered preference removes an extra action from every request. The source language can be detected by the provider in the same translation call. Very short words are sometimes ambiguous, so the panel may also need an optional way to choose a source language when automatic detection produces the wrong result.",
+      "characters": 1694,
+      "translation": "Надійна панель перекладу починається з чіткого зв'язку між виділеним текстом і запитом, який його представляє. Браузер може генерувати кілька подій виділення, поки людина веде курсор по абзацу. Надсилання запиту на кожну подію марнує час і робить інтерфейс нестабільним. Зачекайте, поки виділення завершиться, збережіть вихідний текст у пам'яті та надішліть запит після натискання кнопки перекладу.\n\nКористувач має побачити панель одразу після натискання. Її положення залежить від видимої межі виділення та вільного простору навколо неї. Біля правого краю сторінки панель, можливо, доведеться змістити ліворуч. Біля нижнього краю — відкрити над виділенням. Прокручу",
+      "finish_reason": null,
+      "usage": {
+        "promptTokenCount": 317,
+        "candidatesTokenCount": 209,
+        "totalTokenCount": 526,
+        "promptTokensDetails": [
+          {
+            "modality": "TEXT",
+            "tokenCount": 317
+          }
+        ],
+        "serviceTier": "standard"
+      },
+      "error": "Generation did not complete",
+      "phase": "warm",
+      "round": 1,
+      "input_index": 4,
+      "input_id": "long-1",
+      "size": "long"
+    },
+    {
+      "started_at": "2026-10-02T21:33:00.190471+00:00",
+      "ok": true,
+      "protocol": "HTTP/1.1",
+      "first_text_ms": 7784.46,
+      "status": 200,
+      "headers_ms": 7784.419,
+      "retry_after": null,
+      "returned_model": "gemini-3.8-flash",
+      "reasoning_characters": 0,
+      "stream_events": 2,
+      "connection_reused": true,
+      "milliseconds": 7794.236,
+      "variant": "gemini-3.8-flash-stream",
+      "text": "bank",
+      "characters": 4,
+      "translation": "банк",
+      "finish_reason": "STOP",
+      "usage": {
+        "promptTokenCount": 18,
+        "candidatesTokenCount": 1,
+        "totalTokenCount": 19,
+        "promptTokensDetails": [
+          {
+            "modality": "TEXT",
+            "tokenCount": 18
+          }
+        ],
+        "serviceTier": "standard"
+      },
+      "phase": "warm",
+      "round": 1,
+      "input_index": 0,
+      "input_id": "word-1",
+      "size": "word"
+    },
+    {
+      "started_at": "2026-10-02T21:33:15.195060+00:00",
+      "ok": true,
+      "protocol": "HTTP/1.1",
+      "first_text_ms": 565.913,
+      "status": 200,
+      "headers_ms": 565.856,
+      "retry_after": null,
+      "returned_model": "gemini-3.5-flash-lite",
+      "reasoning_characters": 0,
+      "stream_events": 22,
+      "connection_reused": true,
+      "milliseconds": 1919.768,
+      "variant": "gemini-3.5-flash-lite-stream",
+      "text": "A reliable translation panel starts with a clear connection between the selected text and the request that represents it. The browser can generate several selection events while a person drags across a paragraph. Sending a request for every event wastes time and makes the interface feel unstable. Wait until the selection is complete, keep the source text in memory, and send the request when the translation button is clicked.\n\nThe user should see the panel immediately after clicking. Its position depends on the visible selection rectangle and the available space around it. Near the right edge of the page, the panel may need to move to the left. Near the bottom, it may need to open above the selection. Scrolling should not leave the panel floating over unrelated content. These adjustments should happen locally and should not delay the translation request.\n\nA second selection may be made before the first translation finishes. Give each request a unique identifier and compare it with the current selection before displaying the result. Cancel a request when the transport supports cancellation. If cancellation is unavailable, discard the stale response. The important behavior is that the result always belongs to the text the person most recently asked to translate.\n\nPersist the target language after it changes. For a person who normally translates into Ukrainian, a remembered preference removes an extra action from every request. The source language can be detected by the provider in the same translation call. Very short words are sometimes ambiguous, so the panel may also need an optional way to choose a source language when automatic detection produces the wrong result.",
+      "characters": 1694,
+      "translation": "Надійна панель перекладу починається з чіткого зв'язку між вибраним текстом і запитом, який його представляє. Браузер може генерувати кілька подій виділення, поки користувач перетягує курсор по абзацу. Надсилання запиту для кожної події марнує час і створює відчуття нестабільності інтерфейсу. Зачекайте, доки виділення завершиться, збережіть вихідний текст у пам'яті та надішліть запит після натискання кнопки перекладу.\n\nКористувач повинен побачити панель одразу після кліку. Її положення залежить від прямокутника видимого виділення та доступного простору навколо нього. Ближче до правого краю сторінки панель може знадобитися змістити ліворуч. Ближче до низу вона може відкриватися над виділенням. Прокручування не повинно залишати панель плаваючою над стороннім вмістом. Ці коригування мають відбуватися локально і не повинні затримувати запит на переклад.\n\nДруге виділення може бути зроблене до завершення першого перекладу. Надайте кожному запиту унікальний ідентифікатор і порівнюйте його з поточним виділенням перед відображенням результату. Скасовуйте запит, якщо транспортний протокол підтримує скасування. Якщо скасування недоступне, відкидайте застарілу відповідь. Головне правило полягає в тому, що результат завжди належить до тексту, який користувач попросив перекласти востаннє.\n\nЗберігайте цільову мову після її зміни. Для людини, яка зазвичай перекладає українською, збережена в пам'яті вподобашність позбавляє від зайвої дії в кожному запиті. Вихідна мова може визначатися провайдером у тому ж виклику перекладу. Дуже короткі слова бувають двозначними, тому панель також може потребувати необов'язкового способу вибору вихідної мови, коли автоматичне визначення дає хибний результат.",
+      "finish_reason": "STOP",
+      "usage": {
+        "promptTokenCount": 317,
+        "candidatesTokenCount": 496,
+        "totalTokenCount": 813,
+        "promptTokensDetails": [
+          {
+            "modality": "TEXT",
+            "tokenCount": 317
+          }
+        ],
+        "serviceTier": "standard"
+      },
+      "phase": "warm",
+      "round": 1,
+      "input_index": 4,
+      "input_id": "long-1",
+      "size": "long"
+    },
+    {
+      "started_at": "2026-10-02T21:33:30.198164+00:00",
+      "ok": true,
+      "protocol": "HTTP/1.1",
+      "first_text_ms": 5393.286,
+      "status": 200,
+      "headers_ms": 5393.177,
+      "retry_after": null,
+      "returned_model": "gemini-3.8-flash",
+      "reasoning_characters": 0,
+      "stream_events": 3,
+      "connection_reused": true,
+      "milliseconds": 5408.893,
+      "variant": "gemini-3.8-flash-stream",
+      "text": "You can select a different language from the menu. Your choice will be remembered the next time you open the browser.",
+      "characters": 117,
+      "translation": "Ви можете вибрати іншу мову в меню. Ваш вибір буде збережено до наступного відкриття браузера.",
+      "finish_reason": "STOP",
+      "usage": {
+        "promptTokenCount": 40,
+        "candidatesTokenCount": 25,
+        "totalTokenCount": 65,
+        "promptTokensDetails": [
+          {
+            "modality": "TEXT",
+            "tokenCount": 40
+          }
+        ],
+        "serviceTier": "standard"
+      },
+      "phase": "warm",
+      "round": 1,
+      "input_index": 2,
+      "input_id": "sentence-1",
+      "size": "sentence"
+    },
+    {
+      "started_at": "2026-10-02T21:33:45.201995+00:00",
+      "ok": true,
+      "protocol": "HTTP/1.1",
+      "first_text_ms": 529.194,
+      "status": 200,
+      "headers_ms": 529.146,
+      "retry_after": null,
+      "returned_model": "gemini-3.5-flash-lite",
+      "reasoning_characters": 0,
+      "stream_events": 9,
+      "connection_reused": true,
+      "milliseconds": 973.731,
+      "variant": "gemini-3.5-flash-lite-stream",
+      "text": "When you select text on a web page, a small translation button appears beside it. Click the button to open a panel with the translation. You can change the target language in that panel, and the browser will remember your choice for the next session. Press Escape or click outside the panel to close it. The selected text should remain highlighted so that you can compare the original with the translated version. If the request fails, the panel should explain what happened and offer a retry without losing your selection.",
+      "characters": 523,
+      "translation": "Коли ви виділяєте текст на вебсторінці, біля нього з'являється невелика кнопка перекладу. Натисніть кнопку, щоб відкрити панель із перекладом. Ви можете змінити цільову мову на цій панелі, і браузер запам'ятає ваш вибір для наступного сеансу. Натисніть Escape або клацніть поза панеллю, щоб закрити її. Виділений текст має залишитися підсвіченим, щоб ви могли порівняти оригінал із перекладеною версією. Якщо запит не вдасться виконати, панель повинна пояснити, що сталося, і запропонувати повторну спробу, не втрачаючи вашого виділення.",
+      "finish_reason": "STOP",
+      "usage": {
+        "promptTokenCount": 116,
+        "candidatesTokenCount": 171,
+        "totalTokenCount": 287,
+        "promptTokensDetails": [
+          {
+            "modality": "TEXT",
+            "tokenCount": 116
+          }
+        ],
+        "serviceTier": "standard"
+      },
+      "phase": "warm",
+      "round": 1,
+      "input_index": 3,
+      "input_id": "paragraph-1",
+      "size": "paragraph"
+    },
+    {
+      "started_at": "2026-10-02T21:34:00.207052+00:00",
+      "ok": true,
+      "protocol": "HTTP/1.1",
+      "first_text_ms": 528.749,
+      "status": 200,
+      "headers_ms": 528.697,
+      "retry_after": null,
+      "returned_model": "gemini-3.5-flash-lite",
+      "reasoning_characters": 0,
+      "stream_events": 3,
+      "connection_reused": true,
+      "milliseconds": 570.173,
+      "variant": "gemini-3.5-flash-lite-stream",
+      "text": "Open the settings.",
+      "characters": 18,
+      "translation": "Відкрийте налаштування.",
+      "finish_reason": "STOP",
+      "usage": {
+        "promptTokenCount": 21,
+        "candidatesTokenCount": 7,
+        "totalTokenCount": 28,
+        "promptTokensDetails": [
+          {
+            "modality": "TEXT",
+            "tokenCount": 21
+          }
+        ],
+        "serviceTier": "standard"
+      },
+      "phase": "warm",
+      "round": 1,
+      "input_index": 1,
+      "input_id": "short-1",
+      "size": "short"
+    },
+    {
+      "started_at": "2026-10-02T21:34:15.208593+00:00",
+      "ok": false,
+      "protocol": "HTTP/1.1",
+      "first_text_ms": 3866.461,
+      "status": 200,
+      "headers_ms": 3866.417,
+      "retry_after": null,
+      "returned_model": "gemini-3.8-flash",
+      "reasoning_characters": 0,
+      "stream_error": {
+        "code": 503,
+        "message": "This model is currently experiencing high demand. Spikes in demand are usually temporary. Please try again later.",
+        "status": "UNAVAILABLE"
+      },
+      "stream_events": 38,
+      "connection_reused": true,
+      "milliseconds": 6043.14,
+      "variant": "gemini-3.8-flash-stream",
+      "text": "A reliable translation panel starts with a clear connection between the selected text and the request that represents it. The browser can generate several selection events while a person drags across a paragraph. Sending a request for every event wastes time and makes the interface feel unstable. Wait until the selection is complete, keep the source text in memory, and send the request when the translation button is clicked.\n\nThe user should see the panel immediately after clicking. Its position depends on the visible selection rectangle and the available space around it. Near the right edge of the page, the panel may need to move to the left. Near the bottom, it may need to open above the selection. Scrolling should not leave the panel floating over unrelated content. These adjustments should happen locally and should not delay the translation request.\n\nA second selection may be made before the first translation finishes. Give each request a unique identifier and compare it with the current selection before displaying the result. Cancel a request when the transport supports cancellation. If cancellation is unavailable, discard the stale response. The important behavior is that the result always belongs to the text the person most recently asked to translate.\n\nPersist the target language after it changes. For a person who normally translates into Ukrainian, a remembered preference removes an extra action from every request. The source language can be detected by the provider in the same translation call. Very short words are sometimes ambiguous, so the panel may also need an optional way to choose a source language when automatic detection produces the wrong result.\n\nNetwork connections make a measurable difference. The first request can include DNS lookup, a TCP connection, and a TLS handshake before the service receives any text. Later requests may reuse that connection. A benchmark should show both cases and should record the time until the entire translation is available. For a streamed response, also record when the first translated characters arrive.\n\nTranslation quality depends on context. A river bank and a financial bank share the same English spelling but require different Ukrainian words. Idioms such as feeling blue and spilling the beans should preserve their intended meaning. A fast engine that translates these expressions literally can make a paragraph harder to understand. Evaluate complete passages as well as isolated labels.\n\nLong passages need enough space in the panel to remain readable. Set a maximum height and allow the text to scroll inside it. Preserve paragraph boundaries where possible, and keep the close button accessible while scrolling. Keyboard users should be able to move focus into the panel, copy the translation, and return to the original page without losing their place.\n\nFailures should leave the source selection intact. A temporary network error, an exhausted allowance, and an invalid key require different recovery actions. Show a concise message with the relevant action. A retry should use the same source text and target language. Avoid repeatedly retrying a rejected credential because another request will not fix the configuration.\n\nMeasurements should describe the environment in which they were collected. Browser version, hardware, network connection, input length, model identifier, and source-language settings can all affect the result. Keep the raw timings together with the actual translations so that a later run can be compared against the same inputs. A single unusually fast request does not establish the normal experience.\n\nThe first prototype can concentrate on selection, translation, language preference, and closing the panel. Additional actions should be added only when they remove a frequent obstacle. A small interface can still be dependable if it handles stale requests, keyboard focus, page boundaries, and clear errors. These details matter more to everyday speed than a long list of optional features.",
+      "characters": 4023,
+      "translation": "Надійна панель перекладу починається з чіткого зв'язку між виділеним текстом і запитом, який його представляє. Браузер може генерувати кілька подій виділення, поки людина веде курсор по абзацу. Надсилання запиту на кожну подію марнує час і робить інтерфейс нестабільним. Зачекайте, поки виділення завершиться, збережіть вихідний текст у пам'яті та надішліть запит після натискання кнопки перекладу.\n\nКористувач має бачити панель одразу після кліку. Її розташування залежить від видимого прямокутника виділення та вільного простору навколо нього. Біля правого краю сторінки панель, можливо, доведеться змістити ліворуч. Біля нижнього краю вона може відкриватися над виділеним фрагментом. Прокручування не повинно залишати панель завислою над непов'язаним контентом. Ці коригування мають відбуватися локально і не повинні затримувати запит на переклад.\n\nДруге виділення може бути зроблене до того, як завершиться перший переклад. Надайте кожному запиту унікальний ідентифікатор і порівнюйте його з поточним виділенням перед відображенням результату. Скасовуйте запит, якщо транспортний протокол підтримує скасування. Якщо скасування недоступне, відкидайте застарілу відповідь. Важливою поведінкою є те, що результат завжди повинен належати тексту, який людина востаннє просила перекласти.\n\nЗберігайте цільову мову після її зміни. Для людини, яка зазвичай перекладає українською, збережене налаштування усуває зайву дію з кожного запиту. Мова оригіналу може визначатися провайдером у тому ж виклику перекладу. Дуже короткі слова іноді є неоднозначними, тому панелі також може знадобитися додатковий спосіб вибору вихідної мови, коли автоматичне визначення дає неправильний результат.\n\nМережеві з'єднання мають відчутний вплив. Перший запит може включати пошук DNS, з'єднання TCP і рукостискання TLS ще до того, як сервіс отримає будь-який текст. Наступні запити можуть повторно використовувати це з'єднання. Бенчмарк має показувати обидва випадки та фіксувати час до повної готовності перекладу. Для потокової відповіді також фіксуйте момент надходження перших перекладених символів.\n\nЯкість перекладу залежить від контексту. Річковий берег (river bank) і фінансовий банк (financial bank) мають однакове написання англійською, але вимагають різних українських слів. Такі ідіоми, як «feeling blue» і «spilling the beans», повинні зберігати свій первісний зміст. Швидкий рушій, який перекладає ці вирази буквально, може ускладнити розуміння абзацу. Оцінюйте як цілі уривки, так і окремі написи.\n\nДовгі уривки потребують достатньо місця на панелі, щоб залишатися читабельними. Встановіть максимальну висоту та дозвольте тексту прокручуватися всередині неї. За можливості зберігайте межі абзаців і тримайте кнопку закриття доступною під час прокручування. Користувачі клавіатури повинні мати змогу перемістити фокус на панель, скопіювати переклад і повернутися до вихідної сторінки без втрати своєї позиції.\n\nЗбої мають залишати виділення джерела недоторканим. Тимчасова помилка мережі, вичерпаний ліміт і недійсний ключ вимагають різних дій для відновлення. Показуйте стисле повідомлення з відповідною дією. По",
+      "finish_reason": null,
+      "usage": {
+        "promptTokenCount": 727,
+        "candidatesTokenCount": 912,
+        "totalTokenCount": 1639,
+        "promptTokensDetails": [
+          {
+            "modality": "TEXT",
+            "tokenCount": 727
+          }
+        ],
+        "serviceTier": "standard"
+      },
+      "error": "Generation did not complete",
+      "phase": "warm",
+      "round": 1,
+      "input_index": 5,
+      "input_id": "large-1",
+      "size": "large"
+    },
+    {
+      "started_at": "2026-10-02T21:34:30.211689+00:00",
+      "ok": true,
+      "protocol": "HTTP/1.1",
+      "first_text_ms": 490.003,
+      "status": 200,
+      "headers_ms": 489.96,
+      "retry_after": null,
+      "returned_model": "gemini-3.5-flash-lite",
+      "reasoning_characters": 0,
+      "stream_events": 2,
+      "connection_reused": true,
+      "milliseconds": 496.005,
+      "variant": "gemini-3.5-flash-lite-stream",
+      "text": "bank",
+      "characters": 4,
+      "translation": "банк",
+      "finish_reason": "STOP",
+      "usage": {
+        "promptTokenCount": 18,
+        "candidatesTokenCount": 1,
+        "totalTokenCount": 19,
+        "promptTokensDetails": [
+          {
+            "modality": "TEXT",
+            "tokenCount": 18
+          }
+        ],
+        "serviceTier": "standard"
+      },
+      "phase": "warm",
+      "round": 1,
+      "input_index": 0,
+      "input_id": "word-1",
+      "size": "word"
+    },
+    {
+      "started_at": "2026-10-02T21:34:45.213601+00:00",
+      "ok": false,
+      "protocol": "HTTP/1.1",
+      "first_text_ms": null,
+      "status": 503,
+      "headers_ms": 5408.337,
+      "retry_after": null,
+      "connection_reused": true,
+      "milliseconds": 5408.451,
+      "variant": "gemini-3.8-flash-stream",
+      "text": "You can select a different language from the menu. Your choice will be remembered the next time you open the browser.",
+      "characters": 117,
+      "provider_error": {
+        "error": {
+          "code": 503,
+          "message": "This model is currently experiencing high demand. Spikes in demand are usually temporary. Please try again later.",
+          "status": "UNAVAILABLE"
+        }
+      },
+      "phase": "warm",
+      "round": 2,
+      "input_index": 2,
+      "input_id": "sentence-1",
+      "size": "sentence"
+    },
+    {
+      "started_at": "2026-10-02T21:35:00.218298+00:00",
+      "ok": true,
+      "protocol": "HTTP/1.1",
+      "first_text_ms": 4889.917,
+      "status": 200,
+      "headers_ms": 4889.87,
+      "retry_after": null,
+      "returned_model": "gemini-3.8-flash",
+      "reasoning_characters": 0,
+      "stream_events": 22,
+      "connection_reused": true,
+      "milliseconds": 4917.433,
+      "variant": "gemini-3.8-flash-stream",
+      "text": "A reliable translation panel starts with a clear connection between the selected text and the request that represents it. The browser can generate several selection events while a person drags across a paragraph. Sending a request for every event wastes time and makes the interface feel unstable. Wait until the selection is complete, keep the source text in memory, and send the request when the translation button is clicked.\n\nThe user should see the panel immediately after clicking. Its position depends on the visible selection rectangle and the available space around it. Near the right edge of the page, the panel may need to move to the left. Near the bottom, it may need to open above the selection. Scrolling should not leave the panel floating over unrelated content. These adjustments should happen locally and should not delay the translation request.\n\nA second selection may be made before the first translation finishes. Give each request a unique identifier and compare it with the current selection before displaying the result. Cancel a request when the transport supports cancellation. If cancellation is unavailable, discard the stale response. The important behavior is that the result always belongs to the text the person most recently asked to translate.\n\nPersist the target language after it changes. For a person who normally translates into Ukrainian, a remembered preference removes an extra action from every request. The source language can be detected by the provider in the same translation call. Very short words are sometimes ambiguous, so the panel may also need an optional way to choose a source language when automatic detection produces the wrong result.",
+      "characters": 1694,
+      "translation": "Надійна панель перекладу починається з чіткого зв'язку між виділеним текстом і запитом, який його представляє. Браузер може генерувати кілька подій виділення, поки людина веде курсор по абзацу. Надсилання запиту на кожну подію марнує час і робить інтерфейс нестабільним. Зачекайте, поки виділення завершиться, збережіть вихідний текст у пам'яті та надішліть запит, коли буде натиснуто кнопку перекладу.\n\nКористувач повинен побачити панель одразу після натискання. Її розташування залежить від видимого прямокутника виділення та вільного простору навколо нього. Біля правого краю сторінки панель, можливо, доведеться змістити ліворуч. Біля нижнього краю вона може відкриватися над виділеним фрагментом. Прокручування сторінки не повинно залишати панель висіти над стороннім вмістом. Ці коригування мають відбуватися локально і не повинні затримувати запит на переклад.\n\nДруге виділення може бути зроблене до того, як завершиться перший переклад. Присвоюйте кожному запиту унікальний ідентифікатор і порівнюйте його з поточним виділенням перед відображенням результату. Скасовуйте запит, якщо транспортний протокол підтримує скасування. Якщо скасування недоступне, відхиляйте застарілу відповідь. Важливий принцип полягає в тому, що результат завжди повинен стосуватися тексту, який користувач надіслав на переклад останнім.\n\nЗберігайте цільову мову після її зміни. Для людини, яка зазвичай перекладає українською, збережене налаштування усуває зайву дію під час кожного запиту. Мову оригіналу може визначити сервіс перекладу під час того ж виклику. Дуже короткі слова іноді є неоднозначними, тому в панелі також може знадобитися додаткова можливість вибору вихідної мови вручну, якщо автоматичне визначення дає неправильний результат.",
+      "finish_reason": "STOP",
+      "usage": {
+        "promptTokenCount": 317,
+        "candidatesTokenCount": 494,
+        "totalTokenCount": 811,
+        "promptTokensDetails": [
+          {
+            "modality": "TEXT",
+            "tokenCount": 317
+          }
+        ],
+        "serviceTier": "standard"
+      },
+      "phase": "warm",
+      "round": 2,
+      "input_index": 4,
+      "input_id": "long-1",
+      "size": "long"
+    },
+    {
+      "started_at": "2026-10-02T21:35:15.222137+00:00",
+      "ok": true,
+      "protocol": "HTTP/1.1",
+      "first_text_ms": 716.751,
+      "status": 200,
+      "headers_ms": 716.721,
+      "retry_after": null,
+      "returned_model": "gemini-3.5-flash-lite",
+      "reasoning_characters": 0,
+      "stream_events": 50,
+      "connection_reused": true,
+      "milliseconds": 4193.913,
+      "variant": "gemini-3.5-flash-lite-stream",
+      "text": "A reliable translation panel starts with a clear connection between the selected text and the request that represents it. The browser can generate several selection events while a person drags across a paragraph. Sending a request for every event wastes time and makes the interface feel unstable. Wait until the selection is complete, keep the source text in memory, and send the request when the translation button is clicked.\n\nThe user should see the panel immediately after clicking. Its position depends on the visible selection rectangle and the available space around it. Near the right edge of the page, the panel may need to move to the left. Near the bottom, it may need to open above the selection. Scrolling should not leave the panel floating over unrelated content. These adjustments should happen locally and should not delay the translation request.\n\nA second selection may be made before the first translation finishes. Give each request a unique identifier and compare it with the current selection before displaying the result. Cancel a request when the transport supports cancellation. If cancellation is unavailable, discard the stale response. The important behavior is that the result always belongs to the text the person most recently asked to translate.\n\nPersist the target language after it changes. For a person who normally translates into Ukrainian, a remembered preference removes an extra action from every request. The source language can be detected by the provider in the same translation call. Very short words are sometimes ambiguous, so the panel may also need an optional way to choose a source language when automatic detection produces the wrong result.\n\nNetwork connections make a measurable difference. The first request can include DNS lookup, a TCP connection, and a TLS handshake before the service receives any text. Later requests may reuse that connection. A benchmark should show both cases and should record the time until the entire translation is available. For a streamed response, also record when the first translated characters arrive.\n\nTranslation quality depends on context. A river bank and a financial bank share the same English spelling but require different Ukrainian words. Idioms such as feeling blue and spilling the beans should preserve their intended meaning. A fast engine that translates these expressions literally can make a paragraph harder to understand. Evaluate complete passages as well as isolated labels.\n\nLong passages need enough space in the panel to remain readable. Set a maximum height and allow the text to scroll inside it. Preserve paragraph boundaries where possible, and keep the close button accessible while scrolling. Keyboard users should be able to move focus into the panel, copy the translation, and return to the original page without losing their place.\n\nFailures should leave the source selection intact. A temporary network error, an exhausted allowance, and an invalid key require different recovery actions. Show a concise message with the relevant action. A retry should use the same source text and target language. Avoid repeatedly retrying a rejected credential because another request will not fix the configuration.\n\nMeasurements should describe the environment in which they were collected. Browser version, hardware, network connection, input length, model identifier, and source-language settings can all affect the result. Keep the raw timings together with the actual translations so that a later run can be compared against the same inputs. A single unusually fast request does not establish the normal experience.\n\nThe first prototype can concentrate on selection, translation, language preference, and closing the panel. Additional actions should be added only when they remove a frequent obstacle. A small interface can still be dependable if it handles stale requests, keyboard focus, page boundaries, and clear errors. These details matter more to everyday speed than a long list of optional features.",
+      "characters": 4023,
+      "translation": "Надійна панель перекладу починається з чіткого зв'язку між виділеним текстом і запитом, який його представляє. Браузер може генерувати кілька подій виділення, поки користувач перетягує курсор по абзацу. Надсилання запиту для кожної події марнує час і робить інтерфейс нестабільним. Зачекайте, доки виділення завершиться, збережіть вихідний текст у пам'яті та надішліть запит, коли буде натиснуто кнопку перекладу.\n\nКористувач має бачити панель одразу після кліку. Її положення залежить від прямокутника видимого виділення та доступного простору навколо нього. Близько до правого краю сторінки панель може знадобитися зрушити вліво. Біля нижнього краю вона може відкриватися над виділенням. Прокручування не повинно залишати панель плаваючою над стороннім вмістом. Ці коригування мають відбуватися локально й не затримувати запит на переклад.\n\nДруге виділення може бути зроблене до завершення першого перекладу. Надайте кожному запиту унікальний ідентифікатор і порівняйте його з поточним виділенням перед відображенням результату. Скасуйте запит, якщо транспортний протокол підтримує скасування. Якщо скасування недоступне, відкиньте застарілу відповідь. Головне правило полягає в тому, що результат завжди належить до тексту, який користувач попросив перекласти востаннє.\n\nЗберігайте цільову мову після її зміни. Для людини, яка зазвичай перекладає українською, збережена вподобання усуває зайву дію в кожному запиті. Вихідну мову може визначати провайдер у тому ж виклику перекладу. Дуже короткі слова іноді є неоднозначними, тому панель також може потребувати необов'язкового способу вибору вихідної мови, коли автоматичне визначення дає хибний результат.\n\nМережеві з'єднання мають помітне значення. Перший запит може включати пошук DNS, TCP-з'єднання та TLS-рукостискання, перш ніж сервіс отримає будь-який текст. Подальші запити можуть повторно використовувати це з'єднання. Бенчмарк повинен показувати обидва випадки та фіксувати час до появи всього перекладу. Для потокової відповіді також записуйте момент надходження перших перекладених символів.\n\nЯкість перекладу залежить від контексту. Берег річки (river bank) і фінансовий банк (financial bank) пишуться однаково англійською, але вимагають різних українських слів. Ідіоми, такі як почуватися сумно (feeling blue) або розкрити таємницю (spilling the beans), повинні зберігати своє початкове значення. Швидкий рушій, який перекладає такі вирази дослівно, може ускладнити розуміння абзацу. Оцінюйте як цілі уривки, так і окремі мітки.\n\nДовгі уривки потребують достатньо простору в панелі, щоб залишатися читабельними. Встановіть максимальну висоту та дозвольте тексту прокручуватися всередині неї. Зберігайте межі абзаців, де це можливо, і тримайте кнопку закриття доступною під час прокручування. Користувачі клавіатури повинні мати можливість перевести фокус у панель, скопіювати переклад і повернутися на початкову сторінку, не втрачаючи своєї позиції.\n\nПомилки не повинні порушувати виділення вихідного тексту. Тимчасова мережева помилка, вичерпаний ліміт і недійсний ключ вимагають різних дій для відновлення. Покажіть коротке повідомлення з відповідною дією. Повторна спроба має використовувати той самий вихідний текст і цільову мову. Уникайте багаторазових повторних спроб для відхилених облікових даних, оскільки ще один запит не виправить конфігурацію.\n\nВимірювання повинні описувати середовище, в якому вони були зібрані. Версія браузера, апаратне забезпечення, мережеве з'єднання, довжина введених даних, ідентифікатор моделі та налаштування вихідної мови можуть впливати на результат. Зберігайте необроблені показники часу разом із реальними перекладами, щоб пізніший запуск можна було порівняти з тими ж вхідними даними. Один незвичайно швидкий запит не відображає звичайний досвід використання.\n\nПерший прототип може зосередитися на виділенні, перекладі, виборі мови та закритті панелі. Додаткові дії слід додавати лише тоді, коли вони усувають часту перешкоду. Невеликий інтерфейс все одно може бути надійним, якщо він опрацьовує застарілі запити, фокус клавіатури, межі сторінки та чіткі помилки. Ці деталі важливіші для повсякденної швидкості, ніж довгий список додаткових функцій.",
+      "finish_reason": "STOP",
+      "usage": {
+        "promptTokenCount": 727,
+        "candidatesTokenCount": 1230,
+        "totalTokenCount": 1957,
+        "promptTokensDetails": [
+          {
+            "modality": "TEXT",
+            "tokenCount": 727
+          }
+        ],
+        "serviceTier": "standard"
+      },
+      "phase": "warm",
+      "round": 2,
+      "input_index": 5,
+      "input_id": "large-1",
+      "size": "large"
+    },
+    {
+      "started_at": "2026-10-02T21:35:30.223538+00:00",
+      "ok": true,
+      "protocol": "HTTP/1.1",
+      "first_text_ms": 660.716,
+      "status": 200,
+      "headers_ms": 660.68,
+      "retry_after": null,
+      "returned_model": "gemini-3.5-flash-lite",
+      "reasoning_characters": 0,
+      "stream_events": 3,
+      "connection_reused": true,
+      "milliseconds": 700.742,
+      "variant": "gemini-3.5-flash-lite-stream",
+      "text": "You can select a different language from the menu. Your choice will be remembered the next time you open the browser.",
+      "characters": 117,
+      "translation": "Ви можете вибрати іншу мову з меню. Ваш вибір буде збережено під час наступного відкриття браузера.",
+      "finish_reason": "STOP",
+      "usage": {
+        "promptTokenCount": 40,
+        "candidatesTokenCount": 26,
+        "totalTokenCount": 66,
+        "promptTokensDetails": [
+          {
+            "modality": "TEXT",
+            "tokenCount": 40
+          }
+        ],
+        "serviceTier": "standard"
+      },
+      "phase": "warm",
+      "round": 2,
+      "input_index": 2,
+      "input_id": "sentence-1",
+      "size": "sentence"
+    },
+    {
+      "started_at": "2026-10-02T21:35:45.228144+00:00",
+      "ok": true,
+      "protocol": "HTTP/1.1",
+      "first_text_ms": 2248.214,
+      "status": 200,
+      "headers_ms": 2248.166,
+      "retry_after": null,
+      "returned_model": "gemini-3.8-flash",
+      "reasoning_characters": 0,
+      "stream_events": 50,
+      "connection_reused": true,
+      "milliseconds": 5258.282,
+      "variant": "gemini-3.8-flash-stream",
+      "text": "A reliable translation panel starts with a clear connection between the selected text and the request that represents it. The browser can generate several selection events while a person drags across a paragraph. Sending a request for every event wastes time and makes the interface feel unstable. Wait until the selection is complete, keep the source text in memory, and send the request when the translation button is clicked.\n\nThe user should see the panel immediately after clicking. Its position depends on the visible selection rectangle and the available space around it. Near the right edge of the page, the panel may need to move to the left. Near the bottom, it may need to open above the selection. Scrolling should not leave the panel floating over unrelated content. These adjustments should happen locally and should not delay the translation request.\n\nA second selection may be made before the first translation finishes. Give each request a unique identifier and compare it with the current selection before displaying the result. Cancel a request when the transport supports cancellation. If cancellation is unavailable, discard the stale response. The important behavior is that the result always belongs to the text the person most recently asked to translate.\n\nPersist the target language after it changes. For a person who normally translates into Ukrainian, a remembered preference removes an extra action from every request. The source language can be detected by the provider in the same translation call. Very short words are sometimes ambiguous, so the panel may also need an optional way to choose a source language when automatic detection produces the wrong result.\n\nNetwork connections make a measurable difference. The first request can include DNS lookup, a TCP connection, and a TLS handshake before the service receives any text. Later requests may reuse that connection. A benchmark should show both cases and should record the time until the entire translation is available. For a streamed response, also record when the first translated characters arrive.\n\nTranslation quality depends on context. A river bank and a financial bank share the same English spelling but require different Ukrainian words. Idioms such as feeling blue and spilling the beans should preserve their intended meaning. A fast engine that translates these expressions literally can make a paragraph harder to understand. Evaluate complete passages as well as isolated labels.\n\nLong passages need enough space in the panel to remain readable. Set a maximum height and allow the text to scroll inside it. Preserve paragraph boundaries where possible, and keep the close button accessible while scrolling. Keyboard users should be able to move focus into the panel, copy the translation, and return to the original page without losing their place.\n\nFailures should leave the source selection intact. A temporary network error, an exhausted allowance, and an invalid key require different recovery actions. Show a concise message with the relevant action. A retry should use the same source text and target language. Avoid repeatedly retrying a rejected credential because another request will not fix the configuration.\n\nMeasurements should describe the environment in which they were collected. Browser version, hardware, network connection, input length, model identifier, and source-language settings can all affect the result. Keep the raw timings together with the actual translations so that a later run can be compared against the same inputs. A single unusually fast request does not establish the normal experience.\n\nThe first prototype can concentrate on selection, translation, language preference, and closing the panel. Additional actions should be added only when they remove a frequent obstacle. A small interface can still be dependable if it handles stale requests, keyboard focus, page boundaries, and clear errors. These details matter more to everyday speed than a long list of optional features.",
+      "characters": 4023,
+      "translation": "Надійна панель перекладу починається з чіткого зв'язку між виділеним текстом і запитом, який його представляє. Браузер може генерувати кілька подій виділення, поки людина веде курсор по абзацу. Надсилання запиту на кожну подію марнує час і створює враження нестабільності інтерфейсу. Зачекайте, доки виділення завершиться, збережіть вихідний текст у пам'яті та надішліть запит після натискання кнопки перекладу.\n\nКористувач має бачити панель одразу після кліку. Її положення залежить від видимого прямокутника виділення та вільного простору навколо нього. Біля правого краю сторінки панелі, можливо, доведеться зміститися ліворуч. Біля нижнього краю вона, можливо, має відкритися над виділеним фрагментом. Прокручування не повинно залишати панель завислою над стороннім вмістом. Ці коригування мають відбуватися локально і не повинні затримувати запит на переклад.\n\nДруге виділення може бути зроблене до того, як завершиться перший переклад. Надавайте кожному запиту унікальний ідентифікатор і порівнюйте його з поточним виділенням перед відображенням результату. Скасовуйте запит, якщо транспортний протокол підтримує скасування. Якщо скасування недоступне, відкидайте застарілу відповідь. Важливо забезпечити таку поведінку, за якої результат завжди відповідає тексту, про переклад якого користувач попросив останнім.\n\nЗберігайте цільову мову після її зміни. Для людини, яка зазвичай перекладає українською, збережене налаштування усуває зайву дію з кожного запиту. Мова оригіналу може визначатися постачальником послуги в межах того самого виклику перекладу. Дуже короткі слова іноді є неоднозначними, тому панель може також потребувати додаткової можливості вибору вихідної мови вручну, якщо автоматичне визначення дає неправильний результат.\n\nМережеві з'єднання мають відчутний вплив. Перший запит може включати пошук DNS, встановлення TCP-з'єднання та рукостискання TLS ще до того, як сервіс отримає будь-який текст. Подальші запити можуть повторно використовувати це з'єднання. Тест продуктивності має відображати обидва випадки та фіксувати час до отримання повного перекладу. У разі потокової відповіді також фіксуйте момент надходження перших перекладених символів.\n\nЯкість перекладу залежить від контексту. Берег річки («river bank») та фінансовий банк («financial bank») мають однакове написання в англійській мові, але вимагають різних українських слів. Такі ідіоми, як «feeling blue» (сумувати) та «spilling the beans» (розкрити таємницю), мають зберігати свій первісний зміст. Швидкий рушій, який перекладає ці вирази буквально, може ускладнити розуміння абзацу. Оцінюйте як цілісні уривки, так і окремі написи.\n\nДовгі фрагменти потребують достатньо місця на панелі, щоб залишатися читабельними. Встановіть максимальну висоту та дозвольте прокручування тексту всередині неї. За можливості зберігайте межі абзаців і тримайте кнопку закриття доступною під час прокручування. Користувачі клавіатури повинні мати змогу перемістити фокус на панель, скопіювати переклад і повернутися до вихідної сторінки, не втрачаючи свого місця.\n\nУ разі збоїв виділення вихідного тексту має залишатися недоторканим. Тимчасова помилка мережі, вичерпаний ліміт запитів і недійсний ключ вимагають різних дій для відновлення. Показуйте стисле повідомлення з відповідною дією. Повторна спроба має використовувати той самий вихідний текст і цільову мову. Уникайте багаторазових повторних спроб із відхиленими обліковими даними, оскільки новий запит не виправить помилку в налаштуваннях.\n\nВимірювання мають описувати середовище, в якому вони були зібрані. Версія браузера, апаратне забезпечення, мережеве з'єднання, довжина введеного тексту, ідентифікатор моделі та налаштування вихідної мови — усе це може вплинути на результат. Зберігайте необроблені дані про час разом із самими перекладами, щоб наступний запуск можна було порівняти з тими самими вхідними даними. Окремий незвично швидкий запит не відображає типової роботи системи.\n\nПерший прототип може зосередитися на виділенні, перекладі, виборі мови та закритті панелі. Додаткові дії слід додавати лише тоді, коли вони усувають часту перешкоду. Невеликий інтерфейс все одно може бути надійним, якщо він коректно обробляє застарілі запити, фокус клавіатури, межі сторінки та зрозумілі помилки. Ці деталі мають більше значення для щоденної швидкості роботи, ніж довгий список другорядних функцій.",
+      "finish_reason": "STOP",
+      "usage": {
+        "promptTokenCount": 727,
+        "candidatesTokenCount": 1262,
+        "totalTokenCount": 1989,
+        "promptTokensDetails": [
+          {
+            "modality": "TEXT",
+            "tokenCount": 727
+          }
+        ],
+        "serviceTier": "standard"
+      },
+      "phase": "warm",
+      "round": 2,
+      "input_index": 5,
+      "input_id": "large-1",
+      "size": "large"
+    },
+    {
+      "started_at": "2026-10-02T21:36:00.231331+00:00",
+      "ok": true,
+      "protocol": "HTTP/1.1",
+      "first_text_ms": 623.46,
+      "status": 200,
+      "headers_ms": 623.404,
+      "retry_after": null,
+      "returned_model": "gemini-3.5-flash-lite",
+      "reasoning_characters": 0,
+      "stream_events": 2,
+      "connection_reused": true,
+      "milliseconds": 627.514,
+      "variant": "gemini-3.5-flash-lite-stream",
+      "text": "Open the settings.",
+      "characters": 18,
+      "translation": "Відкрийте налаштування.",
+      "finish_reason": "STOP",
+      "usage": {
+        "promptTokenCount": 21,
+        "candidatesTokenCount": 7,
+        "totalTokenCount": 28,
+        "promptTokensDetails": [
+          {
+            "modality": "TEXT",
+            "tokenCount": 21
+          }
+        ],
+        "serviceTier": "standard"
+      },
+      "phase": "warm",
+      "round": 2,
+      "input_index": 1,
+      "input_id": "short-1",
+      "size": "short"
+    },
+    {
+      "started_at": "2026-10-02T21:36:15.234060+00:00",
+      "ok": true,
+      "protocol": "HTTP/1.1",
+      "first_text_ms": 3478.905,
+      "status": 200,
+      "headers_ms": 3478.863,
+      "retry_after": null,
+      "returned_model": "gemini-3.8-flash",
+      "reasoning_characters": 0,
+      "stream_events": 2,
+      "connection_reused": true,
+      "milliseconds": 3486.652,
+      "variant": "gemini-3.8-flash-stream",
+      "text": "bank",
+      "characters": 4,
+      "translation": "банк",
+      "finish_reason": "STOP",
+      "usage": {
+        "promptTokenCount": 18,
+        "candidatesTokenCount": 1,
+        "totalTokenCount": 19,
+        "promptTokensDetails": [
+          {
+            "modality": "TEXT",
+            "tokenCount": 18
+          }
+        ],
+        "serviceTier": "standard"
+      },
+      "phase": "warm",
+      "round": 2,
+      "input_index": 0,
+      "input_id": "word-1",
+      "size": "word"
+    },
+    {
+      "started_at": "2026-10-02T21:36:30.234822+00:00",
+      "ok": true,
+      "protocol": "HTTP/1.1",
+      "first_text_ms": 478.539,
+      "status": 200,
+      "headers_ms": 478.475,
+      "retry_after": null,
+      "returned_model": "gemini-3.5-flash-lite",
+      "reasoning_characters": 0,
+      "stream_events": 2,
+      "connection_reused": true,
+      "milliseconds": 484.385,
+      "variant": "gemini-3.5-flash-lite-stream",
+      "text": "bank",
+      "characters": 4,
+      "translation": "банк",
+      "finish_reason": "STOP",
+      "usage": {
+        "promptTokenCount": 18,
+        "candidatesTokenCount": 1,
+        "totalTokenCount": 19,
+        "promptTokensDetails": [
+          {
+            "modality": "TEXT",
+            "tokenCount": 18
+          }
+        ],
+        "serviceTier": "standard"
+      },
+      "phase": "warm",
+      "round": 2,
+      "input_index": 0,
+      "input_id": "word-1",
+      "size": "word"
+    },
+    {
+      "started_at": "2026-10-02T21:36:45.239672+00:00",
+      "ok": true,
+      "protocol": "HTTP/1.1",
+      "first_text_ms": 523.723,
+      "status": 200,
+      "headers_ms": 523.674,
+      "retry_after": null,
+      "returned_model": "gemini-3.5-flash-lite",
+      "reasoning_characters": 0,
+      "stream_events": 22,
+      "connection_reused": true,
+      "milliseconds": 1909.397,
+      "variant": "gemini-3.5-flash-lite-stream",
+      "text": "A reliable translation panel starts with a clear connection between the selected text and the request that represents it. The browser can generate several selection events while a person drags across a paragraph. Sending a request for every event wastes time and makes the interface feel unstable. Wait until the selection is complete, keep the source text in memory, and send the request when the translation button is clicked.\n\nThe user should see the panel immediately after clicking. Its position depends on the visible selection rectangle and the available space around it. Near the right edge of the page, the panel may need to move to the left. Near the bottom, it may need to open above the selection. Scrolling should not leave the panel floating over unrelated content. These adjustments should happen locally and should not delay the translation request.\n\nA second selection may be made before the first translation finishes. Give each request a unique identifier and compare it with the current selection before displaying the result. Cancel a request when the transport supports cancellation. If cancellation is unavailable, discard the stale response. The important behavior is that the result always belongs to the text the person most recently asked to translate.\n\nPersist the target language after it changes. For a person who normally translates into Ukrainian, a remembered preference removes an extra action from every request. The source language can be detected by the provider in the same translation call. Very short words are sometimes ambiguous, so the panel may also need an optional way to choose a source language when automatic detection produces the wrong result.",
+      "characters": 1694,
+      "translation": "Надійна панель перекладу починається з чіткого зв'язку між виділеним текстом і запитом, який його представляє. Браузер може генерувати кілька подій виділення, поки користувач перетягує вказівник уздовж абзацу. Надсилання запиту на кожну подію марнує час і створює відчуття нестабільності інтерфейсу. Зачекайте, доки виділення завершиться, збережіть вихідний текст у пам'яті та надішліть запит, коли буде натинуто кнопку перекладу.\n\nКористувач має бачити панель одразу після натискання. Її положення залежить від прямокутника видимого виділення та вільного простору навколо нього. Ближче до правого краю сторінки панель може знадобитися змістити вліво. Ближче до низу вона може відкриватися над виділенням. Прокручування не повинно залишати панель плаваючою над стороннім вмістом. Ці коригування мають відбуватися локально й не повинні затримувати запит на переклад.\n\nНове виділення можна зробити до того, як завершиться попередній переклад. Надайте кожному запиту унікальний ідентифікатор і порівнюйте його з поточним виділенням перед відображенням результату. Скасовуйте запит, якщо транспортний протокол це підтримує. Якщо скасування недоступне, відкидайте застарілу відповідь. Важлива умова полягає в тому, щоб результат завжди належав тому тексту, який користувач попросив перекласти востаннє.\n\nЗберігайте цільову мову після її зміни. Для того, хто зазвичай перекладає українською, збережена в пам'яті вподобання позбавляє від зайвої дії в кожному запиті. Вихідну мову постачальник може визначити в тому ж виклику перекладу. Дуже короткі слова бувають двозначними, тому панель може також потребувати необов'язкового способу вибору вихідної мови, якщо автоматичне визначення дає хибний результат.",
+      "finish_reason": "STOP",
+      "usage": {
+        "promptTokenCount": 317,
+        "candidatesTokenCount": 499,
+        "totalTokenCount": 816,
+        "promptTokensDetails": [
+          {
+            "modality": "TEXT",
+            "tokenCount": 317
+          }
+        ],
+        "serviceTier": "standard"
+      },
+      "phase": "warm",
+      "round": 2,
+      "input_index": 4,
+      "input_id": "long-1",
+      "size": "long"
+    },
+    {
+      "started_at": "2026-10-02T21:37:00.244426+00:00",
+      "ok": true,
+      "protocol": "HTTP/1.1",
+      "first_text_ms": 9602.518,
+      "status": 200,
+      "headers_ms": 9602.469,
+      "retry_after": null,
+      "returned_model": "gemini-3.8-flash",
+      "reasoning_characters": 0,
+      "stream_events": 8,
+      "connection_reused": true,
+      "milliseconds": 9609.317,
+      "variant": "gemini-3.8-flash-stream",
+      "text": "When you select text on a web page, a small translation button appears beside it. Click the button to open a panel with the translation. You can change the target language in that panel, and the browser will remember your choice for the next session. Press Escape or click outside the panel to close it. The selected text should remain highlighted so that you can compare the original with the translated version. If the request fails, the panel should explain what happened and offer a retry without losing your selection.",
+      "characters": 523,
+      "translation": "Коли ви виділяєте текст на вебсторінці, поруч із ним з'являється невелика кнопка перекладу. Натисніть кнопку, щоб відкрити панель із перекладом. На цій панелі ви можете змінити мову перекладу, і браузер запам'ятає ваш вибір для наступного сеансу. Натисніть Escape або клацніть за межами панелі, щоб закрити її. Виділений текст має залишатися підсвіченим, щоб ви могли порівняти оригінал із перекладеною версією. Якщо запит не вдасться виконати, панель має пояснити, що сталося, і запропонувати повторити спробу без втрати виділеного тексту.",
+      "finish_reason": "STOP",
+      "usage": {
+        "promptTokenCount": 116,
+        "candidatesTokenCount": 170,
+        "totalTokenCount": 286,
+        "promptTokensDetails": [
+          {
+            "modality": "TEXT",
+            "tokenCount": 116
+          }
+        ],
+        "serviceTier": "standard"
+      },
+      "phase": "warm",
+      "round": 2,
+      "input_index": 3,
+      "input_id": "paragraph-1",
+      "size": "paragraph"
+    },
+    {
+      "started_at": "2026-10-02T21:37:15.248517+00:00",
+      "ok": true,
+      "protocol": "HTTP/1.1",
+      "first_text_ms": 4577.147,
+      "status": 200,
+      "headers_ms": 4577.111,
+      "retry_after": null,
+      "returned_model": "gemini-3.8-flash",
+      "reasoning_characters": 0,
+      "stream_events": 2,
+      "connection_reused": true,
+      "milliseconds": 4589.126,
+      "variant": "gemini-3.8-flash-stream",
+      "text": "Open the settings.",
+      "characters": 18,
+      "translation": "Відкрийте налаштування.",
+      "finish_reason": "STOP",
+      "usage": {
+        "promptTokenCount": 21,
+        "candidatesTokenCount": 7,
+        "totalTokenCount": 28,
+        "promptTokensDetails": [
+          {
+            "modality": "TEXT",
+            "tokenCount": 21
+          }
+        ],
+        "serviceTier": "standard"
+      },
+      "phase": "warm",
+      "round": 2,
+      "input_index": 1,
+      "input_id": "short-1",
+      "size": "short"
+    },
+    {
+      "started_at": "2026-10-02T21:37:30.249189+00:00",
+      "ok": true,
+      "protocol": "HTTP/1.1",
+      "first_text_ms": 676.906,
+      "status": 200,
+      "headers_ms": 676.836,
+      "retry_after": null,
+      "returned_model": "gemini-3.5-flash-lite",
+      "reasoning_characters": 0,
+      "stream_events": 9,
+      "connection_reused": true,
+      "milliseconds": 1198.506,
+      "variant": "gemini-3.5-flash-lite-stream",
+      "text": "When you select text on a web page, a small translation button appears beside it. Click the button to open a panel with the translation. You can change the target language in that panel, and the browser will remember your choice for the next session. Press Escape or click outside the panel to close it. The selected text should remain highlighted so that you can compare the original with the translated version. If the request fails, the panel should explain what happened and offer a retry without losing your selection.",
+      "characters": 523,
+      "translation": "Коли ви виділяєте текст на вебсторінці, біля нього з'являється невелика кнопка перекладу. Натисніть кнопку, щоб відкрити панель із перекладом. Ви можете змінити мову перекладу на цій панелі, і браузер запам'ятає ваш вибір для наступного сеансу. Натисніть Escape або клацніть за межами панелі, щоб закрити її. Виділений текст має залишатися підсвіченим, щоб ви могли порівняти оригінал із перекладеною версією. Якщо запит не вдається виконати, панель має пояснити, що сталося, і запропонувати повторну спробу, не втрачаючи вашого виділення.",
+      "finish_reason": "STOP",
+      "usage": {
+        "promptTokenCount": 116,
+        "candidatesTokenCount": 171,
+        "totalTokenCount": 287,
+        "promptTokensDetails": [
+          {
+            "modality": "TEXT",
+            "tokenCount": 116
+          }
+        ],
+        "serviceTier": "standard"
+      },
+      "phase": "warm",
+      "round": 2,
+      "input_index": 3,
+      "input_id": "paragraph-1",
+      "size": "paragraph"
+    },
+    {
+      "started_at": "2026-10-02T21:37:45.251200+00:00",
+      "ok": true,
+      "protocol": "HTTP/1.1",
+      "first_text_ms": 570.908,
+      "status": 200,
+      "headers_ms": 570.862,
+      "retry_after": null,
+      "returned_model": "gemini-3.5-flash-lite",
+      "reasoning_characters": 0,
+      "stream_events": 3,
+      "connection_reused": false,
+      "milliseconds": 612.507,
+      "variant": "gemini-3.5-flash-lite-stream",
+      "text": "Open the settings.",
+      "characters": 18,
+      "translation": "Відкрийте налаштування.",
+      "finish_reason": "STOP",
+      "usage": {
+        "promptTokenCount": 21,
+        "candidatesTokenCount": 7,
+        "totalTokenCount": 28,
+        "promptTokensDetails": [
+          {
+            "modality": "TEXT",
+            "tokenCount": 21
+          }
+        ],
+        "serviceTier": "standard"
+      },
+      "phase": "fresh",
+      "round": -1,
+      "input_index": 1,
+      "input_id": "short-1",
+      "size": "short"
+    },
+    {
+      "started_at": "2026-10-02T21:38:00.253518+00:00",
+      "ok": true,
+      "protocol": "HTTP/1.1",
+      "first_text_ms": 582.682,
+      "status": 200,
+      "headers_ms": 582.643,
+      "retry_after": null,
+      "returned_model": "gemini-3.5-flash-lite",
+      "reasoning_characters": 0,
+      "stream_events": 9,
+      "connection_reused": false,
+      "milliseconds": 1068.544,
+      "variant": "gemini-3.5-flash-lite-stream",
+      "text": "When you select text on a web page, a small translation button appears beside it. Click the button to open a panel with the translation. You can change the target language in that panel, and the browser will remember your choice for the next session. Press Escape or click outside the panel to close it. The selected text should remain highlighted so that you can compare the original with the translated version. If the request fails, the panel should explain what happened and offer a retry without losing your selection.",
+      "characters": 523,
+      "translation": "Коли ви виділяєте текст на вебсторінці, біля нього з'являється невелика кнопка перекладу. Натисніть кнопку, щоб відкрити панель із перекладом. Ви можете змінити цільову мову на цій панелі, і браузер запам'ятає ваш вибір для наступного сеансу. Натисніть Escape або клацніть поза панеллю, щоб закрити її. Виділений текст має залишитися підсвіченим, щоб ви могли порівняти оригінал із перекладеною версією. Якщо запит не вдасться виконати, панель повинна пояснити, що сталося, і запропонувати повторну спробу, не втрачаючи вашого виділення.",
+      "finish_reason": "STOP",
+      "usage": {
+        "promptTokenCount": 116,
+        "candidatesTokenCount": 171,
+        "totalTokenCount": 287,
+        "promptTokensDetails": [
+          {
+            "modality": "TEXT",
+            "tokenCount": 116
+          }
+        ],
+        "serviceTier": "standard"
+      },
+      "phase": "fresh",
+      "round": -1,
+      "input_index": 3,
+      "input_id": "paragraph-1",
+      "size": "paragraph"
+    },
+    {
+      "started_at": "2026-10-02T21:38:15.256506+00:00",
+      "ok": true,
+      "protocol": "HTTP/1.1",
+      "first_text_ms": 752.093,
+      "status": 200,
+      "headers_ms": 752.025,
+      "retry_after": null,
+      "returned_model": "gemini-3.5-flash-lite",
+      "reasoning_characters": 0,
+      "stream_events": 51,
+      "connection_reused": false,
+      "milliseconds": 4033.977,
+      "variant": "gemini-3.5-flash-lite-stream",
+      "text": "A reliable translation panel starts with a clear connection between the selected text and the request that represents it. The browser can generate several selection events while a person drags across a paragraph. Sending a request for every event wastes time and makes the interface feel unstable. Wait until the selection is complete, keep the source text in memory, and send the request when the translation button is clicked.\n\nThe user should see the panel immediately after clicking. Its position depends on the visible selection rectangle and the available space around it. Near the right edge of the page, the panel may need to move to the left. Near the bottom, it may need to open above the selection. Scrolling should not leave the panel floating over unrelated content. These adjustments should happen locally and should not delay the translation request.\n\nA second selection may be made before the first translation finishes. Give each request a unique identifier and compare it with the current selection before displaying the result. Cancel a request when the transport supports cancellation. If cancellation is unavailable, discard the stale response. The important behavior is that the result always belongs to the text the person most recently asked to translate.\n\nPersist the target language after it changes. For a person who normally translates into Ukrainian, a remembered preference removes an extra action from every request. The source language can be detected by the provider in the same translation call. Very short words are sometimes ambiguous, so the panel may also need an optional way to choose a source language when automatic detection produces the wrong result.\n\nNetwork connections make a measurable difference. The first request can include DNS lookup, a TCP connection, and a TLS handshake before the service receives any text. Later requests may reuse that connection. A benchmark should show both cases and should record the time until the entire translation is available. For a streamed response, also record when the first translated characters arrive.\n\nTranslation quality depends on context. A river bank and a financial bank share the same English spelling but require different Ukrainian words. Idioms such as feeling blue and spilling the beans should preserve their intended meaning. A fast engine that translates these expressions literally can make a paragraph harder to understand. Evaluate complete passages as well as isolated labels.\n\nLong passages need enough space in the panel to remain readable. Set a maximum height and allow the text to scroll inside it. Preserve paragraph boundaries where possible, and keep the close button accessible while scrolling. Keyboard users should be able to move focus into the panel, copy the translation, and return to the original page without losing their place.\n\nFailures should leave the source selection intact. A temporary network error, an exhausted allowance, and an invalid key require different recovery actions. Show a concise message with the relevant action. A retry should use the same source text and target language. Avoid repeatedly retrying a rejected credential because another request will not fix the configuration.\n\nMeasurements should describe the environment in which they were collected. Browser version, hardware, network connection, input length, model identifier, and source-language settings can all affect the result. Keep the raw timings together with the actual translations so that a later run can be compared against the same inputs. A single unusually fast request does not establish the normal experience.\n\nThe first prototype can concentrate on selection, translation, language preference, and closing the panel. Additional actions should be added only when they remove a frequent obstacle. A small interface can still be dependable if it handles stale requests, keyboard focus, page boundaries, and clear errors. These details matter more to everyday speed than a long list of optional features.",
+      "characters": 4023,
+      "translation": "Надійна панель перекладу починається з чіткого зв'язку між виділеним текстом і запитом, який його представляє. Браузер може генерувати кілька подій виділення, поки користувач перетягує вказівник уздовж абзацу. Надсилання запиту на кожну подію марнує час і робить інтерфейс нестабільним. Зачекайте, доки виділення завершиться, збережіть вихідний текст у пам'яті та надішліть запит після натискання кнопки перекладу.\n\nКористувач має бачити панель одразу після натискання. Її положення залежить від прямокутника видимого виділення та вільного простору навколо нього. Ближче до правого краю сторінки панель може знадобитися змістити ліворуч. Поблизу нижнього краю вона може відкриватися над виділенням. Прокручування не повинно залишати панель плаваючою поверх стороннього вмісту. Ці коригування мають відбуватися локально й не затримувати запит на переклад.\n\nДруге виділення може бути зроблене до завершення першого перекладу. Надайте кожному запиту унікальний ідентифікатор і порівняйте його з поточним виділенням перед відображенням результату. Скасовуйте запит, якщо транспортний протокол це підтримує. Якщо скасування недоступне, відкидайте застарілу відповідь. Важлива поведінка полягає в тому, що результат завжди належить до тексту, який користувач попросив перекласти востаннє.\n\nЗберігайте цільову мову після її зміни. Для людини, яка зазвичай перекладає українською, збережена в пам'яті вподобабка позбавляє потреби в додатковій дії для кожного запиту. Вихідну мову постачальник може визначити в тому ж виклику перекладу. Дуже короткі слова іноді бувають двозначними, тому панель також може потребувати необов'язкового способу вибору вихідної мови, коли автоматичне визначення дає хибний результат.\n\nМережеві з'єднання мають помітне значення. Перший запит може включати пошук DNS, TCP-з'єднання та рукостискання TLS, перш ніж служба отримає будь-який текст. Подальші запити можуть повторно використовувати це з'єднання. Тестування продуктивності має показувати обидва випадки та фіксувати час до появи всього перекладу. Для потокової відповіді також фіксуйте момент надходження перших перекладених символів.\n\nЯкість перекладу залежить від контексту. Берег річки та фінансовий банк пишуться однаково англійською мовою, але вимагають різних українських слів. Ідіоми, такі як почуватися сумно чи розкрити таємницю, мають зберігати своє початкове значення. Швидкий механізм, який перекладає такі вирази дослівно, може ускладнити розуміння абзацу. Оцінюйте цілі уривки, а не лише ізольовані мітки.\n\nДовгі уривки потребують достатньо простору на панелі, щоб залишатися читабельними. Встановіть максимальну висоту та дозвольте тексту прокручуватися всередині. Зберігайте межі абзаців, де це можливо, і тримайте кнопку закриття доступною під час прокручування. Користувачі клавіатури повинні мати змогу переводити фокус усередину панелі, копіювати переклад і повертатися на початкову сторінку, не втрачаючи свого місця.\n\nПомилки мають залишати вихідне виділення неушкодженим. Тимчасова мережева помилка, вичерпаний ліміт і недійсний ключ вимагають різних дій для відновлення. Показуйте коротке повідомлення з відповідною дією. Повторна спроба має використовувати той самий вихідний текст і цільову мову. Уникайте багаторазових спроб для відхилених облікових даних, оскільки ще один запит не виправить конфігурацію.\n\nВимірювання повинні описувати середовище, у якому вони збиралися. Версія браузера, апаратне забезпечення, мережеве з'єднання, довжина вхідних даних, ідентифікатор моделі та налаштування вихідної мови — усе це може впливати на результат. Зберігайте необроблені показники часу разом із самими перекладами, щоб пізніший запуск можна було порівняти з тими самими вхідними даними. Один незвичайно швидкий запит не визначає звичний досвід роботи.\n\nПерший прототип може зосередитися на виділенні, перекладі, мовних уподобаннях і закритті панелі. Додаткові дії слід додавати лише тоді, коли вони усувають часту перешкоду. Невеликий інтерфейс усе одно може бути надійним, якщо він опрацьовує застарілі запити, фокус клавіатури, межі сторінки та чіткі помилки. Ці деталі важать для повсякденної швидкості більше, ніж довгий список необов'язкових функцій.",
+      "finish_reason": "STOP",
+      "usage": {
+        "promptTokenCount": 727,
+        "candidatesTokenCount": 1238,
+        "totalTokenCount": 1965,
+        "promptTokensDetails": [
+          {
+            "modality": "TEXT",
+            "tokenCount": 727
+          }
+        ],
+        "serviceTier": "standard"
+      },
+      "phase": "fresh",
+      "round": -1,
+      "input_index": 5,
+      "input_id": "large-1",
+      "size": "large"
+    },
+    {
+      "started_at": "2026-10-02T21:38:30.260854+00:00",
+      "ok": true,
+      "protocol": "HTTP/1.1",
+      "first_text_ms": 2897.32,
+      "status": 200,
+      "headers_ms": 2897.273,
+      "retry_after": null,
+      "returned_model": "gemini-3.8-flash",
+      "reasoning_characters": 0,
+      "stream_events": 3,
+      "connection_reused": false,
+      "milliseconds": 2903.461,
+      "variant": "gemini-3.8-flash-stream",
+      "text": "Open the settings.",
+      "characters": 18,
+      "translation": "Відкрийте налаштування.",
+      "finish_reason": "STOP",
+      "usage": {
+        "promptTokenCount": 21,
+        "candidatesTokenCount": 7,
+        "totalTokenCount": 28,
+        "promptTokensDetails": [
+          {
+            "modality": "TEXT",
+            "tokenCount": 21
+          }
+        ],
+        "serviceTier": "standard"
+      },
+      "phase": "fresh",
+      "round": -1,
+      "input_index": 1,
+      "input_id": "short-1",
+      "size": "short"
+    },
+    {
+      "started_at": "2026-10-02T21:38:45.263960+00:00",
+      "ok": true,
+      "protocol": "HTTP/1.1",
+      "first_text_ms": 2772.836,
+      "status": 200,
+      "headers_ms": 2772.798,
+      "retry_after": null,
+      "returned_model": "gemini-3.8-flash",
+      "reasoning_characters": 0,
+      "stream_events": 9,
+      "connection_reused": false,
+      "milliseconds": 2905.294,
+      "variant": "gemini-3.8-flash-stream",
+      "text": "When you select text on a web page, a small translation button appears beside it. Click the button to open a panel with the translation. You can change the target language in that panel, and the browser will remember your choice for the next session. Press Escape or click outside the panel to close it. The selected text should remain highlighted so that you can compare the original with the translated version. If the request fails, the panel should explain what happened and offer a retry without losing your selection.",
+      "characters": 523,
+      "translation": "Коли ви виділяєте текст на вебсторінці, поруч із ним з'являється невелика кнопка перекладу. Натисніть кнопку, щоб відкрити панель із перекладом. На цій панелі ви можете змінити мову перекладу, і браузер запам'ятає ваш вибір для наступного сеансу. Натисніть Escape або клацніть за межами панелі, щоб закрити її. Виділений текст має залишатися підсвіченим, щоб ви могли порівняти оригінал із перекладеною версією. Якщо запит не вдасться виконати, на панелі має з'явитися пояснення того, що сталося, та пропозиція повторити спробу без втрати виділеного тексту.",
+      "finish_reason": "STOP",
+      "usage": {
+        "promptTokenCount": 116,
+        "candidatesTokenCount": 176,
+        "totalTokenCount": 292,
+        "promptTokensDetails": [
+          {
+            "modality": "TEXT",
+            "tokenCount": 116
+          }
+        ],
+        "serviceTier": "standard"
+      },
+      "phase": "fresh",
+      "round": -1,
+      "input_index": 3,
+      "input_id": "paragraph-1",
+      "size": "paragraph"
+    },
+    {
+      "started_at": "2026-10-02T21:39:00.265764+00:00",
+      "ok": false,
+      "protocol": "HTTP/1.1",
+      "first_text_ms": null,
+      "status": 429,
+      "headers_ms": 267.454,
+      "retry_after": null,
+      "connection_reused": false,
+      "milliseconds": 267.56,
+      "variant": "gemini-3.8-flash-stream",
+      "text": "A reliable translation panel starts with a clear connection between the selected text and the request that represents it. The browser can generate several selection events while a person drags across a paragraph. Sending a request for every event wastes time and makes the interface feel unstable. Wait until the selection is complete, keep the source text in memory, and send the request when the translation button is clicked.\n\nThe user should see the panel immediately after clicking. Its position depends on the visible selection rectangle and the available space around it. Near the right edge of the page, the panel may need to move to the left. Near the bottom, it may need to open above the selection. Scrolling should not leave the panel floating over unrelated content. These adjustments should happen locally and should not delay the translation request.\n\nA second selection may be made before the first translation finishes. Give each request a unique identifier and compare it with the current selection before displaying the result. Cancel a request when the transport supports cancellation. If cancellation is unavailable, discard the stale response. The important behavior is that the result always belongs to the text the person most recently asked to translate.\n\nPersist the target language after it changes. For a person who normally translates into Ukrainian, a remembered preference removes an extra action from every request. The source language can be detected by the provider in the same translation call. Very short words are sometimes ambiguous, so the panel may also need an optional way to choose a source language when automatic detection produces the wrong result.\n\nNetwork connections make a measurable difference. The first request can include DNS lookup, a TCP connection, and a TLS handshake before the service receives any text. Later requests may reuse that connection. A benchmark should show both cases and should record the time until the entire translation is available. For a streamed response, also record when the first translated characters arrive.\n\nTranslation quality depends on context. A river bank and a financial bank share the same English spelling but require different Ukrainian words. Idioms such as feeling blue and spilling the beans should preserve their intended meaning. A fast engine that translates these expressions literally can make a paragraph harder to understand. Evaluate complete passages as well as isolated labels.\n\nLong passages need enough space in the panel to remain readable. Set a maximum height and allow the text to scroll inside it. Preserve paragraph boundaries where possible, and keep the close button accessible while scrolling. Keyboard users should be able to move focus into the panel, copy the translation, and return to the original page without losing their place.\n\nFailures should leave the source selection intact. A temporary network error, an exhausted allowance, and an invalid key require different recovery actions. Show a concise message with the relevant action. A retry should use the same source text and target language. Avoid repeatedly retrying a rejected credential because another request will not fix the configuration.\n\nMeasurements should describe the environment in which they were collected. Browser version, hardware, network connection, input length, model identifier, and source-language settings can all affect the result. Keep the raw timings together with the actual translations so that a later run can be compared against the same inputs. A single unusually fast request does not establish the normal experience.\n\nThe first prototype can concentrate on selection, translation, language preference, and closing the panel. Additional actions should be added only when they remove a frequent obstacle. A small interface can still be dependable if it handles stale requests, keyboard focus, page boundaries, and clear errors. These details matter more to everyday speed than a long list of optional features.",
+      "characters": 4023,
+      "provider_error": {
+        "error": {
+          "code": 429,
+          "message": "You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. \n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 20, model: gemini-3.8-flash\nPlease retry in 2h20m59.479666823s.",
+          "status": "RESOURCE_EXHAUSTED",
+          "details": [
+            {
+              "@type": "type.googleapis.com/google.rpc.Help",
+              "links": [
+                {
+                  "description": "Learn more about Gemini API quotas",
+                  "url": "https://ai.google.dev/gemini-api/docs/rate-limits"
+                }
+              ]
+            },
+            {
+              "@type": "type.googleapis.com/google.rpc.QuotaFailure",
+              "violations": [
+                {
+                  "quotaMetric": "generativelanguage.googleapis.com/generate_content_free_tier_requests",
+                  "quotaId": "GenerateRequestsPerDayPerProjectPerModel-FreeTier",
+                  "quotaDimensions": {
+                    "location": "global",
+                    "model": "gemini-3.8-flash"
+                  },
+                  "quotaValue": "20"
+                }
+              ]
+            },
+            {
+              "@type": "type.googleapis.com/google.rpc.RetryInfo",
+              "retryDelay": "8459s"
+            }
+          ]
+        }
+      },
+      "phase": "fresh",
+      "round": -1,
+      "input_index": 5,
+      "input_id": "large-1",
+      "size": "large"
+    }
+  ],
+  "blocked": [
+    {
+      "provider": "google",
+      "reason": "No Google Cloud Translation API key configured"
+    },
+    {
+      "provider": "gemini",
+      "reason": "Authentication, billing, or quota rejection; further requests stopped"
+    }
+  ],
+  "summary": {
+    "gemini-3.5-flash-lite-stream": {
+      "cold-first": {
+        "attempted": 1,
+        "successful": 1,
+        "failed": 0,
+        "median_ms": 724.25,
+        "p95_ms": 724.25,
+        "min_ms": 724.25,
+        "max_ms": 724.25,
+        "reused_connections": 0,
+        "first_text_median_ms": 672.75,
+        "first_text_p95_ms": 672.75
+      },
+      "warm": {
+        "attempted": 18,
+        "successful": 18,
+        "failed": 0,
+        "median_ms": 1086.12,
+        "p95_ms": 4193.91,
+        "min_ms": 484.38,
+        "max_ms": 4193.91,
+        "reused_connections": 18,
+        "first_text_median_ms": 556.41,
+        "first_text_p95_ms": 2032.23
+      },
+      "fresh": {
+        "attempted": 3,
+        "successful": 3,
+        "failed": 0,
+        "median_ms": 1068.54,
+        "p95_ms": 4033.98,
+        "min_ms": 612.51,
+        "max_ms": 4033.98,
+        "reused_connections": 0,
+        "first_text_median_ms": 582.68,
+        "first_text_p95_ms": 752.09
+      }
+    },
+    "gemini-3.8-flash-stream": {
+      "cold-first": {
+        "attempted": 1,
+        "successful": 1,
+        "failed": 0,
+        "median_ms": 4560.21,
+        "p95_ms": 4560.21,
+        "min_ms": 4560.21,
+        "max_ms": 4560.21,
+        "reused_connections": 0,
+        "first_text_median_ms": 4554.24,
+        "first_text_p95_ms": 4554.24
+      },
+      "warm": {
+        "attempted": 18,
+        "successful": 14,
+        "failed": 4,
+        "median_ms": 4753.28,
+        "p95_ms": 9609.32,
+        "min_ms": 1341.65,
+        "max_ms": 9609.32,
+        "reused_connections": 14,
+        "first_text_median_ms": 4161.41,
+        "first_text_p95_ms": 9602.52
+      },
+      "fresh": {
+        "attempted": 3,
+        "successful": 2,
+        "failed": 1,
+        "median_ms": 2904.38,
+        "p95_ms": 2905.29,
+        "min_ms": 2903.46,
+        "max_ms": 2905.29,
+        "reused_connections": 0,
+        "first_text_median_ms": 2835.08,
+        "first_text_p95_ms": 2897.32
+      }
+    }
+  }
+}

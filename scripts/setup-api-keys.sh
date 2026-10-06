@@ -184,7 +184,7 @@ finish() {
 # Replace the example below. Set TOTAL_STAGES to match the stages you write.
 # ──────────────────────────────────────────────────────────────────────────
 
-TOTAL_STAGES=3
+TOTAL_STAGES=4
 PROJECT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 ENV_FILE="$PROJECT_DIR/.env"
 
@@ -192,14 +192,15 @@ banner "Shvyd translation API keys"
 say "1. Azure: translator key, optional region, and endpoint."
 say "2. DeepL: API key and endpoint."
 say "3. Cohere: trial API key."
+say "4. Google Cloud Translation: optional API key."
 say "All values go into $ENV_FILE. You may skip any provider."
 pause "Press Enter to continue."
 
 stage "Azure Translator"
 if confirm "Set up Azure now?"; then
   open_url "https://portal.azure.com/"
-  step "Sign in to an active Azure subscription. Search for Translator and create a Translator resource."
-  step "Choose a resource group and resource name, Global region, and the F0 free pricing tier."
+  step "Sign in to an active Azure subscription. Create the shvyd resource group separately with a geographic region, such as Poland Central."
+  step "Search for Translator and create a Translator resource. Select the existing group, a resource name, Global region, and the F0 free tier."
   step "Choose Review + Create, then Create. After deployment, choose Go to resource."
   step "Open Resource Management -> Keys and Endpoint. Copy Key 1 or Key 2."
   ask_secret AZURE_TRANSLATOR_KEY "Paste the Translator key:"
@@ -230,6 +231,17 @@ if confirm "Set up Cohere now?"; then
   step "Copy the free trial key provided after registration."
   ask_secret COHERE_API_KEY "Paste the Cohere trial key:"
   write_env COHERE_API_KEY "$COHERE_API_KEY"
+fi
+
+stage "Google Cloud Translation"
+if confirm "Set up Google now?"; then
+  open_url "https://console.cloud.google.com/"
+  step "Create or select a project, link a billing account, and enable Cloud Translation API."
+  note "Basic NMT has a monthly credit for the first 500,000 characters; an active billing account is required."
+  step "Open APIs & Services -> Credentials -> Create credentials -> API key. Restrict it to Cloud Translation API."
+  ask_secret GOOGLE_TRANSLATE_API_KEY "Paste the Google Cloud API key:"
+  write_env GOOGLE_TRANSLATE_API_KEY "$GOOGLE_TRANSLATE_API_KEY"
+  write_env GOOGLE_TRANSLATE_ENDPOINT "https://translation.googleapis.com"
 fi
 
 # Bash 3 on macOS treats some empty-array expansions as unset under nounset.

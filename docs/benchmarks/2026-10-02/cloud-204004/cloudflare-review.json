@@ -1,0 +1,229 @@
+{
+  "reviewed_at": "2026-10-02T20:57:27.867399+00:00",
+  "source_run": "results.json",
+  "variant": "cloudflare-m2m100-en",
+  "scope": "54 repeated warm responses from the 18-input corpus",
+  "method": "Manual inspection of the eight distinct outputs below; each output was byte-identical across its three repeats. No formal accuracy score.",
+  "api_successes": 54,
+  "warm_attempts": 54,
+  "demonstrably_incomplete_responses": [
+    {
+      "input_id": "long-1",
+      "round": 0,
+      "started_at": "2026-10-02T20:40:50.296469+00:00",
+      "translation_sha256": "bf7f08c477387efc6c6993434b495908dc457c84fa60ceb6ae24f97e5aea91fb",
+      "source_words": 270,
+      "returned_words": 88,
+      "reason": "Only the beginning is translated; it ends mid-sentence near the panel-position discussion and omits later paragraphs."
+    },
+    {
+      "input_id": "long-2",
+      "round": 0,
+      "started_at": "2026-10-02T20:41:50.855502+00:00",
+      "translation_sha256": "2a68fc44633290dfa571ae34d8de87b92c38433808e9dc3dc0a90ea072b20021",
+      "source_words": 250,
+      "returned_words": 102,
+      "reason": "Only the beginning is translated; it ends at the planned-events discussion and omits later paragraphs."
+    },
+    {
+      "input_id": "large-3",
+      "round": 0,
+      "started_at": "2026-10-02T20:42:25.207817+00:00",
+      "translation_sha256": "8ea2d1ba7bf6a1501ab21a45da2693d10c0767fb56ba7254df2e8508f498db1d",
+      "source_words": 575,
+      "returned_words": 68,
+      "reason": "Most of the passage is missing; the output repeats review-related phrases and ends mid-word."
+    },
+    {
+      "input_id": "large-2",
+      "round": 0,
+      "started_at": "2026-10-02T20:43:38.483004+00:00",
+      "translation_sha256": "2a5a9abfd055bdad9201ff2c6314257919c35a06ed5895686e9b62573da1a3e9",
+      "source_words": 606,
+      "returned_words": 78,
+      "reason": "Most of the passage is missing; the output repeats phrases about filling the trip and stops abruptly."
+    },
+    {
+      "input_id": "long-3",
+      "round": 0,
+      "started_at": "2026-10-02T20:44:06.496218+00:00",
+      "translation_sha256": "f126358f3c860fb4acfd399b1ea5a86a9356b1e412a5bc971112dc4691bfa019",
+      "source_words": 234,
+      "returned_words": 95,
+      "reason": "Only the beginning is translated; it ends mid-sentence in the release-note discussion."
+    },
+    {
+      "input_id": "large-1",
+      "round": 0,
+      "started_at": "2026-10-02T20:44:12.690004+00:00",
+      "translation_sha256": "f7a53008dfa15aef9219b6f12e4d074115fb55edbee2289e4cfec035cef38d9b",
+      "source_words": 623,
+      "returned_words": 87,
+      "reason": "Most of the passage is missing; the output includes distorted and repeated key-request text and ends mid-word."
+    },
+    {
+      "input_id": "sentence-2",
+      "round": 0,
+      "started_at": "2026-10-02T20:44:39.105805+00:00",
+      "translation_sha256": "771fb507835197543e753d6e49aec8893f0acf5c58537ed7353a7c19050a5b40",
+      "source_words": 27,
+      "returned_words": 13,
+      "reason": "The entire second sentence asking the reader to contact support is missing."
+    },
+    {
+      "input_id": "paragraph-3",
+      "round": 0,
+      "started_at": "2026-10-02T20:44:44.306106+00:00",
+      "translation_sha256": "a8086ef2483fe84c1a7e66592d902afab0cca2a6e9ba44bcdfeb706bce745a5d",
+      "source_words": 99,
+      "returned_words": 73,
+      "reason": "The final sentence about a clear handoff saving time is missing."
+    },
+    {
+      "input_id": "paragraph-3",
+      "round": 1,
+      "started_at": "2026-10-02T20:45:53.372090+00:00",
+      "translation_sha256": "a8086ef2483fe84c1a7e66592d902afab0cca2a6e9ba44bcdfeb706bce745a5d",
+      "source_words": 99,
+      "returned_words": 73,
+      "reason": "The final sentence about a clear handoff saving time is missing."
+    },
+    {
+      "input_id": "long-3",
+      "round": 1,
+      "started_at": "2026-10-02T20:45:58.941361+00:00",
+      "translation_sha256": "f126358f3c860fb4acfd399b1ea5a86a9356b1e412a5bc971112dc4691bfa019",
+      "source_words": 234,
+      "returned_words": 95,
+      "reason": "Only the beginning is translated; it ends mid-sentence in the release-note discussion."
+    },
+    {
+      "input_id": "long-1",
+      "round": 1,
+      "started_at": "2026-10-02T20:46:09.502561+00:00",
+      "translation_sha256": "bf7f08c477387efc6c6993434b495908dc457c84fa60ceb6ae24f97e5aea91fb",
+      "source_words": 270,
+      "returned_words": 88,
+      "reason": "Only the beginning is translated; it ends mid-sentence near the panel-position discussion and omits later paragraphs."
+    },
+    {
+      "input_id": "large-1",
+      "round": 1,
+      "started_at": "2026-10-02T20:46:17.593755+00:00",
+      "translation_sha256": "f7a53008dfa15aef9219b6f12e4d074115fb55edbee2289e4cfec035cef38d9b",
+      "source_words": 623,
+      "returned_words": 87,
+      "reason": "Most of the passage is missing; the output includes distorted and repeated key-request text and ends mid-word."
+    },
+    {
+      "input_id": "large-3",
+      "round": 1,
+      "started_at": "2026-10-02T20:46:59.772737+00:00",
+      "translation_sha256": "8ea2d1ba7bf6a1501ab21a45da2693d10c0767fb56ba7254df2e8508f498db1d",
+      "source_words": 575,
+      "returned_words": 68,
+      "reason": "Most of the passage is missing; the output repeats review-related phrases and ends mid-word."
+    },
+    {
+      "input_id": "long-2",
+      "round": 1,
+      "started_at": "2026-10-02T20:47:57.263873+00:00",
+      "translation_sha256": "2a68fc44633290dfa571ae34d8de87b92c38433808e9dc3dc0a90ea072b20021",
+      "source_words": 250,
+      "returned_words": 102,
+      "reason": "Only the beginning is translated; it ends at the planned-events discussion and omits later paragraphs."
+    },
+    {
+      "input_id": "sentence-2",
+      "round": 1,
+      "started_at": "2026-10-02T20:48:24.291014+00:00",
+      "translation_sha256": "771fb507835197543e753d6e49aec8893f0acf5c58537ed7353a7c19050a5b40",
+      "source_words": 27,
+      "returned_words": 13,
+      "reason": "The entire second sentence asking the reader to contact support is missing."
+    },
+    {
+      "input_id": "large-2",
+      "round": 1,
+      "started_at": "2026-10-02T20:48:25.822925+00:00",
+      "translation_sha256": "2a5a9abfd055bdad9201ff2c6314257919c35a06ed5895686e9b62573da1a3e9",
+      "source_words": 606,
+      "returned_words": 78,
+      "reason": "Most of the passage is missing; the output repeats phrases about filling the trip and stops abruptly."
+    },
+    {
+      "input_id": "sentence-2",
+      "round": 2,
+      "started_at": "2026-10-02T20:49:12.223816+00:00",
+      "translation_sha256": "771fb507835197543e753d6e49aec8893f0acf5c58537ed7353a7c19050a5b40",
+      "source_words": 27,
+      "returned_words": 13,
+      "reason": "The entire second sentence asking the reader to contact support is missing."
+    },
+    {
+      "input_id": "long-2",
+      "round": 2,
+      "started_at": "2026-10-02T20:51:09.330838+00:00",
+      "translation_sha256": "2a68fc44633290dfa571ae34d8de87b92c38433808e9dc3dc0a90ea072b20021",
+      "source_words": 250,
+      "returned_words": 102,
+      "reason": "Only the beginning is translated; it ends at the planned-events discussion and omits later paragraphs."
+    },
+    {
+      "input_id": "long-3",
+      "round": 2,
+      "started_at": "2026-10-02T20:51:24.407284+00:00",
+      "translation_sha256": "f126358f3c860fb4acfd399b1ea5a86a9356b1e412a5bc971112dc4691bfa019",
+      "source_words": 234,
+      "returned_words": 95,
+      "reason": "Only the beginning is translated; it ends mid-sentence in the release-note discussion."
+    },
+    {
+      "input_id": "large-2",
+      "round": 2,
+      "started_at": "2026-10-02T20:51:29.660260+00:00",
+      "translation_sha256": "2a5a9abfd055bdad9201ff2c6314257919c35a06ed5895686e9b62573da1a3e9",
+      "source_words": 606,
+      "returned_words": 78,
+      "reason": "Most of the passage is missing; the output repeats phrases about filling the trip and stops abruptly."
+    },
+    {
+      "input_id": "paragraph-3",
+      "round": 2,
+      "started_at": "2026-10-02T20:51:39.178358+00:00",
+      "translation_sha256": "a8086ef2483fe84c1a7e66592d902afab0cca2a6e9ba44bcdfeb706bce745a5d",
+      "source_words": 99,
+      "returned_words": 73,
+      "reason": "The final sentence about a clear handoff saving time is missing."
+    },
+    {
+      "input_id": "large-1",
+      "round": 2,
+      "started_at": "2026-10-02T20:51:42.440059+00:00",
+      "translation_sha256": "f7a53008dfa15aef9219b6f12e4d074115fb55edbee2289e4cfec035cef38d9b",
+      "source_words": 623,
+      "returned_words": 87,
+      "reason": "Most of the passage is missing; the output includes distorted and repeated key-request text and ends mid-word."
+    },
+    {
+      "input_id": "long-1",
+      "round": 2,
+      "started_at": "2026-10-02T20:52:58.055534+00:00",
+      "translation_sha256": "bf7f08c477387efc6c6993434b495908dc457c84fa60ceb6ae24f97e5aea91fb",
+      "source_words": 270,
+      "returned_words": 88,
+      "reason": "Only the beginning is translated; it ends mid-sentence near the panel-position discussion and omits later paragraphs."
+    },
+    {
+      "input_id": "large-3",
+      "round": 2,
+      "started_at": "2026-10-02T20:53:26.759454+00:00",
+      "translation_sha256": "8ea2d1ba7bf6a1501ab21a45da2693d10c0767fb56ba7254df2e8508f498db1d",
+      "source_words": 575,
+      "returned_words": 68,
+      "reason": "Most of the passage is missing; the output repeats review-related phrases and ends mid-word."
+    }
+  ],
+  "caution": "Unflagged outputs are not certified correct. API ok means a nonempty response, not verified completeness.",
+  "demonstrably_incomplete_count": 24
+}

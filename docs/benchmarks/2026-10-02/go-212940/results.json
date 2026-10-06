@@ -1,0 +1,1971 @@
+{
+  "metadata": {
+    "started_at": "2026-10-02T21:29:40.721584+00:00",
+    "pair": "en->uk",
+    "rounds": 3,
+    "endpoint": "https://opencode.ai/zen/go/v1/chat/completions",
+    "route": "go",
+    "wire_models": [
+      "glm-5.3-flash",
+      "mimo-v2.6-flash",
+      "deepseek-v4-flash",
+      "deepseek-v4.1-flash"
+    ],
+    "models": {
+      "glm-5.3-flash": {
+        "thinking": {
+          "type": "enabled"
+        },
+        "reasoning_effort": "low"
+      },
+      "mimo-v2.6-flash": {
+        "thinking": {
+          "type": "disabled"
+        }
+      },
+      "deepseek-v4-flash": {
+        "thinking": {
+          "type": "disabled"
+        }
+      },
+      "deepseek-v4.1-flash": {
+        "thinking": {
+          "type": "disabled"
+        }
+      }
+    },
+    "purpose": "Internal model evaluation; Go documents coding-agent traffic, not a general translation service",
+    "transport": "Python http.client HTTP/1.1",
+    "one_request_at_a_time": true,
+    "local_cache": false,
+    "provider_caching": "uncontrolled; session stable for each input across rounds",
+    "retries": 0,
+    "seed": 42,
+    "go_minimum_start_interval_seconds": 2,
+    "max_tokens": 4096,
+    "temperature": 0,
+    "input_file": "docs/benchmarks/inputs-groq-paced-en-uk.json",
+    "input_sha256": "6754f9ede48659704044aa1fa2130a795df37a424b882eef30860df8c61e4181",
+    "harness_sha256": "25bff0b8c3762b59a65caae26bc4ad590fc1e502b1e6a62c6f58e40bbca06077",
+    "completed_at": "2026-10-02T21:37:49.720493+00:00",
+    "comparison_complete": false
+  },
+  "inputs": [
+    {
+      "id": "word-1",
+      "size": "word",
+      "text": "bank"
+    },
+    {
+      "id": "short-1",
+      "size": "short",
+      "text": "Open the settings."
+    },
+    {
+      "id": "sentence-1",
+      "size": "sentence",
+      "text": "You can select a different language from the menu. Your choice will be remembered the next time you open the browser."
+    },
+    {
+      "id": "paragraph-1",
+      "size": "paragraph",
+      "text": "When you select text on a web page, a small translation button appears beside it. Click the button to open a panel with the translation. You can change the target language in that panel, and the browser will remember your choice for the next session. Press Escape or click outside the panel to close it. The selected text should remain highlighted so that you can compare the original with the translated version. If the request fails, the panel should explain what happened and offer a retry without losing your selection."
+    },
+    {
+      "id": "long-1",
+      "size": "long",
+      "text": "A reliable translation panel starts with a clear connection between the selected text and the request that represents it. The browser can generate several selection events while a person drags across a paragraph. Sending a request for every event wastes time and makes the interface feel unstable. Wait until the selection is complete, keep the source text in memory, and send the request when the translation button is clicked.\n\nThe user should see the panel immediately after clicking. Its position depends on the visible selection rectangle and the available space around it. Near the right edge of the page, the panel may need to move to the left. Near the bottom, it may need to open above the selection. Scrolling should not leave the panel floating over unrelated content. These adjustments should happen locally and should not delay the translation request.\n\nA second selection may be made before the first translation finishes. Give each request a unique identifier and compare it with the current selection before displaying the result. Cancel a request when the transport supports cancellation. If cancellation is unavailable, discard the stale response. The important behavior is that the result always belongs to the text the person most recently asked to translate.\n\nPersist the target language after it changes. For a person who normally translates into Ukrainian, a remembered preference removes an extra action from every request. The source language can be detected by the provider in the same translation call. Very short words are sometimes ambiguous, so the panel may also need an optional way to choose a source language when automatic detection produces the wrong result."
+    },
+    {
+      "id": "large-1",
+      "size": "large",
+      "text": "A reliable translation panel starts with a clear connection between the selected text and the request that represents it. The browser can generate several selection events while a person drags across a paragraph. Sending a request for every event wastes time and makes the interface feel unstable. Wait until the selection is complete, keep the source text in memory, and send the request when the translation button is clicked.\n\nThe user should see the panel immediately after clicking. Its position depends on the visible selection rectangle and the available space around it. Near the right edge of the page, the panel may need to move to the left. Near the bottom, it may need to open above the selection. Scrolling should not leave the panel floating over unrelated content. These adjustments should happen locally and should not delay the translation request.\n\nA second selection may be made before the first translation finishes. Give each request a unique identifier and compare it with the current selection before displaying the result. Cancel a request when the transport supports cancellation. If cancellation is unavailable, discard the stale response. The important behavior is that the result always belongs to the text the person most recently asked to translate.\n\nPersist the target language after it changes. For a person who normally translates into Ukrainian, a remembered preference removes an extra action from every request. The source language can be detected by the provider in the same translation call. Very short words are sometimes ambiguous, so the panel may also need an optional way to choose a source language when automatic detection produces the wrong result.\n\nNetwork connections make a measurable difference. The first request can include DNS lookup, a TCP connection, and a TLS handshake before the service receives any text. Later requests may reuse that connection. A benchmark should show both cases and should record the time until the entire translation is available. For a streamed response, also record when the first translated characters arrive.\n\nTranslation quality depends on context. A river bank and a financial bank share the same English spelling but require different Ukrainian words. Idioms such as feeling blue and spilling the beans should preserve their intended meaning. A fast engine that translates these expressions literally can make a paragraph harder to understand. Evaluate complete passages as well as isolated labels.\n\nLong passages need enough space in the panel to remain readable. Set a maximum height and allow the text to scroll inside it. Preserve paragraph boundaries where possible, and keep the close button accessible while scrolling. Keyboard users should be able to move focus into the panel, copy the translation, and return to the original page without losing their place.\n\nFailures should leave the source selection intact. A temporary network error, an exhausted allowance, and an invalid key require different recovery actions. Show a concise message with the relevant action. A retry should use the same source text and target language. Avoid repeatedly retrying a rejected credential because another request will not fix the configuration.\n\nMeasurements should describe the environment in which they were collected. Browser version, hardware, network connection, input length, model identifier, and source-language settings can all affect the result. Keep the raw timings together with the actual translations so that a later run can be compared against the same inputs. A single unusually fast request does not establish the normal experience.\n\nThe first prototype can concentrate on selection, translation, language preference, and closing the panel. Additional actions should be added only when they remove a frequent obstacle. A small interface can still be dependable if it handles stale requests, keyboard focus, page boundaries, and clear errors. These details matter more to everyday speed than a long list of optional features."
+    }
+  ],
+  "samples": [
+    {
+      "started_at": "2026-10-02T21:29:40.722103+00:00",
+      "ok": false,
+      "first_text_ms": null,
+      "protocol": "HTTP/1.1",
+      "translation": "",
+      "reasoning_characters": 0,
+      "finish_reason": null,
+      "usage": null,
+      "status": 400,
+      "headers_ms": 574.787,
+      "provider_error": {
+        "error": {
+          "param": "thinking",
+          "type": "invalid_request_error",
+          "message": "Upstream request failed: [unknown_parameter] invalid request body: json: unknown field \"thinking\""
+        }
+      },
+      "connection_reused": false,
+      "milliseconds": 574.855,
+      "variant": "go-glm-5.3-flash",
+      "text": "When you select text on a web page, a small translation button appears beside it. Click the button to open a panel with the translation. You can change the target language in that panel, and the browser will remember your choice for the next session. Press Escape or click outside the panel to close it. The selected text should remain highlighted so that you can compare the original with the translated version. If the request fails, the panel should explain what happened and offer a retry without losing your selection.",
+      "characters": 523,
+      "input_id": "paragraph-1",
+      "size": "paragraph",
+      "phase": "cold-first",
+      "round": -1
+    },
+    {
+      "started_at": "2026-10-02T21:29:42.722322+00:00",
+      "ok": true,
+      "first_text_ms": 1384.227,
+      "protocol": "HTTP/1.1",
+      "translation": "Коли ви виділяєте текст на веб-сторінці, поруч із ним з'являється невелика кнопка перекладу. Натисніть кнопку, щоб відкрити панель із перекладом. У цій панелі можна змінити мову перекладу, і браузер запам'ятає ваш вибір для наступної сесії. Натисніть Escape або натисніть за межами панелі, щоб її закрити. Виділений текст має залишатися підсвіченим, щоб ви могли порівняти оригінал із перекладом. Якщо запит не вдасться, панель має пояснити, що сталося, і запропонувати повторити спробу, не втративши вашого виділення.",
+      "reasoning_characters": 0,
+      "finish_reason": "stop",
+      "usage": {
+        "prompt_tokens": 123,
+        "completion_tokens": 258,
+        "total_tokens": 381,
+        "prompt_tokens_details": {
+          "cached_tokens": 0
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 0
+        }
+      },
+      "status": 200,
+      "headers_ms": 1382.575,
+      "returned_model": "mimo-v2.6-flash",
+      "connection_reused": false,
+      "milliseconds": 5426.053,
+      "variant": "go-mimo-v2.6-flash",
+      "text": "When you select text on a web page, a small translation button appears beside it. Click the button to open a panel with the translation. You can change the target language in that panel, and the browser will remember your choice for the next session. Press Escape or click outside the panel to close it. The selected text should remain highlighted so that you can compare the original with the translated version. If the request fails, the panel should explain what happened and offer a retry without losing your selection.",
+      "characters": 523,
+      "input_id": "paragraph-1",
+      "size": "paragraph",
+      "phase": "cold-first",
+      "round": -1
+    },
+    {
+      "started_at": "2026-10-02T21:29:48.148957+00:00",
+      "ok": true,
+      "first_text_ms": 3819.463,
+      "protocol": "HTTP/1.1",
+      "translation": "Коли ви виділяєте текст на веб-сторінці, поруч з ним з'являється невелика кнопка перекладу. Натисніть кнопку, щоб відкрити панель із перекладом. Ви можете змінити цільову мову на цій панелі, і браузер запам'ятає ваш вибір до наступного сеансу. Натисніть Escape або клацніть поза панеллю, щоб закрити її. Виділений текст має залишатися підсвіченим, щоб ви могли порівняти оригінал із перекладеною версією. Якщо запит не виконається, панель має пояснити, що сталося, і запропонувати повторну спробу, не втрачаючи вашого виділення.",
+      "reasoning_characters": 4725,
+      "finish_reason": "stop",
+      "usage": {
+        "prompt_tokens": 198,
+        "completion_tokens": 1679,
+        "total_tokens": 1877,
+        "prompt_tokens_details": {}
+      },
+      "status": 200,
+      "headers_ms": 1087.797,
+      "returned_model": "deepseek-v4-flash",
+      "connection_reused": false,
+      "milliseconds": 4155.391,
+      "variant": "go-deepseek-v4-flash",
+      "text": "When you select text on a web page, a small translation button appears beside it. Click the button to open a panel with the translation. You can change the target language in that panel, and the browser will remember your choice for the next session. Press Escape or click outside the panel to close it. The selected text should remain highlighted so that you can compare the original with the translated version. If the request fails, the panel should explain what happened and offer a retry without losing your selection.",
+      "characters": 523,
+      "input_id": "paragraph-1",
+      "size": "paragraph",
+      "phase": "cold-first",
+      "round": -1
+    },
+    {
+      "started_at": "2026-10-02T21:29:52.304795+00:00",
+      "ok": true,
+      "first_text_ms": 1387.697,
+      "protocol": "HTTP/1.1",
+      "translation": "Коли ви виділяєте текст на вебсторінці, поруч із ним з'являється невелика кнопка перекладу. Натисніть цю кнопку, щоб відкрити панель із перекладом. Ви можете змінити цільову мову на цій панелі, і браузер запам'ятає ваш вибір для наступного сеансу. Натисніть Escape або клацніть поза панеллю, щоб закрити її. Виділений текст має залишатися підсвіченим, щоб ви могли порівняти оригінал із перекладеною версією. Якщо запит не вдасться, панель має пояснити, що сталося, і запропонувати повторити спробу, не втрачаючи вашого виділення.",
+      "reasoning_characters": 0,
+      "finish_reason": "stop",
+      "usage": {
+        "prompt_tokens": 119,
+        "completion_tokens": 224,
+        "total_tokens": 343,
+        "prompt_tokens_details": {
+          "cached_tokens": 0
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 0
+        }
+      },
+      "status": 200,
+      "headers_ms": 1352.262,
+      "returned_model": "deepseek-v4.1-flash",
+      "connection_reused": false,
+      "milliseconds": 2509.984,
+      "variant": "go-deepseek-v4.1-flash",
+      "text": "When you select text on a web page, a small translation button appears beside it. Click the button to open a panel with the translation. You can change the target language in that panel, and the browser will remember your choice for the next session. Press Escape or click outside the panel to close it. The selected text should remain highlighted so that you can compare the original with the translated version. If the request fails, the panel should explain what happened and offer a retry without losing your selection.",
+      "characters": 523,
+      "input_id": "paragraph-1",
+      "size": "paragraph",
+      "phase": "cold-first",
+      "round": -1
+    },
+    {
+      "started_at": "2026-10-02T21:29:54.815746+00:00",
+      "ok": true,
+      "first_text_ms": 1133.855,
+      "protocol": "HTTP/1.1",
+      "translation": "Відкрийте налаштування.",
+      "reasoning_characters": 0,
+      "finish_reason": "stop",
+      "usage": {
+        "prompt_tokens": 23,
+        "completion_tokens": 11,
+        "total_tokens": 34,
+        "prompt_tokens_details": {
+          "cached_tokens": 0
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 0
+        }
+      },
+      "status": 200,
+      "headers_ms": 1133.676,
+      "returned_model": "deepseek-v4.1-flash",
+      "connection_reused": true,
+      "milliseconds": 1202.893,
+      "variant": "go-deepseek-v4.1-flash",
+      "text": "Open the settings.",
+      "characters": 18,
+      "input_id": "short-1",
+      "size": "short",
+      "phase": "warm",
+      "round": 0
+    },
+    {
+      "started_at": "2026-10-02T21:29:56.820878+00:00",
+      "ok": true,
+      "first_text_ms": 1383.621,
+      "protocol": "HTTP/1.1",
+      "translation": "банк",
+      "reasoning_characters": 0,
+      "finish_reason": "stop",
+      "usage": {
+        "prompt_tokens": 20,
+        "completion_tokens": 2,
+        "total_tokens": 22,
+        "prompt_tokens_details": {
+          "audio_tokens": 0,
+          "cached_tokens": 0,
+          "cache_creation_input_tokens": 0,
+          "cache_write_tokens": 0
+        },
+        "completion_tokens_details": {
+          "accepted_prediction_tokens": 0,
+          "audio_tokens": 0,
+          "reasoning_tokens": 0,
+          "rejected_prediction_tokens": 0
+        }
+      },
+      "status": 200,
+      "headers_ms": 1333.722,
+      "returned_model": "deepseek-v4.1-flash",
+      "connection_reused": true,
+      "milliseconds": 1387.541,
+      "variant": "go-deepseek-v4.1-flash",
+      "text": "bank",
+      "characters": 4,
+      "input_id": "word-1",
+      "size": "word",
+      "phase": "warm",
+      "round": 0
+    },
+    {
+      "started_at": "2026-10-02T21:29:58.825893+00:00",
+      "ok": true,
+      "first_text_ms": 1898.787,
+      "protocol": "HTTP/1.1",
+      "translation": "Надійна панель перекладу починається з чіткого зв'язку між виділеним текстом і запитом, який його представляє. Браузер може згенерувати кілька подій виділення, поки людина перетягує курсор через абзац. Надсилання запиту на кожну подію витрачає час і робить інтерфейс нестабільним. Дочекайтеся завершення виділення, збережіть вихідний текст у пам'яті та надішліть запит після натискання кнопки перекладу.\n\nКористувач повинен бачити панель одразу після натискання. Її положення залежить від видимого прямокутника виділення та доступного простору навколо нього. Біля правого краю сторінки панель може знадобитися перемістити вліво. Біля нижнього краю вона може відкритися над виділенням. Прокручування не повинно залишати панель, що плаває над непов'язаним вмістом. Ці коригування слід виконувати локально, і вони не повинні затримувати запит на переклад.\n\nПеред завершенням першого перекладу може бути зроблено друге виділення. Присвойте кожному запиту унікальний ідентифікатор і порівнюйте його з поточним виділенням перед відображенням результату. Скасуйте запит, якщо транспортний рівень підтримує скасування. Якщо скасування недоступне, відкиньте застарілу відповідь. Важливо, щоб результат завжди належав тексту, який людина нещодавно попросила перекласти.\n\nЗберігайте цільову мову після її зміни. Для людини, яка зазвичай перекладає українською, збережена налаштованість прибирає зайву дію з кожного запиту. Вихідну мову може визначити провайдер у тому ж виклику перекладу. Дуже короткі слова іноді є неоднозначними, тому панелі може знадобитися додатковий спосіб вибору вихідної мови, коли автоматичне визначення дає неправильний результат.",
+      "reasoning_characters": 0,
+      "finish_reason": "stop",
+      "usage": {
+        "prompt_tokens": 322,
+        "completion_tokens": 757,
+        "total_tokens": 1079,
+        "prompt_tokens_details": {
+          "cached_tokens": 0
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 0
+        }
+      },
+      "status": 200,
+      "headers_ms": 1898.729,
+      "returned_model": "mimo-v2.6-flash",
+      "connection_reused": true,
+      "milliseconds": 12925.343,
+      "variant": "go-mimo-v2.6-flash",
+      "text": "A reliable translation panel starts with a clear connection between the selected text and the request that represents it. The browser can generate several selection events while a person drags across a paragraph. Sending a request for every event wastes time and makes the interface feel unstable. Wait until the selection is complete, keep the source text in memory, and send the request when the translation button is clicked.\n\nThe user should see the panel immediately after clicking. Its position depends on the visible selection rectangle and the available space around it. Near the right edge of the page, the panel may need to move to the left. Near the bottom, it may need to open above the selection. Scrolling should not leave the panel floating over unrelated content. These adjustments should happen locally and should not delay the translation request.\n\nA second selection may be made before the first translation finishes. Give each request a unique identifier and compare it with the current selection before displaying the result. Cancel a request when the transport supports cancellation. If cancellation is unavailable, discard the stale response. The important behavior is that the result always belongs to the text the person most recently asked to translate.\n\nPersist the target language after it changes. For a person who normally translates into Ukrainian, a remembered preference removes an extra action from every request. The source language can be detected by the provider in the same translation call. Very short words are sometimes ambiguous, so the panel may also need an optional way to choose a source language when automatic detection produces the wrong result.",
+      "characters": 1694,
+      "input_id": "long-1",
+      "size": "long",
+      "phase": "warm",
+      "round": 0
+    },
+    {
+      "started_at": "2026-10-02T21:30:11.751989+00:00",
+      "ok": true,
+      "first_text_ms": 3241.144,
+      "protocol": "HTTP/1.1",
+      "translation": "Коли ви виділяєте текст на веб-сторінці, поруч з ним з'являється невелика кнопка перекладу. Натисніть кнопку, щоб відкрити панель із перекладом. Ви можете змінити цільову мову на цій панелі, і браузер запам'ятає ваш вибір до наступного сеансу. Натисніть Escape або клацніть поза панеллю, щоб закрити її. Виділений текст має залишатися підсвіченим, щоб ви могли порівняти оригінал із перекладеною версією. Якщо запит не виконається, панель має пояснити, що сталося, і запропонувати повторну спробу, не втрачаючи вашого виділення.",
+      "reasoning_characters": 4725,
+      "finish_reason": "stop",
+      "usage": {
+        "prompt_tokens": 198,
+        "completion_tokens": 1679,
+        "total_tokens": 1877,
+        "prompt_tokens_details": {}
+      },
+      "status": 200,
+      "headers_ms": 562.739,
+      "returned_model": "deepseek-v4-flash",
+      "connection_reused": true,
+      "milliseconds": 3576.251,
+      "variant": "go-deepseek-v4-flash",
+      "text": "When you select text on a web page, a small translation button appears beside it. Click the button to open a panel with the translation. You can change the target language in that panel, and the browser will remember your choice for the next session. Press Escape or click outside the panel to close it. The selected text should remain highlighted so that you can compare the original with the translated version. If the request fails, the panel should explain what happened and offer a retry without losing your selection.",
+      "characters": 523,
+      "input_id": "paragraph-1",
+      "size": "paragraph",
+      "phase": "warm",
+      "round": 0
+    },
+    {
+      "started_at": "2026-10-02T21:30:15.328769+00:00",
+      "ok": true,
+      "first_text_ms": 2300.031,
+      "protocol": "HTTP/1.1",
+      "translation": "Надійна панель перекладу починається з чіткого зв'язку між виділеним текстом і запитом, який його представляє. Браузер може згенерувати кілька подій виділення, коли людина перетягує курсор через абзац. Надсилання запиту на кожну подію витрачає час і робить інтерфейс нестабільним. Дочекайтеся завершення виділення, збережіть вихідний текст у пам'яті та надішліть запит після натискання кнопки перекладу.\n\nКористувач повинен бачити панель одразу після натискання. Її положення залежить від видимого прямокутника виділення та доступного простору навколо нього. Біля правого краю сторінки панель може знадобитися перемістити вліво. Біля нижнього краю вона може відкритися над виділенням. Прокручування не повинно залишати панель, що плаває над непов'язаним вмістом. Ці коригування слід виконувати локально, і вони не повинні затримувати запит на переклад.\n\nПеред завершенням першого перекладу може бути зроблено друге виділення. Присвойте кожному запиту унікальний ідентифікатор і порівнюйте його з поточним виділенням перед відображенням результату. Скасуйте запит, якщо транспортний протокол підтримує скасування. Якщо скасування недоступне, відкиньте застарілу відповідь. Важливо, щоб результат завжди належав тексту, переклад якого людина попросила найостанніше.\n\nЗберігайте мову призначення після її зміни. Для людини, яка зазвичай перекладає українською, збережена налаштованість прибирає зайву дію з кожного запиту. Вихідну мову може визначити провайдер у тому ж виклику перекладу. Дуже короткі слова іноді є неоднозначними, тому панелі може знадобитися додатковий спосіб вибору вихідної мови, коли автоматичне визначення дає неправильний результат.\n\nМережеві з'єднання мають вимірювану різницю. Перший запит може включати пошук DNS, з'єднання TCP та рукопотискання TLS, перш ніж служба отримає будь-який текст. Наступні запити можуть використовувати це з'єднання повторно. Бенчмарк повинен показувати обидва випадки та записувати час до появи повного перекладу. Для потокової відповіді також слід записувати час прибуття перших перекладених символів.\n\nЯкість перекладу залежить від контексту. «Берег річки» та «фінансовий банк» мають однакове англійське написання, але потребують різних українських слів. Ідіоми, такі як «feeling blue» (бути в поганому настрої) та «spilling the beans» (розкрити таємницю), повинні зберігати їхній задуманий зміст. Швидкий движок, який перекладає такі вирази дослівно, може ускладнити розуміння абзацу. Оцінюйте як повні уривки, так і окремі підписи.\n\nДовгим уривкам потрібно достатньо місця в панелі, щоб залишатися читабельними. Встановіть максимальну висоту та дозвольте тексту прокручуватися всередині. Зберігайте межі абзаців, де це можливо, і робіть кнопку закриття доступною під час прокручування. Користувачі клавіатури повинні мати можливість перемістити фокус на панель, скопіювати переклад і повернутися на початкову сторінку, не втративши свого місця.\n\nПомилки повинні залишати вихідне виділення без змін. Тимчасова мережева помилка, вичерпаний ліміт та недійсний ключ вимагають різних дій для відновлення. Показуйте стисле повідомлення з відповідною дією. Повторна спроба повинна використовувати той самий вихідний текст та мову призначення. Уникайте повторних спроб з відхиленими обліковими даними, оскільки інший запит не виправить конфігурацію.\n\nВимірювання повинні описувати середовище, в якому вони були зібрані. Версія браузера, апаратне забезпечення, мережеве з'єднання, довжина введення, ідентифікатор моделі та налаштування вихідної мови можуть впливати на результат. Зберігайте сирі таймінги разом із фактичними перекладами, щоб пізніший запуск можна було порівняти з тими самими вхідними даними. Один незвично швидкий запит не встановлює нормальний досвід.\n\nПерший прототип може зосередитися на виділенні, перекладі, мовній налаштованості та закритті панелі. Додаткові дії слід додавати лише тоді, коли вони усувають поширену перешкоду. Невеликий інтерфейс може бути надійним, якщо він обробляє застарілі запити, фокус клавіатури, межі сторінки та зрозумілі помилки. Ці деталі важливіші для щоденної швидкості, ніж довгий список додаткових функцій.",
+      "reasoning_characters": 0,
+      "finish_reason": "stop",
+      "usage": {
+        "prompt_tokens": 727,
+        "completion_tokens": 1937,
+        "total_tokens": 2664,
+        "prompt_tokens_details": {
+          "cached_tokens": 0
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 0
+        }
+      },
+      "status": 200,
+      "headers_ms": 2299.988,
+      "returned_model": "mimo-v2.6-flash",
+      "connection_reused": true,
+      "milliseconds": 47630.343,
+      "variant": "go-mimo-v2.6-flash",
+      "text": "A reliable translation panel starts with a clear connection between the selected text and the request that represents it. The browser can generate several selection events while a person drags across a paragraph. Sending a request for every event wastes time and makes the interface feel unstable. Wait until the selection is complete, keep the source text in memory, and send the request when the translation button is clicked.\n\nThe user should see the panel immediately after clicking. Its position depends on the visible selection rectangle and the available space around it. Near the right edge of the page, the panel may need to move to the left. Near the bottom, it may need to open above the selection. Scrolling should not leave the panel floating over unrelated content. These adjustments should happen locally and should not delay the translation request.\n\nA second selection may be made before the first translation finishes. Give each request a unique identifier and compare it with the current selection before displaying the result. Cancel a request when the transport supports cancellation. If cancellation is unavailable, discard the stale response. The important behavior is that the result always belongs to the text the person most recently asked to translate.\n\nPersist the target language after it changes. For a person who normally translates into Ukrainian, a remembered preference removes an extra action from every request. The source language can be detected by the provider in the same translation call. Very short words are sometimes ambiguous, so the panel may also need an optional way to choose a source language when automatic detection produces the wrong result.\n\nNetwork connections make a measurable difference. The first request can include DNS lookup, a TCP connection, and a TLS handshake before the service receives any text. Later requests may reuse that connection. A benchmark should show both cases and should record the time until the entire translation is available. For a streamed response, also record when the first translated characters arrive.\n\nTranslation quality depends on context. A river bank and a financial bank share the same English spelling but require different Ukrainian words. Idioms such as feeling blue and spilling the beans should preserve their intended meaning. A fast engine that translates these expressions literally can make a paragraph harder to understand. Evaluate complete passages as well as isolated labels.\n\nLong passages need enough space in the panel to remain readable. Set a maximum height and allow the text to scroll inside it. Preserve paragraph boundaries where possible, and keep the close button accessible while scrolling. Keyboard users should be able to move focus into the panel, copy the translation, and return to the original page without losing their place.\n\nFailures should leave the source selection intact. A temporary network error, an exhausted allowance, and an invalid key require different recovery actions. Show a concise message with the relevant action. A retry should use the same source text and target language. Avoid repeatedly retrying a rejected credential because another request will not fix the configuration.\n\nMeasurements should describe the environment in which they were collected. Browser version, hardware, network connection, input length, model identifier, and source-language settings can all affect the result. Keep the raw timings together with the actual translations so that a later run can be compared against the same inputs. A single unusually fast request does not establish the normal experience.\n\nThe first prototype can concentrate on selection, translation, language preference, and closing the panel. Additional actions should be added only when they remove a frequent obstacle. A small interface can still be dependable if it handles stale requests, keyboard focus, page boundaries, and clear errors. These details matter more to everyday speed than a long list of optional features.",
+      "characters": 4023,
+      "input_id": "large-1",
+      "size": "large",
+      "phase": "warm",
+      "round": 0
+    },
+    {
+      "started_at": "2026-10-02T21:31:02.959927+00:00",
+      "ok": true,
+      "first_text_ms": 981.418,
+      "protocol": "HTTP/1.1",
+      "translation": "Відкрийте налаштування.",
+      "reasoning_characters": 456,
+      "finish_reason": "stop",
+      "usage": {
+        "prompt_tokens": 102,
+        "completion_tokens": 123,
+        "total_tokens": 225,
+        "prompt_tokens_details": {}
+      },
+      "status": 200,
+      "headers_ms": 605.775,
+      "returned_model": "deepseek-v4-flash",
+      "connection_reused": true,
+      "milliseconds": 983.239,
+      "variant": "go-deepseek-v4-flash",
+      "text": "Open the settings.",
+      "characters": 18,
+      "input_id": "short-1",
+      "size": "short",
+      "phase": "warm",
+      "round": 0
+    },
+    {
+      "started_at": "2026-10-02T21:31:04.964976+00:00",
+      "ok": true,
+      "first_text_ms": 1796.694,
+      "protocol": "HTTP/1.1",
+      "translation": "Надійна панель перекладу починається з чіткого зв'язку між вибраним текстом і запитом, який його представляє. Браузер може генерувати кілька подій виділення, поки людина перетягує курсор через абзац. Надсилання запиту на кожну подію марнує час і змушує інтерфейс відчуватися нестабільним. Зачекайте, поки виділення завершиться, збережіть вихідний текст у пам'яті та надішліть запит, коли буде натиснуто кнопку перекладу.\n\nКористувач повинен побачити панель одразу після натискання. Її положення залежить від видимого прямокутника виділення та доступного простору навколо нього. Біля правого краю сторінки панель може потребувати переміщення вліво. Біля нижнього краю вона може потребувати відкриття над виділенням. Прокручування не повинно залишати панель ширяючою над не пов'язаним вмістом. Ці коригування повинні відбуватися локально й не затримувати запит перекладу.\n\nДруге виділення може бути зроблено до завершення першого перекладу. Надайте кожному запиту унікальний ідентифікатор і порівняйте його з поточним виділенням перед відображенням результату. Скасуйте запит, коли транспорт підтримує скасування. Якщо скасування недоступне, відкиньте застарілу відповідь. Важлива поведінка полягає в тому, що результат завжди належить тексту, який людина найнедавніше попросила перекласти.\n\nЗберігайте цільову мову після її зміни. Для людини, яка зазвичай перекладає українською, запам'ятоване налаштування прибирає зайву дію з кожного запиту. Вихідну мову може визначити постачальник у тому самому виклику перекладу. Дуже короткі слова іноді бувають неоднозначними, тому панель також може потребувати додаткового способу вибрати вихідну мову, коли автоматичне визначення дає неправильний результат.",
+      "reasoning_characters": 0,
+      "finish_reason": "stop",
+      "usage": {
+        "prompt_tokens": 319,
+        "completion_tokens": 651,
+        "total_tokens": 970,
+        "prompt_tokens_details": {
+          "cached_tokens": 0
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 0
+        }
+      },
+      "status": 200,
+      "headers_ms": 1796.6,
+      "returned_model": "deepseek-v4.1-flash",
+      "connection_reused": true,
+      "milliseconds": 5012.21,
+      "variant": "go-deepseek-v4.1-flash",
+      "text": "A reliable translation panel starts with a clear connection between the selected text and the request that represents it. The browser can generate several selection events while a person drags across a paragraph. Sending a request for every event wastes time and makes the interface feel unstable. Wait until the selection is complete, keep the source text in memory, and send the request when the translation button is clicked.\n\nThe user should see the panel immediately after clicking. Its position depends on the visible selection rectangle and the available space around it. Near the right edge of the page, the panel may need to move to the left. Near the bottom, it may need to open above the selection. Scrolling should not leave the panel floating over unrelated content. These adjustments should happen locally and should not delay the translation request.\n\nA second selection may be made before the first translation finishes. Give each request a unique identifier and compare it with the current selection before displaying the result. Cancel a request when the transport supports cancellation. If cancellation is unavailable, discard the stale response. The important behavior is that the result always belongs to the text the person most recently asked to translate.\n\nPersist the target language after it changes. For a person who normally translates into Ukrainian, a remembered preference removes an extra action from every request. The source language can be detected by the provider in the same translation call. Very short words are sometimes ambiguous, so the panel may also need an optional way to choose a source language when automatic detection produces the wrong result.",
+      "characters": 1694,
+      "input_id": "long-1",
+      "size": "long",
+      "phase": "warm",
+      "round": 0
+    },
+    {
+      "started_at": "2026-10-02T21:31:09.977868+00:00",
+      "ok": true,
+      "first_text_ms": 1018.655,
+      "protocol": "HTTP/1.1",
+      "translation": "банк",
+      "reasoning_characters": 721,
+      "finish_reason": "stop",
+      "usage": {
+        "prompt_tokens": 99,
+        "completion_tokens": 165,
+        "total_tokens": 264,
+        "prompt_tokens_details": {}
+      },
+      "status": 200,
+      "headers_ms": 545.513,
+      "returned_model": "deepseek-v4-flash",
+      "connection_reused": true,
+      "milliseconds": 1018.775,
+      "variant": "go-deepseek-v4-flash",
+      "text": "bank",
+      "characters": 4,
+      "input_id": "word-1",
+      "size": "word",
+      "phase": "warm",
+      "round": 0
+    },
+    {
+      "started_at": "2026-10-02T21:31:11.982920+00:00",
+      "ok": true,
+      "first_text_ms": 8100.451,
+      "protocol": "HTTP/1.1",
+      "translation": "Надійна панель перекладу починається з чіткого зв'язку між вибраним текстом і запитом, який його представляє. Браузер може генерувати кілька подій вибору, коли людина перетягує курсор через абзац. Надсилання запиту для кожної події витрачає час і робить інтерфейс нестабільним. Зачекайте, поки вибір буде завершено, зберігайте вихідний текст у пам'яті та надсилайте запит, коли натиснуто кнопку перекладу.\n\nКористувач має бачити панель одразу після натискання. Її позиція залежить від видимого прямокутника вибору та доступного простору навколо нього. Біля правого краю сторінки панель може потребувати зсуву вліво. Біля нижнього краю вона може відкриватися над вибором. Прокручування не повинно залишати панель плаваючою над незв'язаним вмістом. Ці коригування мають відбуватися локально і не затримувати запит на переклад.\n\nДругий вибір може бути зроблений до завершення першого перекладу. Надайте кожному запиту унікальний ідентифікатор і порівнюйте його з поточним вибором перед відображенням результату. Скасовуйте запит, якщо транспорт підтримує скасування. Якщо скасування недоступне, відкидайте застарілу відповідь. Важлива поведінка полягає в тому, що результат завжди належить тексту, який людина найостанніше попросила перекласти.\n\nЗберігайте цільову мову після її зміни. Для людини, яка зазвичай перекладає українською, збережене налаштування усуває зайву дію з кожного запиту. Мову джерела може визначати постачальник у тому самому виклику перекладу. Дуже короткі слова іноді є неоднозначними, тому панель також може потребувати додаткової можливості вибору мови джерела, коли автоматичне визначення дає неправильний результат.",
+      "reasoning_characters": 8646,
+      "finish_reason": "stop",
+      "usage": {
+        "prompt_tokens": 398,
+        "completion_tokens": 3070,
+        "total_tokens": 3468,
+        "prompt_tokens_details": {}
+      },
+      "status": 200,
+      "headers_ms": 660.496,
+      "returned_model": "deepseek-v4-flash",
+      "connection_reused": true,
+      "milliseconds": 9750.202,
+      "variant": "go-deepseek-v4-flash",
+      "text": "A reliable translation panel starts with a clear connection between the selected text and the request that represents it. The browser can generate several selection events while a person drags across a paragraph. Sending a request for every event wastes time and makes the interface feel unstable. Wait until the selection is complete, keep the source text in memory, and send the request when the translation button is clicked.\n\nThe user should see the panel immediately after clicking. Its position depends on the visible selection rectangle and the available space around it. Near the right edge of the page, the panel may need to move to the left. Near the bottom, it may need to open above the selection. Scrolling should not leave the panel floating over unrelated content. These adjustments should happen locally and should not delay the translation request.\n\nA second selection may be made before the first translation finishes. Give each request a unique identifier and compare it with the current selection before displaying the result. Cancel a request when the transport supports cancellation. If cancellation is unavailable, discard the stale response. The important behavior is that the result always belongs to the text the person most recently asked to translate.\n\nPersist the target language after it changes. For a person who normally translates into Ukrainian, a remembered preference removes an extra action from every request. The source language can be detected by the provider in the same translation call. Very short words are sometimes ambiguous, so the panel may also need an optional way to choose a source language when automatic detection produces the wrong result.",
+      "characters": 1694,
+      "input_id": "long-1",
+      "size": "long",
+      "phase": "warm",
+      "round": 0
+    },
+    {
+      "started_at": "2026-10-02T21:31:21.734481+00:00",
+      "ok": true,
+      "first_text_ms": 1168.956,
+      "protocol": "HTTP/1.1",
+      "translation": "Коли ви виділяєте текст на вебсторінці, поруч із ним з'являється невелика кнопка перекладу. Натисніть цю кнопку, щоб відкрити панель із перекладом. Ви можете змінити цільову мову на цій панелі, і браузер запам'ятає ваш вибір для наступного сеансу. Натисніть Escape або клацніть поза панеллю, щоб закрити її. Виділений текст має залишатися підсвіченим, щоб ви могли порівняти оригінал із перекладеною версією. Якщо запит не вдасться, панель має пояснити, що сталося, і запропонувати повторити спробу, не втрачаючи вашого виділення.",
+      "reasoning_characters": 0,
+      "finish_reason": "stop",
+      "usage": {
+        "prompt_tokens": 119,
+        "completion_tokens": 224,
+        "total_tokens": 343,
+        "prompt_tokens_details": {
+          "cached_tokens": 0
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 0
+        }
+      },
+      "status": 200,
+      "headers_ms": 1132.964,
+      "returned_model": "deepseek-v4.1-flash",
+      "connection_reused": true,
+      "milliseconds": 2364.606,
+      "variant": "go-deepseek-v4.1-flash",
+      "text": "When you select text on a web page, a small translation button appears beside it. Click the button to open a panel with the translation. You can change the target language in that panel, and the browser will remember your choice for the next session. Press Escape or click outside the panel to close it. The selected text should remain highlighted so that you can compare the original with the translated version. If the request fails, the panel should explain what happened and offer a retry without losing your selection.",
+      "characters": 523,
+      "input_id": "paragraph-1",
+      "size": "paragraph",
+      "phase": "warm",
+      "round": 0
+    },
+    {
+      "started_at": "2026-10-02T21:31:24.099898+00:00",
+      "ok": true,
+      "first_text_ms": 1243.792,
+      "protocol": "HTTP/1.1",
+      "translation": "Відкрийте налаштування.",
+      "reasoning_characters": 0,
+      "finish_reason": "stop",
+      "usage": {
+        "prompt_tokens": 28,
+        "completion_tokens": 13,
+        "total_tokens": 41,
+        "prompt_tokens_details": {
+          "cached_tokens": 0
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 0
+        }
+      },
+      "status": 200,
+      "headers_ms": 1243.71,
+      "returned_model": "mimo-v2.6-flash",
+      "connection_reused": true,
+      "milliseconds": 1625.909,
+      "variant": "go-mimo-v2.6-flash",
+      "text": "Open the settings.",
+      "characters": 18,
+      "input_id": "short-1",
+      "size": "short",
+      "phase": "warm",
+      "round": 0
+    },
+    {
+      "started_at": "2026-10-02T21:31:26.103024+00:00",
+      "ok": true,
+      "first_text_ms": 12231.929,
+      "protocol": "HTTP/1.1",
+      "translation": "Надійна панель перекладу починається з чіткого зв’язку між вибраним текстом і запитом, який його представляє. Браузер може генерувати кілька подій вибору, поки людина перетягує курсор через абзац. Надсилання запиту на кожну подію витрачає час і робить інтерфейс нестабільним. Зачекайте, поки вибір завершиться, зберігайте вихідний текст у пам’яті та надсилайте запит, коли натиснуто кнопку перекладу.\n\nКористувач має бачити панель одразу після натискання. Її позиція залежить від видимого прямокутника вибору та доступного простору навколо нього. Біля правого краю сторінки панель може потребувати зсуву вліво. Біля нижнього краю вона може відкриватися над вибором. Прокручування не повинно залишати панель плаваючою над невідповідним вмістом. Ці коригування мають відбуватися локально і не затримувати запит на переклад.\n\nДругий вибір може бути зроблений до того, як завершиться перший переклад. Надайте кожному запиту унікальний ідентифікатор і порівнюйте його з поточним вибором перед відображенням результату. Скасовуйте запит, якщо транспорт підтримує скасування. Якщо скасування недоступне, відкидайте застарілу відповідь. Важлива поведінка полягає в тому, що результат завжди належить тексту, який людина найнещодавніше попросила перекласти.\n\nЗберігайте цільову мову після її зміни. Для людини, яка зазвичай перекладає українською, запам’ятована вподобаність усуває зайву дію з кожного запиту. Мову джерела може визначати постачальник у тому самому виклику перекладу. Дуже короткі слова іноді є неоднозначними, тому панель також може потребувати додаткової можливості вибору мови джерела, коли автоматичне визначення дає неправильний результат.\n\nМережеві з’єднання мають відчутну різницю. Перший запит може включати пошук DNS, TCP-з’єднання та рукостискання TLS, перш ніж сервіс отримає будь-який текст. Пізніші запити можуть повторно використовувати це з’єднання. Бенчмарк має показувати обидва випадки та фіксувати час до моменту, коли весь переклад стає доступним. Для потокової відповіді також фіксуйте, коли надходять перші перекладені символи.\n\nЯкість перекладу залежить від контексту. Річковий берег і фінансовий банк мають однакове написання англійською, але потребують різних українських слів. Ідіоми, як-от feeling blue і spilling the beans, мають зберігати своє передбачуване значення. Швидкий рушій, який перекладає ці вирази буквально, може зробити абзац складнішим для розуміння. Оцінюйте цілі уривки, а також окремі мітки.\n\nДовгі уривки потребують достатньо місця в панелі, щоб залишатися читабельними. Встановіть максимальну висоту та дозвольте тексту прокручуватися всередині. Зберігайте межі абзаців, де це можливо, і тримайте кнопку закриття доступною під час прокручування. Користувачі клавіатури повинні мати змогу перемістити фокус у панель, скопіювати переклад і повернутися на вихідну сторінку, не втрачаючи свого місця.\n\nПомилки не повинні порушувати вихідний вибір. Тимчасова мережева помилка, вичерпана квота та недійсний ключ потребують різних дій для відновлення. Покажіть стисле повідомлення з відповідною дією. Повторна спроба має використовувати той самий вихідний текст і цільову мову. Уникайте повторних спроб із відхиленими обліковими даними, оскільки ще один запит не виправить конфігурацію.\n\nВимірювання мають описувати середовище, у якому вони були зібрані. Версія браузера, апаратне забезпечення, мережеве з’єднання, довжина вхідного тексту, ідентифікатор моделі та налаштування мови джерела можуть впливати на результат. Зберігайте сирі показники часу разом із фактичними перекладами, щоб пізніший запуск можна було порівняти з тими самими вхідними даними. Один незвично швидкий запит не встановлює нормального досвіду.\n\nПерший прототип може зосередитися на виборі, перекладі, вподобанні мови та закритті панелі. Додаткові дії слід додавати лише тоді, коли вони усувають часті перешкоди. Невеликий інтерфейс усе одно може бути надійним, якщо він обробляє застарілі запити, фокус клавіатури, межі сторінки та зрозумілі помилки. Ці деталі важливіші для щоденної швидкості, ніж довгий список додаткових функцій.",
+      "reasoning_characters": 15609,
+      "finish_reason": "stop",
+      "usage": {
+        "prompt_tokens": 808,
+        "completion_tokens": 6167,
+        "total_tokens": 6975,
+        "prompt_tokens_details": {
+          "cached_tokens": 256
+        }
+      },
+      "status": 200,
+      "headers_ms": 674.347,
+      "returned_model": "deepseek-v4-flash",
+      "connection_reused": true,
+      "milliseconds": 15014.589,
+      "variant": "go-deepseek-v4-flash",
+      "text": "A reliable translation panel starts with a clear connection between the selected text and the request that represents it. The browser can generate several selection events while a person drags across a paragraph. Sending a request for every event wastes time and makes the interface feel unstable. Wait until the selection is complete, keep the source text in memory, and send the request when the translation button is clicked.\n\nThe user should see the panel immediately after clicking. Its position depends on the visible selection rectangle and the available space around it. Near the right edge of the page, the panel may need to move to the left. Near the bottom, it may need to open above the selection. Scrolling should not leave the panel floating over unrelated content. These adjustments should happen locally and should not delay the translation request.\n\nA second selection may be made before the first translation finishes. Give each request a unique identifier and compare it with the current selection before displaying the result. Cancel a request when the transport supports cancellation. If cancellation is unavailable, discard the stale response. The important behavior is that the result always belongs to the text the person most recently asked to translate.\n\nPersist the target language after it changes. For a person who normally translates into Ukrainian, a remembered preference removes an extra action from every request. The source language can be detected by the provider in the same translation call. Very short words are sometimes ambiguous, so the panel may also need an optional way to choose a source language when automatic detection produces the wrong result.\n\nNetwork connections make a measurable difference. The first request can include DNS lookup, a TCP connection, and a TLS handshake before the service receives any text. Later requests may reuse that connection. A benchmark should show both cases and should record the time until the entire translation is available. For a streamed response, also record when the first translated characters arrive.\n\nTranslation quality depends on context. A river bank and a financial bank share the same English spelling but require different Ukrainian words. Idioms such as feeling blue and spilling the beans should preserve their intended meaning. A fast engine that translates these expressions literally can make a paragraph harder to understand. Evaluate complete passages as well as isolated labels.\n\nLong passages need enough space in the panel to remain readable. Set a maximum height and allow the text to scroll inside it. Preserve paragraph boundaries where possible, and keep the close button accessible while scrolling. Keyboard users should be able to move focus into the panel, copy the translation, and return to the original page without losing their place.\n\nFailures should leave the source selection intact. A temporary network error, an exhausted allowance, and an invalid key require different recovery actions. Show a concise message with the relevant action. A retry should use the same source text and target language. Avoid repeatedly retrying a rejected credential because another request will not fix the configuration.\n\nMeasurements should describe the environment in which they were collected. Browser version, hardware, network connection, input length, model identifier, and source-language settings can all affect the result. Keep the raw timings together with the actual translations so that a later run can be compared against the same inputs. A single unusually fast request does not establish the normal experience.\n\nThe first prototype can concentrate on selection, translation, language preference, and closing the panel. Additional actions should be added only when they remove a frequent obstacle. A small interface can still be dependable if it handles stale requests, keyboard focus, page boundaries, and clear errors. These details matter more to everyday speed than a long list of optional features.",
+      "characters": 4023,
+      "input_id": "large-1",
+      "size": "large",
+      "phase": "warm",
+      "round": 0
+    },
+    {
+      "started_at": "2026-10-02T21:31:41.118647+00:00",
+      "ok": true,
+      "first_text_ms": 1169.213,
+      "protocol": "HTTP/1.1",
+      "translation": "Ви можете вибрати іншу мову в меню. Ваш вибір буде збережено під час наступного запуску браузера.",
+      "reasoning_characters": 0,
+      "finish_reason": "stop",
+      "usage": {
+        "prompt_tokens": 47,
+        "completion_tokens": 45,
+        "total_tokens": 92,
+        "prompt_tokens_details": {
+          "cached_tokens": 0
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 0
+        }
+      },
+      "status": 200,
+      "headers_ms": 1169.137,
+      "returned_model": "mimo-v2.6-flash",
+      "connection_reused": true,
+      "milliseconds": 2219.128,
+      "variant": "go-mimo-v2.6-flash",
+      "text": "You can select a different language from the menu. Your choice will be remembered the next time you open the browser.",
+      "characters": 117,
+      "input_id": "sentence-1",
+      "size": "sentence",
+      "phase": "warm",
+      "round": 0
+    },
+    {
+      "started_at": "2026-10-02T21:31:43.341229+00:00",
+      "ok": true,
+      "first_text_ms": 1296.544,
+      "protocol": "HTTP/1.1",
+      "translation": "Ви можете вибрати іншу мову з меню. Ваш вибір буде збережено наступного разу, коли ви відкриєте браузер.",
+      "reasoning_characters": 0,
+      "finish_reason": "stop",
+      "usage": {
+        "prompt_tokens": 42,
+        "completion_tokens": 43,
+        "total_tokens": 85,
+        "prompt_tokens_details": {
+          "cached_tokens": 0
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 0
+        }
+      },
+      "status": 200,
+      "headers_ms": 1296.484,
+      "returned_model": "deepseek-v4.1-flash",
+      "connection_reused": true,
+      "milliseconds": 1488.404,
+      "variant": "go-deepseek-v4.1-flash",
+      "text": "You can select a different language from the menu. Your choice will be remembered the next time you open the browser.",
+      "characters": 117,
+      "input_id": "sentence-1",
+      "size": "sentence",
+      "phase": "warm",
+      "round": 0
+    },
+    {
+      "started_at": "2026-10-02T21:31:45.341634+00:00",
+      "ok": true,
+      "first_text_ms": 2182.071,
+      "protocol": "HTTP/1.1",
+      "translation": "Надійна панель перекладу починається з чіткого зв’язку між вибраним текстом і запитом, який його представляє. Браузер може генерувати кілька подій виділення, поки людина перетягує курсор через абзац. Надсилання запиту на кожну подію марнує час і змушує інтерфейс відчуватися нестабільним. Зачекайте, доки виділення завершиться, збережіть вихідний текст у пам’яті й надішліть запит, коли натиснуто кнопку перекладу.\n\nКористувач має побачити панель одразу після натискання. Її положення залежить від видимого прямокутника виділення та доступного простору навколо нього. Біля правого краю сторінки панель може потребувати переміщення вліво. Біля нижнього краю вона може потребувати відкриття над виділенням. Прокручування не повинно залишати панель плаваючою над не пов’язаним із нею вмістом. Ці коригування мають відбуватися локально й не затримувати запит перекладу.\n\nДруге виділення може бути зроблено до завершення першого перекладу. Надайте кожному запиту унікальний ідентифікатор і порівняйте його з поточним виділенням перед показом результату. Скасуйте запит, коли транспорт підтримує скасування. Якщо скасування недоступне, відкиньте застарілу відповідь. Важлива поведінка полягає в тому, що результат завжди належить тексту, який людина найнедавніше попросила перекласти.\n\nЗберігайте цільову мову після її зміни. Для людини, яка зазвичай перекладає українською, запам’ятована перевага прибирає зайву дію з кожного запиту. Вихідну мову може визначити постачальник у тому самому виклику перекладу. Дуже короткі слова іноді бувають неоднозначними, тому панель також може потребувати необов’язкового способу вибрати вихідну мову, коли автоматичне визначення дає неправильний результат.\n\nМережеві з’єднання створюють вимірювану різницю. Перший запит може включати пошук DNS, TCP-з’єднання та TLS-рукостискання, перш ніж служба отримає будь-який текст. Пізніші запити можуть повторно використовувати це з’єднання. Тестування продуктивності має показувати обидва випадки й фіксувати час до моменту, коли весь переклад стане доступним. Для потокової відповіді також фіксуйте, коли надходять перші перекладені символи.\n\nЯкість перекладу залежить від контексту. Берег річки та фінансова установа мають однакове англійське написання, але потребують різних українських слів. Ідіоми, як-от feeling blue і spilling the beans, мають зберігати своє передбачене значення. Швидкий рушій, який перекладає ці вирази буквально, може зробити абзац важчим для розуміння. Оцінюйте повні уривки, а також ізольовані позначки.\n\nДовгі уривки потребують достатньо місця в панелі, щоб залишатися читабельними. Установіть максимальну висоту й дозвольте тексту прокручуватися всередині неї. Зберігайте межі абзаців, де це можливо, і тримайте кнопку закриття доступною під час прокручування. Користувачі клавіатури мають мати змогу перемістити фокус у панель, скопіювати переклад і повернутися на початкову сторінку, не втративши своє місце.\n\nЗбої мають залишати вихідне виділення недоторканим. Тимчасова мережева помилка, вичерпаний ліміт і недійсний ключ потребують різних дій для відновлення. Покажіть стисле повідомлення з відповідною дією. Повторна спроба має використовувати той самий вихідний текст і цільову мову. Уникайте повторних спроб із відхиленими обліковими даними, бо ще один запит не виправить конфігурацію.\n\nВимірювання мають описувати середовище, у якому їх було зібрано. Версія браузера, апаратне забезпечення, мережеве з’єднання, довжина введення, ідентифікатор моделі та налаштування вихідної мови — усе це може впливати на результат. Зберігайте необроблені часові показники разом з фактичними перекладами, щоб пізніший запуск можна було порівняти з тими самими вхідними даними. Один надзвичайно швидкий запит не встановлює звичайний досвід.\n\nПерший прототип може зосередитися на виділенні, перекладі, мовній перевазі та закритті панелі. Додаткові дії слід додавати лише тоді, коли вони усувають часту перешкоду. Невеликий інтерфейс усе ще може бути надійним, якщо він обробляє застарілі запити, фокус клавіатури, межі сторінки та зрозумілі помилки. Ці деталі важливіші для повсякденної швидкості, ніж довгий список необов’язкових функцій.",
+      "reasoning_characters": 0,
+      "finish_reason": "stop",
+      "usage": {
+        "prompt_tokens": 729,
+        "completion_tokens": 1661,
+        "total_tokens": 2390,
+        "prompt_tokens_details": {
+          "cached_tokens": 256
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 0
+        }
+      },
+      "status": 200,
+      "headers_ms": 2174.133,
+      "returned_model": "deepseek-v4.1-flash",
+      "connection_reused": true,
+      "milliseconds": 11278.253,
+      "variant": "go-deepseek-v4.1-flash",
+      "text": "A reliable translation panel starts with a clear connection between the selected text and the request that represents it. The browser can generate several selection events while a person drags across a paragraph. Sending a request for every event wastes time and makes the interface feel unstable. Wait until the selection is complete, keep the source text in memory, and send the request when the translation button is clicked.\n\nThe user should see the panel immediately after clicking. Its position depends on the visible selection rectangle and the available space around it. Near the right edge of the page, the panel may need to move to the left. Near the bottom, it may need to open above the selection. Scrolling should not leave the panel floating over unrelated content. These adjustments should happen locally and should not delay the translation request.\n\nA second selection may be made before the first translation finishes. Give each request a unique identifier and compare it with the current selection before displaying the result. Cancel a request when the transport supports cancellation. If cancellation is unavailable, discard the stale response. The important behavior is that the result always belongs to the text the person most recently asked to translate.\n\nPersist the target language after it changes. For a person who normally translates into Ukrainian, a remembered preference removes an extra action from every request. The source language can be detected by the provider in the same translation call. Very short words are sometimes ambiguous, so the panel may also need an optional way to choose a source language when automatic detection produces the wrong result.\n\nNetwork connections make a measurable difference. The first request can include DNS lookup, a TCP connection, and a TLS handshake before the service receives any text. Later requests may reuse that connection. A benchmark should show both cases and should record the time until the entire translation is available. For a streamed response, also record when the first translated characters arrive.\n\nTranslation quality depends on context. A river bank and a financial bank share the same English spelling but require different Ukrainian words. Idioms such as feeling blue and spilling the beans should preserve their intended meaning. A fast engine that translates these expressions literally can make a paragraph harder to understand. Evaluate complete passages as well as isolated labels.\n\nLong passages need enough space in the panel to remain readable. Set a maximum height and allow the text to scroll inside it. Preserve paragraph boundaries where possible, and keep the close button accessible while scrolling. Keyboard users should be able to move focus into the panel, copy the translation, and return to the original page without losing their place.\n\nFailures should leave the source selection intact. A temporary network error, an exhausted allowance, and an invalid key require different recovery actions. Show a concise message with the relevant action. A retry should use the same source text and target language. Avoid repeatedly retrying a rejected credential because another request will not fix the configuration.\n\nMeasurements should describe the environment in which they were collected. Browser version, hardware, network connection, input length, model identifier, and source-language settings can all affect the result. Keep the raw timings together with the actual translations so that a later run can be compared against the same inputs. A single unusually fast request does not establish the normal experience.\n\nThe first prototype can concentrate on selection, translation, language preference, and closing the panel. Additional actions should be added only when they remove a frequent obstacle. A small interface can still be dependable if it handles stale requests, keyboard focus, page boundaries, and clear errors. These details matter more to everyday speed than a long list of optional features.",
+      "characters": 4023,
+      "input_id": "large-1",
+      "size": "large",
+      "phase": "warm",
+      "round": 0
+    },
+    {
+      "started_at": "2026-10-02T21:31:56.621320+00:00",
+      "ok": true,
+      "first_text_ms": 1346.497,
+      "protocol": "HTTP/1.1",
+      "translation": "Ви можете вибрати іншу мову з меню. Ваш вибір буде запам'ятовано наступного разу, коли ви відкриєте браузер.",
+      "reasoning_characters": 960,
+      "finish_reason": "stop",
+      "usage": {
+        "prompt_tokens": 121,
+        "completion_tokens": 312,
+        "total_tokens": 433,
+        "prompt_tokens_details": {}
+      },
+      "status": 200,
+      "headers_ms": 668.588,
+      "returned_model": "deepseek-v4-flash",
+      "connection_reused": true,
+      "milliseconds": 1396.28,
+      "variant": "go-deepseek-v4-flash",
+      "text": "You can select a different language from the menu. Your choice will be remembered the next time you open the browser.",
+      "characters": 117,
+      "input_id": "sentence-1",
+      "size": "sentence",
+      "phase": "warm",
+      "round": 0
+    },
+    {
+      "started_at": "2026-10-02T21:31:58.622152+00:00",
+      "ok": true,
+      "first_text_ms": 2902.357,
+      "protocol": "HTTP/1.1",
+      "translation": "банк",
+      "reasoning_characters": 0,
+      "finish_reason": "stop",
+      "usage": {
+        "prompt_tokens": 25,
+        "completion_tokens": 2,
+        "total_tokens": 27,
+        "prompt_tokens_details": {
+          "cached_tokens": 0
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 0
+        }
+      },
+      "status": 200,
+      "headers_ms": 2902.267,
+      "returned_model": "mimo-v2.6-flash",
+      "connection_reused": true,
+      "milliseconds": 2933.796,
+      "variant": "go-mimo-v2.6-flash",
+      "text": "bank",
+      "characters": 4,
+      "input_id": "word-1",
+      "size": "word",
+      "phase": "warm",
+      "round": 0
+    },
+    {
+      "started_at": "2026-10-02T21:32:01.557458+00:00",
+      "ok": true,
+      "first_text_ms": 1290.61,
+      "protocol": "HTTP/1.1",
+      "translation": "Коли ви виділяєте текст на веб-сторінці, поруч із ним з'являється невелика кнопка перекладу. Натисніть кнопку, щоб відкрити панель із перекладом. Ви можете змінити цільову мову в цій панелі, і браузер запам'ятає ваш вибір для наступної сесії. Натисніть Escape або натисніть за межами панелі, щоб її закрити. Виділений текст має залишатися підсвіченим, щоб ви могли порівняти оригінал із перекладом. Якщо запит не вдасться, панель має пояснити, що сталося, і запропонувати повторити спробу, не втративши ваше виділення.",
+      "reasoning_characters": 0,
+      "finish_reason": "stop",
+      "usage": {
+        "prompt_tokens": 123,
+        "completion_tokens": 260,
+        "total_tokens": 383,
+        "prompt_tokens_details": {
+          "cached_tokens": 64
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 0
+        }
+      },
+      "status": 200,
+      "headers_ms": 1290.535,
+      "returned_model": "mimo-v2.6-flash",
+      "connection_reused": true,
+      "milliseconds": 5378.438,
+      "variant": "go-mimo-v2.6-flash",
+      "text": "When you select text on a web page, a small translation button appears beside it. Click the button to open a panel with the translation. You can change the target language in that panel, and the browser will remember your choice for the next session. Press Escape or click outside the panel to close it. The selected text should remain highlighted so that you can compare the original with the translated version. If the request fails, the panel should explain what happened and offer a retry without losing your selection.",
+      "characters": 523,
+      "input_id": "paragraph-1",
+      "size": "paragraph",
+      "phase": "warm",
+      "round": 0
+    },
+    {
+      "started_at": "2026-10-02T21:32:06.937130+00:00",
+      "ok": true,
+      "first_text_ms": 36086.554,
+      "protocol": "HTTP/1.1",
+      "translation": "Надійна панель перекладу починається з чіткого зв'язку між вибраним текстом і запитом, який його представляє. Браузер може генерувати кілька подій вибору, коли людина перетягує курсор через абзац. Надсилання запиту на кожну подію витрачає час і робить інтерфейс нестабільним. Зачекайте, поки вибір буде завершено, зберігайте вихідний текст у пам'яті та надсилайте запит, коли натиснуто кнопку перекладу.\n\nКористувач має бачити панель одразу після натискання. Її позиція залежить від видимого прямокутника вибору та доступного простору навколо нього. Біля правого краю сторінки панель може потребувати зсуву вліво. Біля нижнього краю вона може відкриватися над вибором. Прокручування не повинно залишати панель плаваючою над незв'язаним вмістом. Ці коригування мають відбуватися локально і не затримувати запит на переклад.\n\nДругий вибір може бути зроблений до завершення першого перекладу. Надайте кожному запиту унікальний ідентифікатор і порівнюйте його з поточним вибором перед відображенням результату. Скасовуйте запит, якщо транспорт підтримує скасування. Якщо скасування недоступне, відкидайте застарілу відповідь. Важлива поведінка полягає в тому, що результат завжди належить тексту, який людина найостанніше попросила перекласти.\n\nЗберігайте цільову мову після її зміни. Для людини, яка зазвичай перекладає українською, запам'ятоване вподобання усуває зайву дію з кожного запиту. Мову джерела може визначати постачальник у тому самому виклику перекладу. Дуже короткі слова іноді неоднозначні, тому панель також може потребувати додаткової можливості вибору мови джерела, коли автоматичне визначення дає неправильний результат.\n\nМережеві з'єднання мають вимірюваний вплив. Перший запит може включати пошук DNS, TCP-з'єднання та рукостискання TLS, перш ніж служба отримає будь-який текст. Пізніші запити можуть повторно використовувати це з'єднання. Бенчмарк має показувати обидва випадки та фіксувати час до моменту, коли весь переклад стає доступним. Для потокової відповіді також фіксуйте, коли надходять перші перекладені символи.\n\nЯкість перекладу залежить від контексту. Річковий берег і фінансовий банк мають однакове англійське написання, але потребують різних українських слів. Ідіоми, як-от feeling blue і spilling the beans, мають зберігати своє передбачуване значення. Швидкий рушій, який перекладає ці вирази буквально, може ускладнити розуміння абзацу. Оцінюйте повні уривки, а також окремі мітки.\n\nДовгі уривки потребують достатньо місця на панелі, щоб залишатися читабельними. Встановіть максимальну висоту та дозвольте тексту прокручуватися всередині неї. Зберігайте межі абзаців, де це можливо, і тримайте кнопку закриття доступною під час прокручування. Користувачі клавіатури повинні мати змогу перемістити фокус на панель, скопіювати переклад і повернутися на вихідну сторінку, не втрачаючи свого місця.\n\nЗбої мають залишати вихідний вибір недоторканим. Тимчасова мережева помилка, вичерпана квота та недійсний ключ потребують різних дій для відновлення. Покажіть стисле повідомлення з відповідною дією. Повторна спроба має використовувати той самий вихідний текст і цільову мову. Уникайте повторних спроб із відхиленими обліковими даними, оскільки ще один запит не виправить конфігурацію.\n\nВимірювання мають описувати середовище, у якому вони були зібрані. Версія браузера, апаратне забезпечення, мережеве з'єднання, довжина вхідного тексту, ідентифікатор моделі та налаштування мови джерела можуть впливати на результат. Зберігайте сирі показники часу разом із фактичними перекладами, щоб пізніший запуск можна було порівняти з тими самими вхідними даними. Один незвично швидкий запит не визначає звичайний досвід.\n\nПерший прототип може зосередитися на виборі, перекладі, налаштуванні мови та закритті панелі. Додаткові дії слід додавати лише тоді, коли вони усувають часті перешкоди. Невеликий інтерфейс усе ще може бути надійним, якщо він обробляє застарілі запити, фокус клавіатури, межі сторінки та чіткі помилки. Ці деталі важливіші для щоденної швидкості, ніж довгий список додаткових функцій.",
+      "reasoning_characters": 20897,
+      "finish_reason": "stop",
+      "usage": {
+        "prompt_tokens": 808,
+        "completion_tokens": 7834,
+        "total_tokens": 8642,
+        "prompt_tokens_details": {
+          "cached_tokens": 768
+        }
+      },
+      "status": 200,
+      "headers_ms": 509.295,
+      "returned_model": "deepseek-v4-flash",
+      "connection_reused": true,
+      "milliseconds": 38947.644,
+      "variant": "go-deepseek-v4-flash",
+      "text": "A reliable translation panel starts with a clear connection between the selected text and the request that represents it. The browser can generate several selection events while a person drags across a paragraph. Sending a request for every event wastes time and makes the interface feel unstable. Wait until the selection is complete, keep the source text in memory, and send the request when the translation button is clicked.\n\nThe user should see the panel immediately after clicking. Its position depends on the visible selection rectangle and the available space around it. Near the right edge of the page, the panel may need to move to the left. Near the bottom, it may need to open above the selection. Scrolling should not leave the panel floating over unrelated content. These adjustments should happen locally and should not delay the translation request.\n\nA second selection may be made before the first translation finishes. Give each request a unique identifier and compare it with the current selection before displaying the result. Cancel a request when the transport supports cancellation. If cancellation is unavailable, discard the stale response. The important behavior is that the result always belongs to the text the person most recently asked to translate.\n\nPersist the target language after it changes. For a person who normally translates into Ukrainian, a remembered preference removes an extra action from every request. The source language can be detected by the provider in the same translation call. Very short words are sometimes ambiguous, so the panel may also need an optional way to choose a source language when automatic detection produces the wrong result.\n\nNetwork connections make a measurable difference. The first request can include DNS lookup, a TCP connection, and a TLS handshake before the service receives any text. Later requests may reuse that connection. A benchmark should show both cases and should record the time until the entire translation is available. For a streamed response, also record when the first translated characters arrive.\n\nTranslation quality depends on context. A river bank and a financial bank share the same English spelling but require different Ukrainian words. Idioms such as feeling blue and spilling the beans should preserve their intended meaning. A fast engine that translates these expressions literally can make a paragraph harder to understand. Evaluate complete passages as well as isolated labels.\n\nLong passages need enough space in the panel to remain readable. Set a maximum height and allow the text to scroll inside it. Preserve paragraph boundaries where possible, and keep the close button accessible while scrolling. Keyboard users should be able to move focus into the panel, copy the translation, and return to the original page without losing their place.\n\nFailures should leave the source selection intact. A temporary network error, an exhausted allowance, and an invalid key require different recovery actions. Show a concise message with the relevant action. A retry should use the same source text and target language. Avoid repeatedly retrying a rejected credential because another request will not fix the configuration.\n\nMeasurements should describe the environment in which they were collected. Browser version, hardware, network connection, input length, model identifier, and source-language settings can all affect the result. Keep the raw timings together with the actual translations so that a later run can be compared against the same inputs. A single unusually fast request does not establish the normal experience.\n\nThe first prototype can concentrate on selection, translation, language preference, and closing the panel. Additional actions should be added only when they remove a frequent obstacle. A small interface can still be dependable if it handles stale requests, keyboard focus, page boundaries, and clear errors. These details matter more to everyday speed than a long list of optional features.",
+      "characters": 4023,
+      "input_id": "large-1",
+      "size": "large",
+      "phase": "warm",
+      "round": 1
+    },
+    {
+      "started_at": "2026-10-02T21:32:45.887668+00:00",
+      "ok": true,
+      "first_text_ms": 1320.619,
+      "protocol": "HTTP/1.1",
+      "translation": "Ви можете вибрати іншу мову з меню. Ваш вибір буде запам'ятано наступного разу, коли ви відкриєте браузер.",
+      "reasoning_characters": 0,
+      "finish_reason": "stop",
+      "usage": {
+        "prompt_tokens": 42,
+        "completion_tokens": 45,
+        "total_tokens": 87,
+        "prompt_tokens_details": {
+          "cached_tokens": 0
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 0
+        }
+      },
+      "status": 200,
+      "headers_ms": 1313.338,
+      "returned_model": "deepseek-v4.1-flash",
+      "connection_reused": true,
+      "milliseconds": 1595.193,
+      "variant": "go-deepseek-v4.1-flash",
+      "text": "You can select a different language from the menu. Your choice will be remembered the next time you open the browser.",
+      "characters": 117,
+      "input_id": "sentence-1",
+      "size": "sentence",
+      "phase": "warm",
+      "round": 1
+    },
+    {
+      "started_at": "2026-10-02T21:32:47.889447+00:00",
+      "ok": true,
+      "first_text_ms": 9241.198,
+      "protocol": "HTTP/1.1",
+      "translation": "Надійна панель перекладу починається з чіткого зв'язку між виділеним текстом і запитом, який його представляє. Браузер може генерувати кілька подій виділення, коли людина перетягує курсор через абзац. Надсилання запиту для кожної події витрачає час і робить інтерфейс нестабільним. Зачекайте, поки виділення буде завершено, зберігайте вихідний текст у пам'яті та надсилайте запит, коли натиснуто кнопку перекладу.\n\nКористувач має бачити панель одразу після натискання. Її позиція залежить від видимого прямокутника виділення та доступного простору навколо нього. Біля правого краю сторінки панель може потребувати зсуву вліво. Біля нижнього краю вона може відкриватися над виділенням. Прокручування не повинно залишати панель плаваючою над невідповідним вмістом. Ці коригування мають відбуватися локально і не затримувати запит на переклад.\n\nДруге виділення може бути зроблене до завершення першого перекладу. Надайте кожному запиту унікальний ідентифікатор і порівнюйте його з поточним виділенням перед відображенням результату. Скасовуйте запит, якщо транспорт підтримує скасування. Якщо скасування недоступне, відкидайте застарілу відповідь. Важлива поведінка полягає в тому, що результат завжди належить тексту, який людина найостанніше попросила перекласти.\n\nЗберігайте цільову мову після її зміни. Для людини, яка зазвичай перекладає українською, запам'ятована настройка прибирає зайву дію з кожного запиту. Мову джерела може визначати постачальник у тому самому виклику перекладу. Дуже короткі слова іноді є неоднозначними, тому панель також може потребувати додаткової можливості вибору мови джерела, коли автоматичне визначення дає неправильний результат.",
+      "reasoning_characters": 12602,
+      "finish_reason": "stop",
+      "usage": {
+        "prompt_tokens": 398,
+        "completion_tokens": 4593,
+        "total_tokens": 4991,
+        "prompt_tokens_details": {
+          "cached_tokens": 256
+        }
+      },
+      "status": 200,
+      "headers_ms": 780.695,
+      "returned_model": "deepseek-v4-flash",
+      "connection_reused": true,
+      "milliseconds": 10515.15,
+      "variant": "go-deepseek-v4-flash",
+      "text": "A reliable translation panel starts with a clear connection between the selected text and the request that represents it. The browser can generate several selection events while a person drags across a paragraph. Sending a request for every event wastes time and makes the interface feel unstable. Wait until the selection is complete, keep the source text in memory, and send the request when the translation button is clicked.\n\nThe user should see the panel immediately after clicking. Its position depends on the visible selection rectangle and the available space around it. Near the right edge of the page, the panel may need to move to the left. Near the bottom, it may need to open above the selection. Scrolling should not leave the panel floating over unrelated content. These adjustments should happen locally and should not delay the translation request.\n\nA second selection may be made before the first translation finishes. Give each request a unique identifier and compare it with the current selection before displaying the result. Cancel a request when the transport supports cancellation. If cancellation is unavailable, discard the stale response. The important behavior is that the result always belongs to the text the person most recently asked to translate.\n\nPersist the target language after it changes. For a person who normally translates into Ukrainian, a remembered preference removes an extra action from every request. The source language can be detected by the provider in the same translation call. Very short words are sometimes ambiguous, so the panel may also need an optional way to choose a source language when automatic detection produces the wrong result.",
+      "characters": 1694,
+      "input_id": "long-1",
+      "size": "long",
+      "phase": "warm",
+      "round": 1
+    },
+    {
+      "started_at": "2026-10-02T21:32:58.406129+00:00",
+      "ok": true,
+      "first_text_ms": 1296.339,
+      "protocol": "HTTP/1.1",
+      "translation": "Ви можете обрати іншу мову з меню. Ваш вибір буде запам'ятовано наступного разу, коли ви відкриєте браузер.",
+      "reasoning_characters": 1118,
+      "finish_reason": "stop",
+      "usage": {
+        "prompt_tokens": 121,
+        "completion_tokens": 350,
+        "total_tokens": 471,
+        "prompt_tokens_details": {}
+      },
+      "status": 200,
+      "headers_ms": 562.551,
+      "returned_model": "deepseek-v4-flash",
+      "connection_reused": true,
+      "milliseconds": 1406.263,
+      "variant": "go-deepseek-v4-flash",
+      "text": "You can select a different language from the menu. Your choice will be remembered the next time you open the browser.",
+      "characters": 117,
+      "input_id": "sentence-1",
+      "size": "sentence",
+      "phase": "warm",
+      "round": 1
+    },
+    {
+      "started_at": "2026-10-02T21:33:00.411158+00:00",
+      "ok": true,
+      "first_text_ms": 1090.165,
+      "protocol": "HTTP/1.1",
+      "translation": "Коли ви виділяєте текст на вебсторінці, поруч із ним з'являється невелика кнопка перекладу. Натисніть цю кнопку, щоб відкрити панель із перекладом. Ви можете змінити цільову мову на цій панелі, і браузер запам'ятає ваш вибір для наступного сеансу. Натисніть Escape або клацніть поза панеллю, щоб закрити її. Виділений текст має залишатися підсвіченим, щоб ви могли порівняти оригінал із перекладеною версією. Якщо запит не вдасться, панель має пояснити, що сталося, і запропонувати повторити спробу, не втрачаючи вашого виділення.",
+      "reasoning_characters": 0,
+      "finish_reason": "stop",
+      "usage": {
+        "prompt_tokens": 119,
+        "completion_tokens": 224,
+        "total_tokens": 343,
+        "prompt_tokens_details": {
+          "cached_tokens": 0
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 0
+        }
+      },
+      "status": 200,
+      "headers_ms": 1090.078,
+      "returned_model": "deepseek-v4.1-flash",
+      "connection_reused": true,
+      "milliseconds": 2309.419,
+      "variant": "go-deepseek-v4.1-flash",
+      "text": "When you select text on a web page, a small translation button appears beside it. Click the button to open a panel with the translation. You can change the target language in that panel, and the browser will remember your choice for the next session. Press Escape or click outside the panel to close it. The selected text should remain highlighted so that you can compare the original with the translated version. If the request fails, the panel should explain what happened and offer a retry without losing your selection.",
+      "characters": 523,
+      "input_id": "paragraph-1",
+      "size": "paragraph",
+      "phase": "warm",
+      "round": 1
+    },
+    {
+      "started_at": "2026-10-02T21:33:02.721937+00:00",
+      "ok": true,
+      "first_text_ms": 1337.046,
+      "protocol": "HTTP/1.1",
+      "translation": "Відкрийте налаштування.",
+      "reasoning_characters": 0,
+      "finish_reason": "stop",
+      "usage": {
+        "prompt_tokens": 28,
+        "completion_tokens": 13,
+        "total_tokens": 41,
+        "prompt_tokens_details": {
+          "cached_tokens": 0
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 0
+        }
+      },
+      "status": 200,
+      "headers_ms": 1336.976,
+      "returned_model": "mimo-v2.6-flash",
+      "connection_reused": true,
+      "milliseconds": 1652.595,
+      "variant": "go-mimo-v2.6-flash",
+      "text": "Open the settings.",
+      "characters": 18,
+      "input_id": "short-1",
+      "size": "short",
+      "phase": "warm",
+      "round": 1
+    },
+    {
+      "started_at": "2026-10-02T21:33:04.726750+00:00",
+      "ok": true,
+      "first_text_ms": 1324.219,
+      "protocol": "HTTP/1.1",
+      "translation": "банк",
+      "reasoning_characters": 0,
+      "finish_reason": "stop",
+      "usage": {
+        "prompt_tokens": 20,
+        "completion_tokens": 2,
+        "total_tokens": 22,
+        "prompt_tokens_details": {
+          "audio_tokens": 0,
+          "cached_tokens": 0,
+          "cache_creation_input_tokens": 0,
+          "cache_write_tokens": 0
+        },
+        "completion_tokens_details": {
+          "accepted_prediction_tokens": 0,
+          "audio_tokens": 0,
+          "reasoning_tokens": 0,
+          "rejected_prediction_tokens": 0
+        }
+      },
+      "status": 200,
+      "headers_ms": 1274.258,
+      "returned_model": "deepseek-v4.1-flash",
+      "connection_reused": true,
+      "milliseconds": 1325.825,
+      "variant": "go-deepseek-v4.1-flash",
+      "text": "bank",
+      "characters": 4,
+      "input_id": "word-1",
+      "size": "word",
+      "phase": "warm",
+      "round": 1
+    },
+    {
+      "started_at": "2026-10-02T21:33:06.731430+00:00",
+      "ok": true,
+      "first_text_ms": 6649.447,
+      "protocol": "HTTP/1.1",
+      "translation": "Надійна панель перекладу починається з чіткого зв'язку між виділеним текстом і запитом, який його представляє. Браузер може згенерувати кілька подій виділення, поки людина перетягує курсор через абзац. Надсилання запиту на кожну подію витрачає час і робить інтерфейс нестабільним. Дочекайтеся завершення виділення, збережіть вихідний текст у пам'яті та надішліть запит після натискання кнопки перекладу.\n\nКористувач повинен бачити панель одразу після натискання. Її положення залежить від видимого прямокутника виділення та доступного простору навколо нього. Біля правого краю сторінки панель може знадобитися перемістити вліво. Біля нижнього краю вона може відкритися над виділенням. Прокручування не повинно залишати панель, що плаває над непов'язаним вмістом. Ці коригування слід виконувати локально, і вони не повинні затримувати запит на переклад.\n\nПеред завершенням першого перекладу може бути зроблено друге виділення. Присвойте кожному запиту унікальний ідентифікатор і порівнюйте його з поточним виділенням перед відображенням результату. Скасуйте запит, якщо транспортний протокол підтримує скасування. Якщо скасування недоступне, відкиньте застарілу відповідь. Важливо, щоб результат завжди належав тексту, який людина нещодавно просила перекласти.\n\nЗберігайте мову призначення після її зміни. Для людини, яка зазвичай перекладає українською, запам'ятована налаштування прибирає зайву дію з кожного запиту. Вихідну мову може визначити провайдер у тому ж виклику перекладу. Дуже короткі слова іноді є неоднозначними, тому панелі може знадобитися необов'язковий спосіб вибору вихідної мови, коли автоматичне визначення дає неправильний результат.\n\nМережеві з'єднання мають вимірюваний вплив. Перший запит може включати пошук DNS, з'єднання TCP та рукопотискування TLS, перш ніж служба отримає будь-який текст. Наступні запити можуть повторно використовувати це з'єднання. Бенчмарк повинен показувати обидва випадки та записувати час до того, як весь переклад стає доступним. Для потокової відповіді також записуйте, коли приходять перші перекладені символи.\n\nЯкість перекладу залежить від контексту. Річковий берег і фінансовий банк мають однакове англійське написання, але вимагають різних українських слів. Ідіоми, такі як «feeling blue» (бути в поганому настрої) та «spilling the beans» (розкрити таємницю), повинні зберігати їхній задуманий зміст. Швидкий движок, який перекладає ці вирази дослівно, може зробити абзац важче зрозумілим. Оцінюйте як повні уривки, так і окремі підписи.\n\nДовгі уривки потребують достатньо місця в панелі, щоб залишатися читабельними. Встановіть максимальну висоту та дозвольте тексту прокручуватися всередині. Зберігайте межі абзаців, де це можливо, і тримайте кнопку закриття доступною під час прокручування. Користувачі клавіатури повинні мати можливість перемістити фокус у панель, скопіювати переклад і повернутися до оригінальної сторінки, не втративши своє місце.\n\nПомилки повинні залишати вихідне виділення недоторканим. Тимчасова мережева помилка, вичерпаний ліміт та недійсний ключ вимагають різних дій для відновлення. Показуйте стисле повідомлення з відповідною дією. Повторна спроба повинна використовувати той самий вихідний текст та мову призначення. Уникайте повторних спроб з відхиленими обліковими даними, оскільки інший запит не виправить конфігурацію.\n\nВимірювання повинні описувати середовище, в якому вони були зібрані. Версія браузера, апаратне забезпечення, мережеве з'єднання, довжина введення, ідентифікатор моделі та налаштування вихідної мови можуть впливати на результат. Зберігайте сирі таймінги разом із фактичними перекладами, щоб пізніший запуск можна було порівняти з тими самими вхідними даними. Один незвично швидкий запит не встановлює нормальний досвід.\n\nПерший прототип може зосередитися на виділенні, перекладі, мовних налаштуваннях та закритті панелі. Додаткові дії слід додавати лише тоді, коли вони усувають часту перешкоду. Маленький інтерфейс все ще може бути надійним, якщо він обробляє застарілі запити, фокус клавіатури, межі сторінки та зрозумілі помилки. Ці деталі важливіші для щоденної швидкості, ніж довгий список необов'язкових функцій.",
+      "reasoning_characters": 0,
+      "finish_reason": "stop",
+      "usage": {
+        "prompt_tokens": 727,
+        "completion_tokens": 1940,
+        "total_tokens": 2667,
+        "prompt_tokens_details": {
+          "cached_tokens": 0
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 0
+        }
+      },
+      "status": 200,
+      "headers_ms": 5715.602,
+      "returned_model": "mimo-v2.6-flash",
+      "connection_reused": true,
+      "milliseconds": 65879.414,
+      "variant": "go-mimo-v2.6-flash",
+      "text": "A reliable translation panel starts with a clear connection between the selected text and the request that represents it. The browser can generate several selection events while a person drags across a paragraph. Sending a request for every event wastes time and makes the interface feel unstable. Wait until the selection is complete, keep the source text in memory, and send the request when the translation button is clicked.\n\nThe user should see the panel immediately after clicking. Its position depends on the visible selection rectangle and the available space around it. Near the right edge of the page, the panel may need to move to the left. Near the bottom, it may need to open above the selection. Scrolling should not leave the panel floating over unrelated content. These adjustments should happen locally and should not delay the translation request.\n\nA second selection may be made before the first translation finishes. Give each request a unique identifier and compare it with the current selection before displaying the result. Cancel a request when the transport supports cancellation. If cancellation is unavailable, discard the stale response. The important behavior is that the result always belongs to the text the person most recently asked to translate.\n\nPersist the target language after it changes. For a person who normally translates into Ukrainian, a remembered preference removes an extra action from every request. The source language can be detected by the provider in the same translation call. Very short words are sometimes ambiguous, so the panel may also need an optional way to choose a source language when automatic detection produces the wrong result.\n\nNetwork connections make a measurable difference. The first request can include DNS lookup, a TCP connection, and a TLS handshake before the service receives any text. Later requests may reuse that connection. A benchmark should show both cases and should record the time until the entire translation is available. For a streamed response, also record when the first translated characters arrive.\n\nTranslation quality depends on context. A river bank and a financial bank share the same English spelling but require different Ukrainian words. Idioms such as feeling blue and spilling the beans should preserve their intended meaning. A fast engine that translates these expressions literally can make a paragraph harder to understand. Evaluate complete passages as well as isolated labels.\n\nLong passages need enough space in the panel to remain readable. Set a maximum height and allow the text to scroll inside it. Preserve paragraph boundaries where possible, and keep the close button accessible while scrolling. Keyboard users should be able to move focus into the panel, copy the translation, and return to the original page without losing their place.\n\nFailures should leave the source selection intact. A temporary network error, an exhausted allowance, and an invalid key require different recovery actions. Show a concise message with the relevant action. A retry should use the same source text and target language. Avoid repeatedly retrying a rejected credential because another request will not fix the configuration.\n\nMeasurements should describe the environment in which they were collected. Browser version, hardware, network connection, input length, model identifier, and source-language settings can all affect the result. Keep the raw timings together with the actual translations so that a later run can be compared against the same inputs. A single unusually fast request does not establish the normal experience.\n\nThe first prototype can concentrate on selection, translation, language preference, and closing the panel. Additional actions should be added only when they remove a frequent obstacle. A small interface can still be dependable if it handles stale requests, keyboard focus, page boundaries, and clear errors. These details matter more to everyday speed than a long list of optional features.",
+      "characters": 4023,
+      "input_id": "large-1",
+      "size": "large",
+      "phase": "warm",
+      "round": 1
+    },
+    {
+      "started_at": "2026-10-02T21:34:12.612020+00:00",
+      "ok": true,
+      "first_text_ms": 1391.348,
+      "protocol": "HTTP/1.1",
+      "translation": "Надійна панель перекладу починається з чіткого зв’язку між вибраним текстом і запитом, який його представляє. Браузер може генерувати кілька подій виділення, поки людина перетягує курсор через абзац. Надсилання запиту на кожну подію марнує час і робить інтерфейс нестабільним. Зачекайте, поки виділення завершиться, збережіть вихідний текст у пам’яті й надішліть запит, коли натиснуто кнопку перекладу.\n\nКористувач має побачити панель одразу після натискання. Її положення залежить від видимого прямокутника виділення та доступного простору навколо нього. Біля правого краю сторінки панель може потребувати переміщення вліво. Біля нижнього краю їй може знадобитися відкритися над виділенням. Прокручування не повинно залишати панель плаваючою над не пов’язаним вмістом. Ці коригування мають відбуватися локально й не затримувати запит перекладу.\n\nДруге виділення може бути зроблено до завершення першого перекладу. Надайте кожному запиту унікальний ідентифікатор і порівняйте його з поточним виділенням перед показом результату. Скасуйте запит, коли транспорт підтримує скасування. Якщо скасування недоступне, відкиньте застарілу відповідь. Важлива поведінка полягає в тому, що результат завжди належить тексту, який людина найнедавніше попросила перекласти.\n\nЗберігайте цільову мову після її зміни. Для людини, яка зазвичай перекладає українською, запам’ятоване налаштування прибирає зайву дію з кожного запиту. Вихідну мову може визначити постачальник у тому самому виклику перекладу. Дуже короткі слова іноді бувають неоднозначними, тому панель також може потребувати необов’язкового способу вибрати вихідну мову, коли автоматичне визначення дає неправильний результат.",
+      "reasoning_characters": 0,
+      "finish_reason": "stop",
+      "usage": {
+        "prompt_tokens": 319,
+        "completion_tokens": 648,
+        "total_tokens": 967,
+        "prompt_tokens_details": {
+          "cached_tokens": 256
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 0
+        }
+      },
+      "status": 200,
+      "headers_ms": 1379.549,
+      "returned_model": "deepseek-v4.1-flash",
+      "connection_reused": true,
+      "milliseconds": 4867.203,
+      "variant": "go-deepseek-v4.1-flash",
+      "text": "A reliable translation panel starts with a clear connection between the selected text and the request that represents it. The browser can generate several selection events while a person drags across a paragraph. Sending a request for every event wastes time and makes the interface feel unstable. Wait until the selection is complete, keep the source text in memory, and send the request when the translation button is clicked.\n\nThe user should see the panel immediately after clicking. Its position depends on the visible selection rectangle and the available space around it. Near the right edge of the page, the panel may need to move to the left. Near the bottom, it may need to open above the selection. Scrolling should not leave the panel floating over unrelated content. These adjustments should happen locally and should not delay the translation request.\n\nA second selection may be made before the first translation finishes. Give each request a unique identifier and compare it with the current selection before displaying the result. Cancel a request when the transport supports cancellation. If cancellation is unavailable, discard the stale response. The important behavior is that the result always belongs to the text the person most recently asked to translate.\n\nPersist the target language after it changes. For a person who normally translates into Ukrainian, a remembered preference removes an extra action from every request. The source language can be detected by the provider in the same translation call. Very short words are sometimes ambiguous, so the panel may also need an optional way to choose a source language when automatic detection produces the wrong result.",
+      "characters": 1694,
+      "input_id": "long-1",
+      "size": "long",
+      "phase": "warm",
+      "round": 1
+    },
+    {
+      "started_at": "2026-10-02T21:34:17.480638+00:00",
+      "ok": true,
+      "first_text_ms": 1628.914,
+      "protocol": "HTTP/1.1",
+      "translation": "Ви можете вибрати іншу мову в меню. Ваш вибір буде збережено під час наступного запуску браузера.",
+      "reasoning_characters": 0,
+      "finish_reason": "stop",
+      "usage": {
+        "prompt_tokens": 47,
+        "completion_tokens": 45,
+        "total_tokens": 92,
+        "prompt_tokens_details": {
+          "cached_tokens": 0
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 0
+        }
+      },
+      "status": 200,
+      "headers_ms": 1622.92,
+      "returned_model": "mimo-v2.6-flash",
+      "connection_reused": true,
+      "milliseconds": 2204.752,
+      "variant": "go-mimo-v2.6-flash",
+      "text": "You can select a different language from the menu. Your choice will be remembered the next time you open the browser.",
+      "characters": 117,
+      "input_id": "sentence-1",
+      "size": "sentence",
+      "phase": "warm",
+      "round": 1
+    },
+    {
+      "started_at": "2026-10-02T21:34:19.687535+00:00",
+      "ok": true,
+      "first_text_ms": 2088.622,
+      "protocol": "HTTP/1.1",
+      "translation": "банк",
+      "reasoning_characters": 0,
+      "finish_reason": "stop",
+      "usage": {
+        "prompt_tokens": 25,
+        "completion_tokens": 2,
+        "total_tokens": 27,
+        "prompt_tokens_details": {
+          "cached_tokens": 0
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 0
+        }
+      },
+      "status": 200,
+      "headers_ms": 2088.545,
+      "returned_model": "mimo-v2.6-flash",
+      "connection_reused": true,
+      "milliseconds": 2201.745,
+      "variant": "go-mimo-v2.6-flash",
+      "text": "bank",
+      "characters": 4,
+      "input_id": "word-1",
+      "size": "word",
+      "phase": "warm",
+      "round": 1
+    },
+    {
+      "started_at": "2026-10-02T21:34:21.890835+00:00",
+      "ok": true,
+      "first_text_ms": 2105.687,
+      "protocol": "HTTP/1.1",
+      "translation": "Надійна панель перекладу починається з чіткого зв'язку між виділеним текстом і запитом, який його представляє. Браузер може згенерувати кілька подій виділення, коли людина перетягує курсор через абзац. Надсилання запиту на кожну подію витрачає час і робить інтерфейс нестабільним. Дочекайтеся завершення виділення, збережіть вихідний текст у пам'яті та надішліть запит після натискання кнопки перекладу.\n\nКористувач повинен бачити панель одразу після натискання. Її положення залежить від видимого прямокутника виділення та доступного простору навколо нього. Біля правого краю сторінки панель може знадобитися перемістити вліво. Біля нижнього краю вона може відкритися над виділенням. Прокручування не повинно залишати панель, що плаває над непов'язаним вмістом. Ці коригування слід виконувати локально, і вони не повинні затримувати запит на переклад.\n\nПеред завершенням першого перекладу може бути зроблено друге виділення. Присвойте кожному запиту унікальний ідентифікатор і порівнюйте його з поточним виділенням перед відображенням результату. Скасуйте запит, якщо транспортний рівень підтримує скасування. Якщо скасування недоступне, відкиньте застарілу відповідь. Важливо, щоб результат завжди належав тексту, який людина нещодавно просила перекласти.\n\nЗберігайте цільову мову після її зміни. Для людини, яка зазвичай перекладає українською, збережена налаштованість прибирає зайву дію з кожного запиту. Вихідну мову може визначити провайдер у тому ж виклику перекладу. Дуже короткі слова іноді є неоднозначними, тому панелі може знадобитися додатковий спосіб вибору вихідної мови, якщо автоматичне визначення дає неправильний результат.",
+      "reasoning_characters": 0,
+      "finish_reason": "stop",
+      "usage": {
+        "prompt_tokens": 322,
+        "completion_tokens": 758,
+        "total_tokens": 1080,
+        "prompt_tokens_details": {
+          "cached_tokens": 0
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 0
+        }
+      },
+      "status": 200,
+      "headers_ms": 2105.59,
+      "returned_model": "mimo-v2.6-flash",
+      "connection_reused": true,
+      "milliseconds": 14202.485,
+      "variant": "go-mimo-v2.6-flash",
+      "text": "A reliable translation panel starts with a clear connection between the selected text and the request that represents it. The browser can generate several selection events while a person drags across a paragraph. Sending a request for every event wastes time and makes the interface feel unstable. Wait until the selection is complete, keep the source text in memory, and send the request when the translation button is clicked.\n\nThe user should see the panel immediately after clicking. Its position depends on the visible selection rectangle and the available space around it. Near the right edge of the page, the panel may need to move to the left. Near the bottom, it may need to open above the selection. Scrolling should not leave the panel floating over unrelated content. These adjustments should happen locally and should not delay the translation request.\n\nA second selection may be made before the first translation finishes. Give each request a unique identifier and compare it with the current selection before displaying the result. Cancel a request when the transport supports cancellation. If cancellation is unavailable, discard the stale response. The important behavior is that the result always belongs to the text the person most recently asked to translate.\n\nPersist the target language after it changes. For a person who normally translates into Ukrainian, a remembered preference removes an extra action from every request. The source language can be detected by the provider in the same translation call. Very short words are sometimes ambiguous, so the panel may also need an optional way to choose a source language when automatic detection produces the wrong result.",
+      "characters": 1694,
+      "input_id": "long-1",
+      "size": "long",
+      "phase": "warm",
+      "round": 1
+    },
+    {
+      "started_at": "2026-10-02T21:34:36.094567+00:00",
+      "ok": true,
+      "first_text_ms": 3590.693,
+      "protocol": "HTTP/1.1",
+      "translation": "Коли ви виділяєте текст на веб-сторінці, поруч з ним з'являється невелика кнопка перекладу. Натисніть кнопку, щоб відкрити панель із перекладом. Ви можете змінити цільову мову на цій панелі, і браузер запам'ятає ваш вибір до наступного сеансу. Натисніть Escape або клацніть поза панеллю, щоб закрити її. Виділений текст має залишатися підсвіченим, щоб ви могли порівняти оригінал із перекладеною версією. Якщо запит не вдасться, панель має пояснити, що сталося, і запропонувати повторну спробу, не втрачаючи вашого виділення.",
+      "reasoning_characters": 3777,
+      "finish_reason": "stop",
+      "usage": {
+        "prompt_tokens": 198,
+        "completion_tokens": 1366,
+        "total_tokens": 1564,
+        "prompt_tokens_details": {}
+      },
+      "status": 200,
+      "headers_ms": 538.36,
+      "returned_model": "deepseek-v4-flash",
+      "connection_reused": true,
+      "milliseconds": 4011.328,
+      "variant": "go-deepseek-v4-flash",
+      "text": "When you select text on a web page, a small translation button appears beside it. Click the button to open a panel with the translation. You can change the target language in that panel, and the browser will remember your choice for the next session. Press Escape or click outside the panel to close it. The selected text should remain highlighted so that you can compare the original with the translated version. If the request fails, the panel should explain what happened and offer a retry without losing your selection.",
+      "characters": 523,
+      "input_id": "paragraph-1",
+      "size": "paragraph",
+      "phase": "warm",
+      "round": 1
+    },
+    {
+      "started_at": "2026-10-02T21:34:40.108193+00:00",
+      "ok": true,
+      "first_text_ms": 774.973,
+      "protocol": "HTTP/1.1",
+      "translation": "Відкрийте налаштування.",
+      "reasoning_characters": 456,
+      "finish_reason": "stop",
+      "usage": {
+        "prompt_tokens": 102,
+        "completion_tokens": 123,
+        "total_tokens": 225,
+        "prompt_tokens_details": {}
+      },
+      "status": 200,
+      "headers_ms": 561.563,
+      "returned_model": "deepseek-v4-flash",
+      "connection_reused": true,
+      "milliseconds": 827.433,
+      "variant": "go-deepseek-v4-flash",
+      "text": "Open the settings.",
+      "characters": 18,
+      "input_id": "short-1",
+      "size": "short",
+      "phase": "warm",
+      "round": 1
+    },
+    {
+      "started_at": "2026-10-02T21:34:42.109971+00:00",
+      "ok": true,
+      "first_text_ms": 7725.991,
+      "protocol": "HTTP/1.1",
+      "translation": "Коли ви виділяєте текст на веб-сторінці, поруч із ним з'являється невелика кнопка перекладу. Натисніть кнопку, щоб відкрити панель із перекладом. У цій панелі можна змінити мову перекладу, і браузер запам'ятає ваш вибір для наступної сесії. Натисніть Escape або натисніть за межами панелі, щоб її закрити. Виділений текст має залишатися підсвіченим, щоб ви могли порівняти оригінал із перекладом. Якщо запит не вдасться, панель має пояснити, що сталося, і запропонувати повторити спробу, не втративши ваше виділення.",
+      "reasoning_characters": 0,
+      "finish_reason": "stop",
+      "usage": {
+        "prompt_tokens": 123,
+        "completion_tokens": 258,
+        "total_tokens": 381,
+        "prompt_tokens_details": {
+          "cached_tokens": 64
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 0
+        }
+      },
+      "status": 200,
+      "headers_ms": 5570.121,
+      "returned_model": "mimo-v2.6-flash",
+      "connection_reused": true,
+      "milliseconds": 10795.262,
+      "variant": "go-mimo-v2.6-flash",
+      "text": "When you select text on a web page, a small translation button appears beside it. Click the button to open a panel with the translation. You can change the target language in that panel, and the browser will remember your choice for the next session. Press Escape or click outside the panel to close it. The selected text should remain highlighted so that you can compare the original with the translated version. If the request fails, the panel should explain what happened and offer a retry without losing your selection.",
+      "characters": 523,
+      "input_id": "paragraph-1",
+      "size": "paragraph",
+      "phase": "warm",
+      "round": 1
+    },
+    {
+      "started_at": "2026-10-02T21:34:52.906717+00:00",
+      "ok": true,
+      "first_text_ms": 1410.361,
+      "protocol": "HTTP/1.1",
+      "translation": "Відкрийте налаштування.",
+      "reasoning_characters": 0,
+      "finish_reason": "stop",
+      "usage": {
+        "prompt_tokens": 23,
+        "completion_tokens": 11,
+        "total_tokens": 34,
+        "prompt_tokens_details": {
+          "cached_tokens": 0
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 0
+        }
+      },
+      "status": 200,
+      "headers_ms": 1410.298,
+      "returned_model": "deepseek-v4.1-flash",
+      "connection_reused": true,
+      "milliseconds": 1440.937,
+      "variant": "go-deepseek-v4.1-flash",
+      "text": "Open the settings.",
+      "characters": 18,
+      "input_id": "short-1",
+      "size": "short",
+      "phase": "warm",
+      "round": 1
+    },
+    {
+      "started_at": "2026-10-02T21:34:54.911407+00:00",
+      "ok": true,
+      "first_text_ms": 1188.479,
+      "protocol": "HTTP/1.1",
+      "translation": "банк",
+      "reasoning_characters": 911,
+      "finish_reason": "stop",
+      "usage": {
+        "prompt_tokens": 99,
+        "completion_tokens": 216,
+        "total_tokens": 315,
+        "prompt_tokens_details": {}
+      },
+      "status": 200,
+      "headers_ms": 580.643,
+      "returned_model": "deepseek-v4-flash",
+      "connection_reused": true,
+      "milliseconds": 1194.473,
+      "variant": "go-deepseek-v4-flash",
+      "text": "bank",
+      "characters": 4,
+      "input_id": "word-1",
+      "size": "word",
+      "phase": "warm",
+      "round": 1
+    },
+    {
+      "started_at": "2026-10-02T21:34:56.916469+00:00",
+      "ok": true,
+      "first_text_ms": 1121.728,
+      "protocol": "HTTP/1.1",
+      "translation": "Надійна панель перекладу починається з чіткого зв’язку між вибраним текстом і запитом, який його представляє. Браузер може генерувати кілька подій виділення, поки людина перетягує курсор через абзац. Надсилання запиту на кожну подію марнує час і змушує інтерфейс відчуватися нестабільним. Зачекайте, доки виділення завершиться, збережіть вихідний текст у пам’яті й надішліть запит, коли натиснуто кнопку перекладу.\n\nКористувач має побачити панель одразу після натискання. Її положення залежить від видимого прямокутника виділення та доступного простору навколо нього. Біля правого краю сторінки панель може потребувати переміщення вліво. Біля нижнього краю вона може потребувати відкриття над виділенням. Прокручування не повинно залишати панель плаваючою над не пов’язаним вмістом. Ці коригування мають відбуватися локально й не затримувати запит перекладу.\n\nДруге виділення може бути зроблено до завершення першого перекладу. Надайте кожному запиту унікальний ідентифікатор і порівняйте його з поточним виділенням перед показом результату. Скасуйте запит, коли транспорт підтримує скасування. Якщо скасування недоступне, відкиньте застарілу відповідь. Важлива поведінка полягає в тому, що результат завжди належить тексту, який людина найнедавніше попросила перекласти.\n\nЗберігайте цільову мову після її зміни. Для людини, яка зазвичай перекладає українською, запам’ятоване налаштування прибирає зайву дію з кожного запиту. Вихідну мову може визначити постачальник у тому самому виклику перекладу. Дуже короткі слова іноді бувають неоднозначними, тому панель також може потребувати необов’язкового способу вибрати вихідну мову, коли автоматичне визначення дає неправильний результат.\n\nМережеві з’єднання створюють вимірювану різницю. Перший запит може включати пошук DNS, TCP-з’єднання та TLS-рукостискання, перш ніж служба отримає будь-який текст. Пізніші запити можуть повторно використовувати це з’єднання. Тестування продуктивності має показувати обидва випадки й фіксувати час до моменту, коли весь переклад стане доступним. Для потокової відповіді також фіксуйте, коли надходять перші перекладені символи.\n\nЯкість перекладу залежить від контексту. Берег річки та фінансовий банк мають однакове англійське написання, але потребують різних українських слів. Ідіоми, як-от feeling blue і spilling the beans, мають зберігати своє передбачене значення. Швидкий рушій, який перекладає ці вирази буквально, може зробити абзац важчим для розуміння. Оцінюйте повні уривки, а також ізольовані позначки.\n\nДовгі уривки потребують достатньо місця в панелі, щоб залишатися читабельними. Установіть максимальну висоту й дозвольте тексту прокручуватися всередині неї. Зберігайте межі абзаців, де це можливо, і тримайте кнопку закриття доступною під час прокручування. Користувачі клавіатури мають мати змогу перемістити фокус у панель, скопіювати переклад і повернутися на початкову сторінку, не втративши своє місце.\n\nЗбої мають залишати вихідне виділення недоторканим. Тимчасова мережева помилка, вичерпаний ліміт і недійсний ключ потребують різних дій для відновлення. Покажіть стисле повідомлення з відповідною дією. Повторна спроба має використовувати той самий вихідний текст і цільову мову. Уникайте повторних спроб із відхиленими обліковими даними, бо ще один запит не виправить конфігурацію.\n\nВимірювання мають описувати середовище, у якому їх було зібрано. Версія браузера, апаратне забезпечення, мережеве з’єднання, довжина введення, ідентифікатор моделі та налаштування вихідної мови — усе це може впливати на результат. Зберігайте необроблені часові показники разом з фактичними перекладами, щоб пізніший запуск можна було порівняти з тими самими вхідними даними. Один надзвичайно швидкий запит не встановлює нормальний досвід.\n\nПерший прототип може зосередитися на виділенні, перекладі, мовному налаштуванні та закритті панелі. Додаткові дії слід додавати лише тоді, коли вони усувають часту перешкоду. Невеликий інтерфейс усе ще може бути надійним, якщо він обробляє застарілі запити, фокус клавіатури, межі сторінки та зрозумілі помилки. Ці деталі важливіші для повсякденної швидкості, ніж довгий список необов’язкових функцій.",
+      "reasoning_characters": 0,
+      "finish_reason": "stop",
+      "usage": {
+        "prompt_tokens": 729,
+        "completion_tokens": 1659,
+        "total_tokens": 2388,
+        "prompt_tokens_details": {
+          "cached_tokens": 640
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 0
+        }
+      },
+      "status": 200,
+      "headers_ms": 1107.861,
+      "returned_model": "deepseek-v4.1-flash",
+      "connection_reused": true,
+      "milliseconds": 9595.051,
+      "variant": "go-deepseek-v4.1-flash",
+      "text": "A reliable translation panel starts with a clear connection between the selected text and the request that represents it. The browser can generate several selection events while a person drags across a paragraph. Sending a request for every event wastes time and makes the interface feel unstable. Wait until the selection is complete, keep the source text in memory, and send the request when the translation button is clicked.\n\nThe user should see the panel immediately after clicking. Its position depends on the visible selection rectangle and the available space around it. Near the right edge of the page, the panel may need to move to the left. Near the bottom, it may need to open above the selection. Scrolling should not leave the panel floating over unrelated content. These adjustments should happen locally and should not delay the translation request.\n\nA second selection may be made before the first translation finishes. Give each request a unique identifier and compare it with the current selection before displaying the result. Cancel a request when the transport supports cancellation. If cancellation is unavailable, discard the stale response. The important behavior is that the result always belongs to the text the person most recently asked to translate.\n\nPersist the target language after it changes. For a person who normally translates into Ukrainian, a remembered preference removes an extra action from every request. The source language can be detected by the provider in the same translation call. Very short words are sometimes ambiguous, so the panel may also need an optional way to choose a source language when automatic detection produces the wrong result.\n\nNetwork connections make a measurable difference. The first request can include DNS lookup, a TCP connection, and a TLS handshake before the service receives any text. Later requests may reuse that connection. A benchmark should show both cases and should record the time until the entire translation is available. For a streamed response, also record when the first translated characters arrive.\n\nTranslation quality depends on context. A river bank and a financial bank share the same English spelling but require different Ukrainian words. Idioms such as feeling blue and spilling the beans should preserve their intended meaning. A fast engine that translates these expressions literally can make a paragraph harder to understand. Evaluate complete passages as well as isolated labels.\n\nLong passages need enough space in the panel to remain readable. Set a maximum height and allow the text to scroll inside it. Preserve paragraph boundaries where possible, and keep the close button accessible while scrolling. Keyboard users should be able to move focus into the panel, copy the translation, and return to the original page without losing their place.\n\nFailures should leave the source selection intact. A temporary network error, an exhausted allowance, and an invalid key require different recovery actions. Show a concise message with the relevant action. A retry should use the same source text and target language. Avoid repeatedly retrying a rejected credential because another request will not fix the configuration.\n\nMeasurements should describe the environment in which they were collected. Browser version, hardware, network connection, input length, model identifier, and source-language settings can all affect the result. Keep the raw timings together with the actual translations so that a later run can be compared against the same inputs. A single unusually fast request does not establish the normal experience.\n\nThe first prototype can concentrate on selection, translation, language preference, and closing the panel. Additional actions should be added only when they remove a frequent obstacle. A small interface can still be dependable if it handles stale requests, keyboard focus, page boundaries, and clear errors. These details matter more to everyday speed than a long list of optional features.",
+      "characters": 4023,
+      "input_id": "large-1",
+      "size": "large",
+      "phase": "warm",
+      "round": 1
+    },
+    {
+      "started_at": "2026-10-02T21:35:06.512929+00:00",
+      "ok": true,
+      "first_text_ms": 1111.033,
+      "protocol": "HTTP/1.1",
+      "translation": "Ви можете вибрати іншу мову з меню. Ваш вибір буде збережено наступного разу, коли ви відкриєте браузер.",
+      "reasoning_characters": 0,
+      "finish_reason": "stop",
+      "usage": {
+        "prompt_tokens": 42,
+        "completion_tokens": 43,
+        "total_tokens": 85,
+        "prompt_tokens_details": {
+          "cached_tokens": 0
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 0
+        }
+      },
+      "status": 200,
+      "headers_ms": 1097.175,
+      "returned_model": "deepseek-v4.1-flash",
+      "connection_reused": true,
+      "milliseconds": 1378.828,
+      "variant": "go-deepseek-v4.1-flash",
+      "text": "You can select a different language from the menu. Your choice will be remembered the next time you open the browser.",
+      "characters": 117,
+      "input_id": "sentence-1",
+      "size": "sentence",
+      "phase": "warm",
+      "round": 2
+    },
+    {
+      "started_at": "2026-10-02T21:35:08.517952+00:00",
+      "ok": true,
+      "first_text_ms": 1134.072,
+      "protocol": "HTTP/1.1",
+      "translation": "Надійна панель перекладу починається з чіткого зв’язку між вибраним текстом і запитом, який його представляє. Браузер може генерувати кілька подій виділення, поки людина протягує курсор по абзацу. Надсилання запиту на кожну подію марнує час і змушує інтерфейс відчуватися нестабільним. Зачекайте, доки виділення завершиться, збережіть вихідний текст у пам’яті й надішліть запит, коли натиснуто кнопку перекладу.\n\nКористувач має побачити панель одразу після натискання. Її положення залежить від видимого прямокутника виділення та доступного простору навколо нього. Біля правого краю сторінки панель може потребувати переміщення вліво. Біля нижнього краю вона може потребувати відкриття над виділенням. Прокручування не повинно залишати панель плаваючою над не пов’язаним вмістом. Ці коригування мають відбуватися локально й не затримувати запит перекладу.\n\nДруге виділення може бути зроблено до завершення першого перекладу. Надайте кожному запиту унікальний ідентифікатор і порівняйте його з поточним виділенням перед показом результату. Скасуйте запит, коли транспорт підтримує скасування. Якщо скасування недоступне, відкиньте застарілу відповідь. Важлива поведінка полягає в тому, що результат завжди належить тексту, який людина найнедавніше попросила перекласти.\n\nЗберігайте цільову мову після її зміни. Для людини, яка зазвичай перекладає українською, запам’ятована перевага прибирає зайву дію з кожного запиту. Вихідну мову може визначити постачальник у тому самому виклику перекладу. Дуже короткі слова іноді бувають неоднозначними, тому панель також може потребувати необов’язкового способу вибрати вихідну мову, коли автоматичне визначення дає неправильний результат.\n\nМережеві з’єднання створюють вимірювану різницю. Перший запит може включати пошук DNS, TCP-з’єднання та TLS-рукостискання, перш ніж служба отримає будь-який текст. Пізніші запити можуть повторно використовувати це з’єднання. Тестування продуктивності має показувати обидва випадки й фіксувати час до моменту, коли весь переклад стане доступним. Для потокової відповіді також фіксуйте, коли надходять перші перекладені символи.\n\nЯкість перекладу залежить від контексту. Берег річки й фінансова установа мають однакове англійське написання, але потребують різних українських слів. Ідіоми, як-от «feeling blue» і «spilling the beans», мають зберігати своє передбачене значення. Швидкий рушій, який перекладає ці вирази буквально, може зробити абзац важчим для розуміння. Оцінюйте повні уривки, а також ізольовані мітки.\n\nДовгі уривки потребують достатньо місця в панелі, щоб залишатися читабельними. Установіть максимальну висоту й дозвольте тексту прокручуватися всередині неї. Зберігайте межі абзаців, де це можливо, і тримайте кнопку закриття доступною під час прокручування. Користувачі клавіатури мають мати змогу перемістити фокус у панель, скопіювати переклад і повернутися на початкову сторінку, не втративши своє місце.\n\nЗбої мають залишати вихідне виділення недоторканим. Тимчасова мережева помилка, вичерпаний ліміт і недійсний ключ потребують різних дій для відновлення. Покажіть стисле повідомлення з відповідною дією. Повторна спроба має використовувати той самий вихідний текст і цільову мову. Уникайте повторних спроб із відхиленими обліковими даними, бо ще один запит не виправить конфігурацію.\n\nВимірювання мають описувати середовище, у якому їх було зібрано. Версія браузера, апаратне забезпечення, мережеве з’єднання, довжина введення, ідентифікатор моделі та налаштування вихідної мови — усе це може впливати на результат. Зберігайте необроблені часові показники разом з фактичними перекладами, щоб пізніший запуск можна було порівняти з тими самими вхідними даними. Один надзвичайно швидкий запит не встановлює звичайний досвід.\n\nПерший прототип може зосередитися на виділенні, перекладі, мовній перевазі та закритті панелі. Додаткові дії слід додавати лише тоді, коли вони усувають часту перешкоду. Невеликий інтерфейс усе ще може бути надійним, якщо він обробляє застарілі запити, фокус клавіатури, межі сторінки та зрозумілі помилки. Ці деталі важливіші для повсякденної швидкості, ніж довгий список необов’язкових функцій.",
+      "reasoning_characters": 0,
+      "finish_reason": "stop",
+      "usage": {
+        "prompt_tokens": 729,
+        "completion_tokens": 1661,
+        "total_tokens": 2390,
+        "prompt_tokens_details": {
+          "cached_tokens": 640
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 0
+        }
+      },
+      "status": 200,
+      "headers_ms": 1124.193,
+      "returned_model": "deepseek-v4.1-flash",
+      "connection_reused": true,
+      "milliseconds": 10206.371,
+      "variant": "go-deepseek-v4.1-flash",
+      "text": "A reliable translation panel starts with a clear connection between the selected text and the request that represents it. The browser can generate several selection events while a person drags across a paragraph. Sending a request for every event wastes time and makes the interface feel unstable. Wait until the selection is complete, keep the source text in memory, and send the request when the translation button is clicked.\n\nThe user should see the panel immediately after clicking. Its position depends on the visible selection rectangle and the available space around it. Near the right edge of the page, the panel may need to move to the left. Near the bottom, it may need to open above the selection. Scrolling should not leave the panel floating over unrelated content. These adjustments should happen locally and should not delay the translation request.\n\nA second selection may be made before the first translation finishes. Give each request a unique identifier and compare it with the current selection before displaying the result. Cancel a request when the transport supports cancellation. If cancellation is unavailable, discard the stale response. The important behavior is that the result always belongs to the text the person most recently asked to translate.\n\nPersist the target language after it changes. For a person who normally translates into Ukrainian, a remembered preference removes an extra action from every request. The source language can be detected by the provider in the same translation call. Very short words are sometimes ambiguous, so the panel may also need an optional way to choose a source language when automatic detection produces the wrong result.\n\nNetwork connections make a measurable difference. The first request can include DNS lookup, a TCP connection, and a TLS handshake before the service receives any text. Later requests may reuse that connection. A benchmark should show both cases and should record the time until the entire translation is available. For a streamed response, also record when the first translated characters arrive.\n\nTranslation quality depends on context. A river bank and a financial bank share the same English spelling but require different Ukrainian words. Idioms such as feeling blue and spilling the beans should preserve their intended meaning. A fast engine that translates these expressions literally can make a paragraph harder to understand. Evaluate complete passages as well as isolated labels.\n\nLong passages need enough space in the panel to remain readable. Set a maximum height and allow the text to scroll inside it. Preserve paragraph boundaries where possible, and keep the close button accessible while scrolling. Keyboard users should be able to move focus into the panel, copy the translation, and return to the original page without losing their place.\n\nFailures should leave the source selection intact. A temporary network error, an exhausted allowance, and an invalid key require different recovery actions. Show a concise message with the relevant action. A retry should use the same source text and target language. Avoid repeatedly retrying a rejected credential because another request will not fix the configuration.\n\nMeasurements should describe the environment in which they were collected. Browser version, hardware, network connection, input length, model identifier, and source-language settings can all affect the result. Keep the raw timings together with the actual translations so that a later run can be compared against the same inputs. A single unusually fast request does not establish the normal experience.\n\nThe first prototype can concentrate on selection, translation, language preference, and closing the panel. Additional actions should be added only when they remove a frequent obstacle. A small interface can still be dependable if it handles stale requests, keyboard focus, page boundaries, and clear errors. These details matter more to everyday speed than a long list of optional features.",
+      "characters": 4023,
+      "input_id": "large-1",
+      "size": "large",
+      "phase": "warm",
+      "round": 2
+    },
+    {
+      "started_at": "2026-10-02T21:35:18.726201+00:00",
+      "ok": true,
+      "first_text_ms": 1001.544,
+      "protocol": "HTTP/1.1",
+      "translation": "банк",
+      "reasoning_characters": 730,
+      "finish_reason": "stop",
+      "usage": {
+        "prompt_tokens": 99,
+        "completion_tokens": 173,
+        "total_tokens": 272,
+        "prompt_tokens_details": {}
+      },
+      "status": 200,
+      "headers_ms": 566.071,
+      "returned_model": "deepseek-v4-flash",
+      "connection_reused": true,
+      "milliseconds": 1005.842,
+      "variant": "go-deepseek-v4-flash",
+      "text": "bank",
+      "characters": 4,
+      "input_id": "word-1",
+      "size": "word",
+      "phase": "warm",
+      "round": 2
+    },
+    {
+      "started_at": "2026-10-02T21:35:20.726271+00:00",
+      "ok": true,
+      "first_text_ms": 906.707,
+      "protocol": "HTTP/1.1",
+      "translation": "Ви можете вибрати іншу мову в меню. Ваш вибір буде збережено під час наступного запуску браузера.",
+      "reasoning_characters": 0,
+      "finish_reason": "stop",
+      "usage": {
+        "prompt_tokens": 47,
+        "completion_tokens": 45,
+        "total_tokens": 92,
+        "prompt_tokens_details": {
+          "cached_tokens": 0
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 0
+        }
+      },
+      "status": 200,
+      "headers_ms": 906.661,
+      "returned_model": "mimo-v2.6-flash",
+      "connection_reused": true,
+      "milliseconds": 1756.165,
+      "variant": "go-mimo-v2.6-flash",
+      "text": "You can select a different language from the menu. Your choice will be remembered the next time you open the browser.",
+      "characters": 117,
+      "input_id": "sentence-1",
+      "size": "sentence",
+      "phase": "warm",
+      "round": 2
+    },
+    {
+      "started_at": "2026-10-02T21:35:22.729612+00:00",
+      "ok": true,
+      "first_text_ms": 1128.689,
+      "protocol": "HTTP/1.1",
+      "translation": "Коли ви виділяєте текст на вебсторінці, поруч із ним з'являється невелика кнопка перекладу. Натисніть цю кнопку, щоб відкрити панель із перекладом. Ви можете змінити цільову мову на цій панелі, і браузер запам'ятає ваш вибір для наступного сеансу. Натисніть Escape або клацніть поза панеллю, щоб закрити її. Виділений текст має залишатися підсвіченим, щоб ви могли порівняти оригінал із перекладеною версією. Якщо запит не вдасться, панель має пояснити, що сталося, і запропонувати повторити спробу, не втрачаючи вашого виділення.",
+      "reasoning_characters": 0,
+      "finish_reason": "stop",
+      "usage": {
+        "prompt_tokens": 119,
+        "completion_tokens": 224,
+        "total_tokens": 343,
+        "prompt_tokens_details": {
+          "cached_tokens": 0
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 0
+        }
+      },
+      "status": 200,
+      "headers_ms": 1118.537,
+      "returned_model": "deepseek-v4.1-flash",
+      "connection_reused": true,
+      "milliseconds": 2432.553,
+      "variant": "go-deepseek-v4.1-flash",
+      "text": "When you select text on a web page, a small translation button appears beside it. Click the button to open a panel with the translation. You can change the target language in that panel, and the browser will remember your choice for the next session. Press Escape or click outside the panel to close it. The selected text should remain highlighted so that you can compare the original with the translated version. If the request fails, the panel should explain what happened and offer a retry without losing your selection.",
+      "characters": 523,
+      "input_id": "paragraph-1",
+      "size": "paragraph",
+      "phase": "warm",
+      "round": 2
+    },
+    {
+      "started_at": "2026-10-02T21:35:25.163750+00:00",
+      "ok": true,
+      "first_text_ms": 3272.052,
+      "protocol": "HTTP/1.1",
+      "translation": "Надійна панель перекладу починається з чіткого зв'язку між вибраним текстом і запитом, який його представляє. Браузер може генерувати кілька подій вибору, коли людина перетягує курсор через абзац. Надсилання запиту для кожної події витрачає час і робить інтерфейс нестабільним. Зачекайте, поки вибір буде завершено, зберігайте вихідний текст у пам'яті та надсилайте запит, коли буде натиснуто кнопку перекладу.\n\nКористувач має бачити панель одразу після натискання. Її позиція залежить від видимого прямокутника вибору та доступного простору навколо нього. Біля правого краю сторінки панель може потребувати зміщення вліво. Біля нижнього краю вона може відкриватися над вибором. Прокручування не повинно залишати панель плаваючою над невідповідним вмістом. Ці коригування мають відбуватися локально і не затримувати запит на переклад.\n\nДругий вибір може бути зроблений до того, як завершиться перший переклад. Надайте кожному запиту унікальний ідентифікатор і порівнюйте його з поточним вибором перед відображенням результату. Скасовуйте запит, якщо транспорт підтримує скасування. Якщо скасування недоступне, відкидайте застарілу відповідь. Важлива поведінка полягає в тому, що результат завжди належить тексту, який людина найнещодавніше попросила перекласти.\n\nЗберігайте цільову мову після її зміни. Для людини, яка зазвичай перекладає українською, запам'ятована налаштованість усуває зайву дію з кожного запиту. Мову джерела може визначати постачальник у тому самому виклику перекладу. Дуже короткі слова іноді є неоднозначними, тому панель також може потребувати додаткового способу вибору мови джерела, коли автоматичне визначення дає неправильний результат.",
+      "reasoning_characters": 4584,
+      "finish_reason": "stop",
+      "usage": {
+        "prompt_tokens": 398,
+        "completion_tokens": 1881,
+        "total_tokens": 2279,
+        "prompt_tokens_details": {
+          "cached_tokens": 256
+        }
+      },
+      "status": 200,
+      "headers_ms": 676.631,
+      "returned_model": "deepseek-v4-flash",
+      "connection_reused": true,
+      "milliseconds": 4382.538,
+      "variant": "go-deepseek-v4-flash",
+      "text": "A reliable translation panel starts with a clear connection between the selected text and the request that represents it. The browser can generate several selection events while a person drags across a paragraph. Sending a request for every event wastes time and makes the interface feel unstable. Wait until the selection is complete, keep the source text in memory, and send the request when the translation button is clicked.\n\nThe user should see the panel immediately after clicking. Its position depends on the visible selection rectangle and the available space around it. Near the right edge of the page, the panel may need to move to the left. Near the bottom, it may need to open above the selection. Scrolling should not leave the panel floating over unrelated content. These adjustments should happen locally and should not delay the translation request.\n\nA second selection may be made before the first translation finishes. Give each request a unique identifier and compare it with the current selection before displaying the result. Cancel a request when the transport supports cancellation. If cancellation is unavailable, discard the stale response. The important behavior is that the result always belongs to the text the person most recently asked to translate.\n\nPersist the target language after it changes. For a person who normally translates into Ukrainian, a remembered preference removes an extra action from every request. The source language can be detected by the provider in the same translation call. Very short words are sometimes ambiguous, so the panel may also need an optional way to choose a source language when automatic detection produces the wrong result.",
+      "characters": 1694,
+      "input_id": "long-1",
+      "size": "long",
+      "phase": "warm",
+      "round": 2
+    },
+    {
+      "started_at": "2026-10-02T21:35:29.547959+00:00",
+      "ok": true,
+      "first_text_ms": 1118.553,
+      "protocol": "HTTP/1.1",
+      "translation": "Надійна панель перекладу починається з чіткого зв'язку між вибраним текстом і запитом, який його представляє. Браузер може генерувати кілька подій виділення, поки людина перетягує курсор через абзац. Надсилання запиту на кожну подію марнує час і робить інтерфейс нестабільним. Зачекайте, поки виділення завершиться, збережіть вихідний текст у пам'яті та надішліть запит, коли натиснуто кнопку перекладу.\n\nКористувач має побачити панель одразу після натискання. Її положення залежить від видимого прямокутника виділення та доступного простору навколо нього. Біля правого краю сторінки панель може потребувати зміщення вліво. Біля нижнього краю вона може потребувати відкриття над виділенням. Прокручування не повинно залишати панель ширяючою над не пов'язаним вмістом. Ці коригування мають відбуватися локально й не затримувати запит перекладу.\n\nДруге виділення може бути зроблено до завершення першого перекладу. Надайте кожному запиту унікальний ідентифікатор і порівняйте його з поточним виділенням перед відображенням результату. Скасуйте запит, коли транспорт підтримує скасування. Якщо скасування недоступне, відкиньте застарілу відповідь. Важлива поведінка полягає в тому, що результат завжди належить тексту, який людина найнедавніше попросила перекласти.\n\nЗберігайте цільову мову після її зміни. Для людини, яка зазвичай перекладає українською, запам'ятоване налаштування прибирає зайву дію з кожного запиту. Вихідну мову може визначити постачальник у тому самому виклику перекладу. Дуже короткі слова іноді бувають неоднозначними, тому панель також може потребувати додаткового способу вибрати вихідну мову, коли автоматичне визначення дає неправильний результат.",
+      "reasoning_characters": 0,
+      "finish_reason": "stop",
+      "usage": {
+        "prompt_tokens": 319,
+        "completion_tokens": 643,
+        "total_tokens": 962,
+        "prompt_tokens_details": {
+          "cached_tokens": 256
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 0
+        }
+      },
+      "status": 200,
+      "headers_ms": 1112.327,
+      "returned_model": "deepseek-v4.1-flash",
+      "connection_reused": true,
+      "milliseconds": 4378.316,
+      "variant": "go-deepseek-v4.1-flash",
+      "text": "A reliable translation panel starts with a clear connection between the selected text and the request that represents it. The browser can generate several selection events while a person drags across a paragraph. Sending a request for every event wastes time and makes the interface feel unstable. Wait until the selection is complete, keep the source text in memory, and send the request when the translation button is clicked.\n\nThe user should see the panel immediately after clicking. Its position depends on the visible selection rectangle and the available space around it. Near the right edge of the page, the panel may need to move to the left. Near the bottom, it may need to open above the selection. Scrolling should not leave the panel floating over unrelated content. These adjustments should happen locally and should not delay the translation request.\n\nA second selection may be made before the first translation finishes. Give each request a unique identifier and compare it with the current selection before displaying the result. Cancel a request when the transport supports cancellation. If cancellation is unavailable, discard the stale response. The important behavior is that the result always belongs to the text the person most recently asked to translate.\n\nPersist the target language after it changes. For a person who normally translates into Ukrainian, a remembered preference removes an extra action from every request. The source language can be detected by the provider in the same translation call. Very short words are sometimes ambiguous, so the panel may also need an optional way to choose a source language when automatic detection produces the wrong result.",
+      "characters": 1694,
+      "input_id": "long-1",
+      "size": "long",
+      "phase": "warm",
+      "round": 2
+    },
+    {
+      "started_at": "2026-10-02T21:35:33.928574+00:00",
+      "ok": true,
+      "first_text_ms": 1052.159,
+      "protocol": "HTTP/1.1",
+      "translation": "Відкрийте налаштування.",
+      "reasoning_characters": 0,
+      "finish_reason": "stop",
+      "usage": {
+        "prompt_tokens": 28,
+        "completion_tokens": 13,
+        "total_tokens": 41,
+        "prompt_tokens_details": {
+          "cached_tokens": 0
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 0
+        }
+      },
+      "status": 200,
+      "headers_ms": 1052.092,
+      "returned_model": "mimo-v2.6-flash",
+      "connection_reused": true,
+      "milliseconds": 1286.186,
+      "variant": "go-mimo-v2.6-flash",
+      "text": "Open the settings.",
+      "characters": 18,
+      "input_id": "short-1",
+      "size": "short",
+      "phase": "warm",
+      "round": 2
+    },
+    {
+      "started_at": "2026-10-02T21:35:35.931739+00:00",
+      "ok": true,
+      "first_text_ms": 2030.952,
+      "protocol": "HTTP/1.1",
+      "translation": "Ви можете вибрати іншу мову з меню. Ваш вибір буде запам'ятований наступного разу, коли ви відкриєте браузер.",
+      "reasoning_characters": 1915,
+      "finish_reason": "stop",
+      "usage": {
+        "prompt_tokens": 121,
+        "completion_tokens": 646,
+        "total_tokens": 767,
+        "prompt_tokens_details": {}
+      },
+      "status": 200,
+      "headers_ms": 546.718,
+      "returned_model": "deepseek-v4-flash",
+      "connection_reused": true,
+      "milliseconds": 2125.819,
+      "variant": "go-deepseek-v4-flash",
+      "text": "You can select a different language from the menu. Your choice will be remembered the next time you open the browser.",
+      "characters": 117,
+      "input_id": "sentence-1",
+      "size": "sentence",
+      "phase": "warm",
+      "round": 2
+    },
+    {
+      "started_at": "2026-10-02T21:35:38.059221+00:00",
+      "ok": true,
+      "first_text_ms": 775.231,
+      "protocol": "HTTP/1.1",
+      "translation": "Відкрийте налаштування.",
+      "reasoning_characters": 456,
+      "finish_reason": "stop",
+      "usage": {
+        "prompt_tokens": 102,
+        "completion_tokens": 123,
+        "total_tokens": 225,
+        "prompt_tokens_details": {}
+      },
+      "status": 200,
+      "headers_ms": 531.279,
+      "returned_model": "deepseek-v4-flash",
+      "connection_reused": true,
+      "milliseconds": 817.213,
+      "variant": "go-deepseek-v4-flash",
+      "text": "Open the settings.",
+      "characters": 18,
+      "input_id": "short-1",
+      "size": "short",
+      "phase": "warm",
+      "round": 2
+    },
+    {
+      "started_at": "2026-10-02T21:35:40.060785+00:00",
+      "ok": true,
+      "first_text_ms": 1573.828,
+      "protocol": "HTTP/1.1",
+      "translation": "банк",
+      "reasoning_characters": 0,
+      "finish_reason": "stop",
+      "usage": {
+        "prompt_tokens": 25,
+        "completion_tokens": 2,
+        "total_tokens": 27,
+        "prompt_tokens_details": {
+          "cached_tokens": 0
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 0
+        }
+      },
+      "status": 200,
+      "headers_ms": 1573.735,
+      "returned_model": "mimo-v2.6-flash",
+      "connection_reused": true,
+      "milliseconds": 1635.672,
+      "variant": "go-mimo-v2.6-flash",
+      "text": "bank",
+      "characters": 4,
+      "input_id": "word-1",
+      "size": "word",
+      "phase": "warm",
+      "round": 2
+    },
+    {
+      "started_at": "2026-10-02T21:35:42.065814+00:00",
+      "ok": true,
+      "first_text_ms": 776.971,
+      "protocol": "HTTP/1.1",
+      "translation": "Надійна панель перекладу починається з чіткого зв'язку між виділеним текстом і запитом, який його представляє. Браузер може генерувати кілька подій виділення, коли людина перетягує курсор через абзац. Надсилання запиту на кожну подію витрачає час і робить інтерфейс нестабільним. Дочекайтеся завершення виділення, збережіть вихідний текст у пам'яті та надішліть запит після натискання кнопки перекладу.\n\nКористувач повинен бачити панель одразу після натискання. Її положення залежить від видимого прямокутника виділення та доступного простору навколо нього. Біля правого краю сторінки панель може знадобитися перемістити вліво. Біля нижнього краю вона може відкриватися над виділенням. Прокручування не повинно залишати панель, що плаває над непов'язаним вмістом. Ці коригування слід виконувати локально, і вони не повинні затримувати запит на переклад.\n\nПеред завершенням першого перекладу може бути зроблено друге виділення. Присвойте кожному запиту унікальний ідентифікатор і порівнюйте його з поточним виділенням перед відображенням результату. Скасуйте запит, якщо транспортний протокол підтримує скасування. Якщо скасування недоступне, відкиньте застарілу відповідь. Важливо, щоб результат завжди належав тексту, який людина нещодавно просила перекласти.\n\nЗберігайте цільову мову після її зміни. Для людини, яка зазвичай перекладає українською, збережена налаштунка прибирає зайву дію з кожного запиту. Вихідну мову може визначити провайдер у тому ж виклику перекладу. Дуже короткі слова іноді є неоднозначними, тому панелі може знадобитися додатковий спосіб вибору вихідної мови, якщо автоматичне визначення дає неправильний результат.",
+      "reasoning_characters": 0,
+      "finish_reason": "stop",
+      "usage": {
+        "prompt_tokens": 322,
+        "completion_tokens": 757,
+        "total_tokens": 1079,
+        "prompt_tokens_details": {
+          "cached_tokens": 320
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 0
+        }
+      },
+      "status": 200,
+      "headers_ms": 776.902,
+      "returned_model": "mimo-v2.6-flash",
+      "connection_reused": true,
+      "milliseconds": 13242.909,
+      "variant": "go-mimo-v2.6-flash",
+      "text": "A reliable translation panel starts with a clear connection between the selected text and the request that represents it. The browser can generate several selection events while a person drags across a paragraph. Sending a request for every event wastes time and makes the interface feel unstable. Wait until the selection is complete, keep the source text in memory, and send the request when the translation button is clicked.\n\nThe user should see the panel immediately after clicking. Its position depends on the visible selection rectangle and the available space around it. Near the right edge of the page, the panel may need to move to the left. Near the bottom, it may need to open above the selection. Scrolling should not leave the panel floating over unrelated content. These adjustments should happen locally and should not delay the translation request.\n\nA second selection may be made before the first translation finishes. Give each request a unique identifier and compare it with the current selection before displaying the result. Cancel a request when the transport supports cancellation. If cancellation is unavailable, discard the stale response. The important behavior is that the result always belongs to the text the person most recently asked to translate.\n\nPersist the target language after it changes. For a person who normally translates into Ukrainian, a remembered preference removes an extra action from every request. The source language can be detected by the provider in the same translation call. Very short words are sometimes ambiguous, so the panel may also need an optional way to choose a source language when automatic detection produces the wrong result.",
+      "characters": 1694,
+      "input_id": "long-1",
+      "size": "long",
+      "phase": "warm",
+      "round": 2
+    },
+    {
+      "started_at": "2026-10-02T21:35:55.310199+00:00",
+      "ok": true,
+      "first_text_ms": 3295.9,
+      "protocol": "HTTP/1.1",
+      "translation": "Коли ви виділяєте текст на веб-сторінці, поруч з ним з'являється невелика кнопка перекладу. Натисніть кнопку, щоб відкрити панель із перекладом. Ви можете змінити цільову мову на цій панелі, і браузер запам'ятає ваш вибір до наступного сеансу. Натисніть Escape або клацніть поза панеллю, щоб закрити її. Виділений текст має залишатися підсвіченим, щоб ви могли порівняти оригінал із перекладеною версією. Якщо запит не виконається, панель має пояснити, що сталося, і запропонувати повторну спробу, не втрачаючи вашого виділення.",
+      "reasoning_characters": 4725,
+      "finish_reason": "stop",
+      "usage": {
+        "prompt_tokens": 198,
+        "completion_tokens": 1679,
+        "total_tokens": 1877,
+        "prompt_tokens_details": {}
+      },
+      "status": 200,
+      "headers_ms": 593.906,
+      "returned_model": "deepseek-v4-flash",
+      "connection_reused": true,
+      "milliseconds": 3720.361,
+      "variant": "go-deepseek-v4-flash",
+      "text": "When you select text on a web page, a small translation button appears beside it. Click the button to open a panel with the translation. You can change the target language in that panel, and the browser will remember your choice for the next session. Press Escape or click outside the panel to close it. The selected text should remain highlighted so that you can compare the original with the translated version. If the request fails, the panel should explain what happened and offer a retry without losing your selection.",
+      "characters": 523,
+      "input_id": "paragraph-1",
+      "size": "paragraph",
+      "phase": "warm",
+      "round": 2
+    },
+    {
+      "started_at": "2026-10-02T21:35:59.032356+00:00",
+      "ok": true,
+      "first_text_ms": 3732.508,
+      "protocol": "HTTP/1.1",
+      "translation": "Надійна панель перекладу починається з чіткого зв'язку між виділеним текстом і запитом, який його представляє. Браузер може згенерувати кілька подій виділення, коли людина перетягує курсор через абзац. Надсилання запиту на кожну подію витрачає час і робить інтерфейс нестабільним. Дочекайтеся завершення виділення, збережіть вихідний текст у пам'яті та надішліть запит після натискання кнопки перекладу.\n\nКористувач повинен бачити панель одразу після натискання. Її положення залежить від видимого прямокутника виділення та доступного простору навколо нього. Біля правого краю сторінки панель може знадобитися перемістити вліво. Біля нижнього краю вона може відкритися над виділенням. Прокручування не повинно залишити панель, що плаває над непов'язаним вмістом. Ці коригування слід виконувати локально, і вони не повинні затримувати запит на переклад.\n\nПеред завершенням першого перекладу може бути зроблено друге виділення. Присвойте кожному запиту унікальний ідентифікатор і порівнюйте його з поточним виділенням перед відображенням результату. Скасуйте запит, якщо транспортний протокол підтримує скасування. Якщо скасування недоступне, відкиньте застарілу відповідь. Важливо, щоб результат завжди належав тексту, який людина нещодавно просила перекласти.\n\nЗберігайте мову призначення після її зміни. Для людини, яка зазвичай перекладає українською, збережена налаштованість прибирає зайву дію з кожного запиту. Вихідну мову може визначити провайдер у тому ж виклику перекладу. Дуже короткі слова іноді є неоднозначними, тому панелі може знадобитися додатковий спосіб вибору вихідної мови, коли автоматичне визначення дає неправильний результат.\n\nМережеві з'єднання мають вимірювану різницю. Перший запит може включати пошук DNS, з'єднання TCP та рукопотискання TLS, перш ніж служба отримає будь-який текст. Наступні запити можуть повторно використовувати це з'єднання. Бенчмарк повинен показувати обидва випадки та записувати час до того, як весь переклад стане доступним. Для потокової відповіді також слід записувати, коли приходять перші перекладені символи.\n\nЯкість перекладу залежить від контексту. Річковий берег і фінансовий банк мають однакове англійське написання, але потребують різних українських слів. Ідіоми, такі як «feeling blue» (бути в поганому настрої) та «spilling the beans» (розкрити таємницю), повинні зберігати їхній задуманий зміст. Швидкий движок, який перекладає ці вирази дослівно, може зробити абзац важче зрозумілим. Оцінюйте як повні уривки, так і окремі підписи.\n\nДовгі уривки потребують достатньо місця в панелі, щоб залишатися читабельними. Встановіть максимальну висоту та дозвольте тексту прокручуватися всередині неї. Зберігайте межі абзаців, де це можливо, і тримайте кнопку закриття доступною під час прокручування. Користувачі клавіатури повинні мати можливість перемістити фокус на панель, скопіювати переклад і повернутися до оригінальної сторінки, не втративши свого місця.\n\nПомилки повинні залишати вихідне виділення без змін. Тимчасова мережева помилка, вичерпаний ліміт та недійсний ключ вимагають різних дій для відновлення. Показуйте стисле повідомлення з відповідною дією. Повторна спроба повинна використовувати той самий вихідний текст та мову призначення. Уникайте повторних спроб з відхиленими обліковими даними, оскільки інший запит не виправить конфігурацію.\n\nВимірювання повинні описувати середовище, в якому вони були зібрані. Версія браузера, апаратне забезпечення, мережеве з'єднання, довжина введення, ідентифікатор моделі та налаштування вихідної мови можуть впливати на результат. Зберігайте сирі таймінги разом із фактичними перекладами, щоб пізніший запуск можна було порівняти з тими самими вхідними даними. Один незвично швидкий запит не встановлює нормальний досвід.\n\nПерший прототип може зосередитися на виділенні, перекладі, мовній налаштованості та закритті панелі. Додаткові дії слід додавати лише тоді, коли вони усувають часту перешкоду. Маленький інтерфейс все ще може бути надійним, якщо він обробляє застарілі запити, фокус клавіатури, межі сторінки та зрозумілі помилки. Ці деталі важливіші для щоденної швидкості, ніж довгий список додаткових функцій.",
+      "reasoning_characters": 0,
+      "finish_reason": "stop",
+      "usage": {
+        "prompt_tokens": 727,
+        "completion_tokens": 1939,
+        "total_tokens": 2666,
+        "prompt_tokens_details": {
+          "cached_tokens": 0
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 0
+        }
+      },
+      "status": 200,
+      "headers_ms": 3732.46,
+      "returned_model": "mimo-v2.6-flash",
+      "connection_reused": true,
+      "milliseconds": 56890.599,
+      "variant": "go-mimo-v2.6-flash",
+      "text": "A reliable translation panel starts with a clear connection between the selected text and the request that represents it. The browser can generate several selection events while a person drags across a paragraph. Sending a request for every event wastes time and makes the interface feel unstable. Wait until the selection is complete, keep the source text in memory, and send the request when the translation button is clicked.\n\nThe user should see the panel immediately after clicking. Its position depends on the visible selection rectangle and the available space around it. Near the right edge of the page, the panel may need to move to the left. Near the bottom, it may need to open above the selection. Scrolling should not leave the panel floating over unrelated content. These adjustments should happen locally and should not delay the translation request.\n\nA second selection may be made before the first translation finishes. Give each request a unique identifier and compare it with the current selection before displaying the result. Cancel a request when the transport supports cancellation. If cancellation is unavailable, discard the stale response. The important behavior is that the result always belongs to the text the person most recently asked to translate.\n\nPersist the target language after it changes. For a person who normally translates into Ukrainian, a remembered preference removes an extra action from every request. The source language can be detected by the provider in the same translation call. Very short words are sometimes ambiguous, so the panel may also need an optional way to choose a source language when automatic detection produces the wrong result.\n\nNetwork connections make a measurable difference. The first request can include DNS lookup, a TCP connection, and a TLS handshake before the service receives any text. Later requests may reuse that connection. A benchmark should show both cases and should record the time until the entire translation is available. For a streamed response, also record when the first translated characters arrive.\n\nTranslation quality depends on context. A river bank and a financial bank share the same English spelling but require different Ukrainian words. Idioms such as feeling blue and spilling the beans should preserve their intended meaning. A fast engine that translates these expressions literally can make a paragraph harder to understand. Evaluate complete passages as well as isolated labels.\n\nLong passages need enough space in the panel to remain readable. Set a maximum height and allow the text to scroll inside it. Preserve paragraph boundaries where possible, and keep the close button accessible while scrolling. Keyboard users should be able to move focus into the panel, copy the translation, and return to the original page without losing their place.\n\nFailures should leave the source selection intact. A temporary network error, an exhausted allowance, and an invalid key require different recovery actions. Show a concise message with the relevant action. A retry should use the same source text and target language. Avoid repeatedly retrying a rejected credential because another request will not fix the configuration.\n\nMeasurements should describe the environment in which they were collected. Browser version, hardware, network connection, input length, model identifier, and source-language settings can all affect the result. Keep the raw timings together with the actual translations so that a later run can be compared against the same inputs. A single unusually fast request does not establish the normal experience.\n\nThe first prototype can concentrate on selection, translation, language preference, and closing the panel. Additional actions should be added only when they remove a frequent obstacle. A small interface can still be dependable if it handles stale requests, keyboard focus, page boundaries, and clear errors. These details matter more to everyday speed than a long list of optional features.",
+      "characters": 4023,
+      "input_id": "large-1",
+      "size": "large",
+      "phase": "warm",
+      "round": 2
+    },
+    {
+      "started_at": "2026-10-02T21:36:55.925022+00:00",
+      "ok": true,
+      "first_text_ms": 1422.588,
+      "protocol": "HTTP/1.1",
+      "translation": "Відкрийте налаштування.",
+      "reasoning_characters": 0,
+      "finish_reason": "stop",
+      "usage": {
+        "prompt_tokens": 23,
+        "completion_tokens": 11,
+        "total_tokens": 34,
+        "prompt_tokens_details": {
+          "cached_tokens": 0
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 0
+        }
+      },
+      "status": 200,
+      "headers_ms": 1412.815,
+      "returned_model": "deepseek-v4.1-flash",
+      "connection_reused": true,
+      "milliseconds": 1504.501,
+      "variant": "go-deepseek-v4.1-flash",
+      "text": "Open the settings.",
+      "characters": 18,
+      "input_id": "short-1",
+      "size": "short",
+      "phase": "warm",
+      "round": 2
+    },
+    {
+      "started_at": "2026-10-02T21:36:57.930075+00:00",
+      "ok": true,
+      "first_text_ms": 36089.094,
+      "protocol": "HTTP/1.1",
+      "translation": "Надійна панель перекладу починається з чіткого зв’язку між вибраним текстом і запитом, який його представляє. Браузер може генерувати кілька подій вибору, поки людина перетягує курсор через абзац. Надсилання запиту на кожну подію витрачає час і робить інтерфейс нестабільним. Зачекайте, поки вибір завершиться, зберігайте вихідний текст у пам’яті та надсилайте запит, коли натиснуто кнопку перекладу.\n\nКористувач має бачити панель одразу після натискання. Її позиція залежить від видимого прямокутника вибору та доступного простору навколо нього. Біля правого краю сторінки панель може потребувати зсуву вліво. Біля нижнього краю вона може відкриватися над вибором. Прокручування не повинно залишати панель плаваючою над невідповідним вмістом. Ці коригування мають відбуватися локально і не затримувати запит на переклад.\n\nДругий вибір може бути зроблений до того, як завершиться перший переклад. Надайте кожному запиту унікальний ідентифікатор і порівнюйте його з поточним вибором перед відображенням результату. Скасовуйте запит, якщо транспорт підтримує скасування. Якщо скасування недоступне, відкидайте застарілу відповідь. Важлива поведінка полягає в тому, що результат завжди належить тексту, який людина найнещодавніше попросила перекласти.\n\nЗберігайте цільову мову після її зміни. Для людини, яка зазвичай перекладає українською, запам’ятоване вподобання прибирає зайву дію з кожного запиту. Вихідну мову може визначати постачальник у тому самому виклику перекладу. Дуже короткі слова іноді неоднозначні, тому панель також може потребувати додаткової можливості вибору вихідної мови, коли автоматичне визначення дає неправильний результат.\n\nМережеві з’єднання мають відчутну різницю. Перший запит може включати пошук DNS, TCP-з’єднання та рукостискання TLS, перш ніж сервіс отримає будь-який текст. Пізніші запити можуть повторно використовувати це з’єднання. Бенчмарк має показувати обидва випадки та фіксувати час до моменту, коли весь переклад стає доступним. Для потокової відповіді також фіксуйте, коли надходять перші перекладені символи.\n\nЯкість перекладу залежить від контексту. Річковий берег і фінансовий банк мають однакове написання англійською, але потребують різних українських слів. Ідіоми, як-от feeling blue і spilling the beans, мають зберігати своє передбачуване значення. Швидкий рушій, який перекладає ці вирази буквально, може ускладнити розуміння абзацу. Оцінюйте цілі уривки, а також окремі мітки.\n\nДовгі уривки потребують достатньо місця на панелі, щоб залишатися читабельними. Встановіть максимальну висоту та дозвольте тексту прокручуватися всередині. Зберігайте межі абзаців, де це можливо, і тримайте кнопку закриття доступною під час прокручування. Користувачі клавіатури повинні мати змогу перемістити фокус на панель, скопіювати переклад і повернутися на вихідну сторінку, не втрачаючи свого місця.\n\nПомилки не повинні порушувати вихідне виділення. Тимчасова мережева помилка, вичерпана квота та недійсний ключ потребують різних дій для відновлення. Покажіть стисле повідомлення з відповідною дією. Повторна спроба має використовувати той самий вихідний текст і цільову мову. Уникайте повторних спроб із відхиленими обліковими даними, оскільки ще один запит не виправить конфігурацію.\n\nВимірювання мають описувати середовище, у якому вони були зібрані. Версія браузера, апаратне забезпечення, мережеве з’єднання, довжина вхідного тексту, ідентифікатор моделі та налаштування вихідної мови — усе це може вплинути на результат. Зберігайте сирі показники часу разом із фактичними перекладами, щоб пізніший запуск можна було порівняти з тими самими вхідними даними. Один незвично швидкий запит не встановлює нормальний досвід.\n\nПерший прототип може зосередитися на виборі, перекладі, налаштуванні мови та закритті панелі. Додаткові дії слід додавати лише тоді, коли вони усувають часті перешкоди. Невеликий інтерфейс усе одно може бути надійним, якщо він обробляє застарілі запити, фокус клавіатури, межі сторінки та зрозумілі помилки. Ці деталі важливіші для щоденної швидкості, ніж довгий список додаткових функцій.",
+      "reasoning_characters": 13272,
+      "finish_reason": "stop",
+      "usage": {
+        "prompt_tokens": 808,
+        "completion_tokens": 5624,
+        "total_tokens": 6432,
+        "prompt_tokens_details": {
+          "cached_tokens": 256
+        }
+      },
+      "status": 200,
+      "headers_ms": 23311.946,
+      "returned_model": "deepseek-v4-flash",
+      "connection_reused": true,
+      "milliseconds": 40394.853,
+      "variant": "go-deepseek-v4-flash",
+      "text": "A reliable translation panel starts with a clear connection between the selected text and the request that represents it. The browser can generate several selection events while a person drags across a paragraph. Sending a request for every event wastes time and makes the interface feel unstable. Wait until the selection is complete, keep the source text in memory, and send the request when the translation button is clicked.\n\nThe user should see the panel immediately after clicking. Its position depends on the visible selection rectangle and the available space around it. Near the right edge of the page, the panel may need to move to the left. Near the bottom, it may need to open above the selection. Scrolling should not leave the panel floating over unrelated content. These adjustments should happen locally and should not delay the translation request.\n\nA second selection may be made before the first translation finishes. Give each request a unique identifier and compare it with the current selection before displaying the result. Cancel a request when the transport supports cancellation. If cancellation is unavailable, discard the stale response. The important behavior is that the result always belongs to the text the person most recently asked to translate.\n\nPersist the target language after it changes. For a person who normally translates into Ukrainian, a remembered preference removes an extra action from every request. The source language can be detected by the provider in the same translation call. Very short words are sometimes ambiguous, so the panel may also need an optional way to choose a source language when automatic detection produces the wrong result.\n\nNetwork connections make a measurable difference. The first request can include DNS lookup, a TCP connection, and a TLS handshake before the service receives any text. Later requests may reuse that connection. A benchmark should show both cases and should record the time until the entire translation is available. For a streamed response, also record when the first translated characters arrive.\n\nTranslation quality depends on context. A river bank and a financial bank share the same English spelling but require different Ukrainian words. Idioms such as feeling blue and spilling the beans should preserve their intended meaning. A fast engine that translates these expressions literally can make a paragraph harder to understand. Evaluate complete passages as well as isolated labels.\n\nLong passages need enough space in the panel to remain readable. Set a maximum height and allow the text to scroll inside it. Preserve paragraph boundaries where possible, and keep the close button accessible while scrolling. Keyboard users should be able to move focus into the panel, copy the translation, and return to the original page without losing their place.\n\nFailures should leave the source selection intact. A temporary network error, an exhausted allowance, and an invalid key require different recovery actions. Show a concise message with the relevant action. A retry should use the same source text and target language. Avoid repeatedly retrying a rejected credential because another request will not fix the configuration.\n\nMeasurements should describe the environment in which they were collected. Browser version, hardware, network connection, input length, model identifier, and source-language settings can all affect the result. Keep the raw timings together with the actual translations so that a later run can be compared against the same inputs. A single unusually fast request does not establish the normal experience.\n\nThe first prototype can concentrate on selection, translation, language preference, and closing the panel. Additional actions should be added only when they remove a frequent obstacle. A small interface can still be dependable if it handles stale requests, keyboard focus, page boundaries, and clear errors. These details matter more to everyday speed than a long list of optional features.",
+      "characters": 4023,
+      "input_id": "large-1",
+      "size": "large",
+      "phase": "warm",
+      "round": 2
+    },
+    {
+      "started_at": "2026-10-02T21:37:38.326702+00:00",
+      "ok": true,
+      "first_text_ms": 3441.271,
+      "protocol": "HTTP/1.1",
+      "translation": "Коли ви виділяєте текст на веб-сторінці, поруч із ним з'являється невелика кнопка перекладу. Натисніть кнопку, щоб відкрити панель із перекладом. Ви можете змінити цільову мову в цій панелі, і браузер запам'ятає ваш вибір для наступної сесії. Натисніть Escape або натисніть за межами панелі, щоб її закрити. Виділений текст має залишатися підсвіченим, щоб ви могли порівняти оригінал із перекладом. Якщо запит не вдасться, панель має пояснити, що сталося, і запропонувати повторити спробу, не втративши ваше виділення.",
+      "reasoning_characters": 0,
+      "finish_reason": "stop",
+      "usage": {
+        "prompt_tokens": 123,
+        "completion_tokens": 260,
+        "total_tokens": 383,
+        "prompt_tokens_details": {
+          "cached_tokens": 0
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 0
+        }
+      },
+      "status": 200,
+      "headers_ms": 3441.223,
+      "returned_model": "mimo-v2.6-flash",
+      "connection_reused": true,
+      "milliseconds": 7255.129,
+      "variant": "go-mimo-v2.6-flash",
+      "text": "When you select text on a web page, a small translation button appears beside it. Click the button to open a panel with the translation. You can change the target language in that panel, and the browser will remember your choice for the next session. Press Escape or click outside the panel to close it. The selected text should remain highlighted so that you can compare the original with the translated version. If the request fails, the panel should explain what happened and offer a retry without losing your selection.",
+      "characters": 523,
+      "input_id": "paragraph-1",
+      "size": "paragraph",
+      "phase": "warm",
+      "round": 2
+    },
+    {
+      "started_at": "2026-10-02T21:37:45.583714+00:00",
+      "ok": true,
+      "first_text_ms": 4126.027,
+      "protocol": "HTTP/1.1",
+      "translation": "банк",
+      "reasoning_characters": 0,
+      "finish_reason": "stop",
+      "usage": {
+        "prompt_tokens": 20,
+        "completion_tokens": 2,
+        "total_tokens": 22,
+        "prompt_tokens_details": {
+          "audio_tokens": 0,
+          "cached_tokens": 0,
+          "cache_creation_input_tokens": 0,
+          "cache_write_tokens": 0
+        },
+        "completion_tokens_details": {
+          "accepted_prediction_tokens": 0,
+          "audio_tokens": 0,
+          "reasoning_tokens": 0,
+          "rejected_prediction_tokens": 0
+        }
+      },
+      "status": 200,
+      "headers_ms": 4074.559,
+      "returned_model": "deepseek-v4.1-flash",
+      "connection_reused": true,
+      "milliseconds": 4132.329,
+      "variant": "go-deepseek-v4.1-flash",
+      "text": "bank",
+      "characters": 4,
+      "input_id": "word-1",
+      "size": "word",
+      "phase": "warm",
+      "round": 2
+    }
+  ],
+  "summary": {
+    "go-glm-5.3-flash": {
+      "cold-first": {
+        "attempted": 1,
+        "successful": 0,
+        "failed": 1
+      }
+    },
+    "go-mimo-v2.6-flash": {
+      "cold-first": {
+        "attempted": 1,
+        "successful": 1,
+        "failed": 0,
+        "median_ms": 5426.05,
+        "p95_ms": 5426.05,
+        "min_ms": 5426.05,
+        "max_ms": 5426.05,
+        "reused_connections": 0,
+        "first_text_median_ms": 1384.23,
+        "first_text_p95_ms": 1384.23
+      },
+      "warm": {
+        "attempted": 18,
+        "successful": 18,
+        "failed": 0,
+        "median_ms": 4156.12,
+        "p95_ms": 65879.41,
+        "min_ms": 1286.19,
+        "max_ms": 65879.41,
+        "reused_connections": 18,
+        "first_text_median_ms": 1763.85,
+        "first_text_p95_ms": 7725.99
+      }
+    },
+    "go-deepseek-v4-flash": {
+      "cold-first": {
+        "attempted": 1,
+        "successful": 1,
+        "failed": 0,
+        "median_ms": 4155.39,
+        "p95_ms": 4155.39,
+        "min_ms": 4155.39,
+        "max_ms": 4155.39,
+        "reused_connections": 0,
+        "first_text_median_ms": 3819.46,
+        "first_text_p95_ms": 3819.46
+      },
+      "warm": {
+        "attempted": 18,
+        "successful": 18,
+        "failed": 0,
+        "median_ms": 2851.03,
+        "p95_ms": 40394.85,
+        "min_ms": 817.21,
+        "max_ms": 40394.85,
+        "reused_connections": 18,
+        "first_text_median_ms": 2636.05,
+        "first_text_p95_ms": 36089.09
+      }
+    },
+    "go-deepseek-v4.1-flash": {
+      "cold-first": {
+        "attempted": 1,
+        "successful": 1,
+        "failed": 0,
+        "median_ms": 2509.98,
+        "p95_ms": 2509.98,
+        "min_ms": 2509.98,
+        "max_ms": 2509.98,
+        "reused_connections": 0,
+        "first_text_median_ms": 1387.7,
+        "first_text_p95_ms": 1387.7
+      },
+      "warm": {
+        "attempted": 18,
+        "successful": 18,
+        "failed": 0,
+        "median_ms": 2337.01,
+        "p95_ms": 11278.25,
+        "min_ms": 1202.89,
+        "max_ms": 11278.25,
+        "reused_connections": 18,
+        "first_text_median_ms": 1308.58,
+        "first_text_p95_ms": 4126.03
+      }
+    }
+  },
+  "blocked": [
+    {
+      "variant": "go-glm-5.3-flash",
+      "reason": {
+        "error": {
+          "param": "thinking",
+          "type": "invalid_request_error",
+          "message": "Upstream request failed: [unknown_parameter] invalid request body: json: unknown field \"thinking\""
+        }
+      }
+    }
+  ]
+}

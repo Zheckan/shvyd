@@ -1,0 +1,288 @@
+{
+  "metadata": {
+    "started_at": "2026-10-02T20:39:46.158358+00:00",
+    "pair": "en->uk",
+    "transport": "Python http.client HTTP/1.1",
+    "rounds": 5,
+    "seed": 42,
+    "local_cache": false,
+    "measurement_mode": "smoke",
+    "input_file": "docs/benchmarks/inputs-en-uk.json",
+    "llm_output_limit": "max(512, source characters), capped at 4000 tokens",
+    "timing": "request start to entire response body; network included",
+    "cohere_minimum_start_interval_seconds": 3.2,
+    "deepl_minimum_start_interval_seconds": 2.0,
+    "new_provider_pacing": {
+      "groq": "30 RPM and conservative 8000 TPM reservation",
+      "gemini_minimum_seconds": 15.0,
+      "cerebras_minimum_seconds": 2.1,
+      "azure_characters_per_second": 500
+    },
+    "harness_sha256": "ee1a913bcfea2a09c897b350ef222f147f8b26a183a48b0342b17f56c5d153a5",
+    "input_sha256": "ce3982095d81d0a7dc65402b177b59380c23a5c88ed045e8bf7d3c8a616ce559",
+    "configuration": {
+      "providers": {
+        "azure": {
+          "configured": true,
+          "region": "",
+          "endpoint": "https://api.cognitive.microsofttranslator.com",
+          "api_version": "2026-06-06"
+        },
+        "deepl": {
+          "configured": true,
+          "endpoint": "https://api-free.deepl.com"
+        },
+        "cohere": {
+          "configured": true,
+          "endpoint": "https://api.cohere.com",
+          "model": "north-small-translate-09-2026"
+        },
+        "google": {
+          "configured": false,
+          "endpoint": "https://translation.googleapis.com"
+        },
+        "groq": {
+          "configured": true,
+          "endpoint": "https://api.groq.com",
+          "model": "qwen/qwen3.8-27b"
+        },
+        "gemini": {
+          "configured": true,
+          "endpoint": "https://generativelanguage.googleapis.com",
+          "model": "gemini-3.1-flash-lite"
+        },
+        "cerebras": {
+          "configured": false,
+          "endpoint": "https://api.cerebras.ai",
+          "model": "qwen-3.8-27b"
+        },
+        "cloudflare": {
+          "configured": true,
+          "endpoint": "https://api.cloudflare.com",
+          "model": "@cf/meta/m2m100-1.2b",
+          "token_present": true,
+          "account_id_present": true
+        }
+      }
+    },
+    "finished_at": "2026-10-02T20:39:49.029777+00:00"
+  },
+  "inputs": [
+    {
+      "id": "core-1",
+      "size": "core",
+      "text": "bank"
+    },
+    {
+      "id": "core-2",
+      "size": "core",
+      "text": "Open the settings."
+    },
+    {
+      "id": "core-3",
+      "size": "core",
+      "text": "Your changes have been saved."
+    },
+    {
+      "id": "core-4",
+      "size": "core",
+      "text": "I am feeling blue."
+    },
+    {
+      "id": "core-5",
+      "size": "core",
+      "text": "He eventually spilled the beans."
+    },
+    {
+      "id": "core-6",
+      "size": "core",
+      "text": "It costs an arm and a leg."
+    },
+    {
+      "id": "core-7",
+      "size": "core",
+      "text": "The river bank is steep."
+    },
+    {
+      "id": "core-8",
+      "size": "core",
+      "text": "Please restart your browser after the installation is complete."
+    },
+    {
+      "id": "core-9",
+      "size": "core",
+      "text": "The patch addresses a race condition in the background worker."
+    },
+    {
+      "id": "core-10",
+      "size": "core",
+      "text": "You can select a different language from the menu. Your choice will be remembered the next time you open the browser."
+    },
+    {
+      "id": "core-11",
+      "size": "core",
+      "text": "The update improves performance and fixes several bugs. Please restart your browser after the installation is complete. Your saved settings and bookmarks will remain available."
+    },
+    {
+      "id": "core-12",
+      "size": "core",
+      "text": "When you select text on a web page, a small translation button appears beside it. Click the button to see the translation without leaving the page. The tool remembers your last chosen language and keeps the interface simple."
+    }
+  ],
+  "variants": [
+    {
+      "id": "groq-qwen-stream",
+      "provider": "groq",
+      "endpoint": "https://api.groq.com",
+      "model": "qwen/qwen3.8-27b",
+      "stream": true,
+      "detect": true
+    },
+    {
+      "id": "gemini-flash-lite-stream",
+      "provider": "gemini",
+      "endpoint": "https://generativelanguage.googleapis.com",
+      "model": "gemini-3.1-flash-lite",
+      "stream": true,
+      "detect": true
+    },
+    {
+      "id": "cloudflare-m2m100-en",
+      "provider": "cloudflare",
+      "endpoint": "https://api.cloudflare.com",
+      "model": "@cf/meta/m2m100-1.2b",
+      "detect": false
+    }
+  ],
+  "preflight": [],
+  "samples": [
+    {
+      "started_at": "2026-10-02T20:39:46.158515+00:00",
+      "ok": true,
+      "protocol": "HTTP/1.1",
+      "first_text_ms": 128.585,
+      "status": 200,
+      "headers_ms": 124.907,
+      "retry_after": null,
+      "returned_model": "qwen/qwen3.8-27b",
+      "reasoning_characters": 0,
+      "stream_events": 11,
+      "connection_reused": false,
+      "milliseconds": 144.353,
+      "variant": "groq-qwen-stream",
+      "text": "Open the settings.",
+      "characters": 18,
+      "translation": "Відкрийте налаштування.",
+      "finish_reason": "stop",
+      "usage": {
+        "queue_time": 0.016572279,
+        "prompt_tokens": 32,
+        "prompt_time": 0.00240297,
+        "completion_tokens": 9,
+        "completion_time": 0.01790087,
+        "total_tokens": 41,
+        "total_time": 0.02030384
+      },
+      "phase": "cold-first",
+      "round": -1
+    },
+    {
+      "started_at": "2026-10-02T20:39:46.303416+00:00",
+      "ok": true,
+      "protocol": "HTTP/1.1",
+      "first_text_ms": 674.395,
+      "status": 200,
+      "headers_ms": 674.205,
+      "retry_after": null,
+      "returned_model": "gemini-3.1-flash-lite",
+      "reasoning_characters": 0,
+      "stream_events": 3,
+      "connection_reused": false,
+      "milliseconds": 717.526,
+      "variant": "gemini-flash-lite-stream",
+      "text": "Open the settings.",
+      "characters": 18,
+      "translation": "Відкрийте налаштування.",
+      "finish_reason": "STOP",
+      "usage": {
+        "promptTokenCount": 21,
+        "candidatesTokenCount": 7,
+        "totalTokenCount": 28,
+        "promptTokensDetails": [
+          {
+            "modality": "TEXT",
+            "tokenCount": 21
+          }
+        ],
+        "serviceTier": "standard"
+      },
+      "phase": "cold-first",
+      "round": -1
+    },
+    {
+      "started_at": "2026-10-02T20:39:47.023283+00:00",
+      "ok": true,
+      "protocol": "HTTP/1.1",
+      "first_text_ms": null,
+      "status": 200,
+      "headers_ms": 2004.788,
+      "retry_after": null,
+      "connection_reused": false,
+      "milliseconds": 2005.005,
+      "variant": "cloudflare-m2m100-en",
+      "text": "Open the settings.",
+      "characters": 18,
+      "translation": "Відкрийте настройки",
+      "phase": "cold-first",
+      "round": -1
+    }
+  ],
+  "blocked": [
+    {
+      "provider": "google",
+      "reason": "No Google Cloud Translation API key configured"
+    }
+  ],
+  "summary": {
+    "groq-qwen-stream": {
+      "cold-first": {
+        "attempted": 1,
+        "successful": 1,
+        "failed": 0,
+        "median_ms": 144.35,
+        "p95_ms": 144.35,
+        "min_ms": 144.35,
+        "max_ms": 144.35,
+        "reused_connections": 0,
+        "first_text_median_ms": 128.59,
+        "first_text_p95_ms": 128.59
+      }
+    },
+    "gemini-flash-lite-stream": {
+      "cold-first": {
+        "attempted": 1,
+        "successful": 1,
+        "failed": 0,
+        "median_ms": 717.53,
+        "p95_ms": 717.53,
+        "min_ms": 717.53,
+        "max_ms": 717.53,
+        "reused_connections": 0,
+        "first_text_median_ms": 674.39,
+        "first_text_p95_ms": 674.39
+      }
+    },
+    "cloudflare-m2m100-en": {
+      "cold-first": {
+        "attempted": 1,
+        "successful": 1,
+        "failed": 0,
+        "median_ms": 2005.01,
+        "p95_ms": 2005.01,
+        "min_ms": 2005.01,
+        "max_ms": 2005.01,
+        "reused_connections": 0
+      }
+    }
+  }
+}

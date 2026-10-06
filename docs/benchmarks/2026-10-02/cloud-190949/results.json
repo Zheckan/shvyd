@@ -1,0 +1,123 @@
+{
+  "metadata": {
+    "started_at": "2026-10-02T19:09:49.161412+00:00",
+    "pair": "en->uk",
+    "transport": "Python http.client HTTP/1.1",
+    "rounds": 5,
+    "seed": 42,
+    "local_cache": false,
+    "timing": "request start to entire response body; network included",
+    "cohere_minimum_start_interval_seconds": 3.2,
+    "configuration": {
+      "providers": {
+        "azure": {
+          "configured": true,
+          "region": "",
+          "endpoint": "https://api.cognitive.microsofttranslator.com",
+          "api_version": "2026-06-06"
+        },
+        "deepl": {
+          "configured": true,
+          "endpoint": "https://api.deepl.com"
+        },
+        "cohere": {
+          "configured": true,
+          "endpoint": "https://api.cohere.com",
+          "model": "north-small-translate-09-2026"
+        },
+        "google": {
+          "configured": false,
+          "endpoint": "https://translation.googleapis.com"
+        }
+      }
+    }
+  },
+  "inputs": [
+    "bank",
+    "Open the settings.",
+    "Your changes have been saved.",
+    "I am feeling blue.",
+    "He eventually spilled the beans.",
+    "It costs an arm and a leg.",
+    "The river bank is steep.",
+    "Please restart your browser after the installation is complete.",
+    "The patch addresses a race condition in the background worker.",
+    "You can select a different language from the menu. Your choice will be remembered the next time you open the browser.",
+    "The update improves performance and fixes several bugs. Please restart your browser after the installation is complete. Your saved settings and bookmarks will remain available.",
+    "When you select text on a web page, a small translation button appears beside it. Click the button to see the translation without leaving the page. The tool remembers your last chosen language and keeps the interface simple."
+  ],
+  "variants": [
+    {
+      "id": "deepl-latency_optimized-en",
+      "provider": "deepl",
+      "endpoint": "https://api.deepl.com",
+      "model": "latency_optimized",
+      "detect": false
+    },
+    {
+      "id": "deepl-latency_optimized-auto",
+      "provider": "deepl",
+      "endpoint": "https://api.deepl.com",
+      "model": "latency_optimized",
+      "detect": true
+    },
+    {
+      "id": "deepl-quality_optimized-en",
+      "provider": "deepl",
+      "endpoint": "https://api.deepl.com",
+      "model": "quality_optimized",
+      "detect": false
+    },
+    {
+      "id": "deepl-quality_optimized-auto",
+      "provider": "deepl",
+      "endpoint": "https://api.deepl.com",
+      "model": "quality_optimized",
+      "detect": true
+    }
+  ],
+  "preflight": [
+    {
+      "provider": "deepl",
+      "endpoint": "https://api.deepl.com",
+      "started_at": "2026-10-02T19:09:49.161436+00:00",
+      "ok": false,
+      "protocol": "HTTP/1.1",
+      "first_text_ms": null,
+      "status": 403,
+      "headers_ms": 198.639,
+      "response": {
+        "message": "Authentication failed, provided API key is invalid. You can find more info in our docs: https://developers.deepl.com/docs/getting-started/auth"
+      },
+      "connection_reused": false,
+      "milliseconds": 198.694
+    },
+    {
+      "provider": "deepl",
+      "endpoint": "https://api-free.deepl.com",
+      "started_at": "2026-10-02T19:09:49.360845+00:00",
+      "ok": false,
+      "protocol": "HTTP/1.1",
+      "first_text_ms": null,
+      "status": 403,
+      "headers_ms": 212.881,
+      "response": {
+        "message": "Authentication failed, provided API key is invalid. You can find more info in our docs: https://developers.deepl.com/docs/getting-started/auth"
+      },
+      "connection_reused": false,
+      "milliseconds": 212.937
+    }
+  ],
+  "samples": [],
+  "blocked": [
+    {
+      "provider": "deepl",
+      "reason": "All official usage endpoints rejected the key"
+    },
+    {
+      "provider": "google",
+      "reason": "No Google Cloud Translation API key configured"
+    }
+  ],
+  "summary": {}
+}

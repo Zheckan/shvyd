@@ -1,0 +1,11 @@
+{
+  "provider": "deepl",
+  "endpoint": "https://api-free.deepl.com",
+  "status": 200,
+  "usage": {
+    "character_count": 134668,
+    "character_limit": 1000000,
+    "remaining_characters": 865332
+  },
+  "checked_at": "2026-10-02T19:40:09.876375+00:00"
+}

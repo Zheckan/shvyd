@@ -1,0 +1,2002 @@
+{
+  "schema_version": 1,
+  "generated_at": "2026-10-02T21:42:39.170625+00:00",
+  "pair": "en->uk",
+  "units": "milliseconds",
+  "inputs": [
+    {
+      "id": "word-1",
+      "size": "word",
+      "text": "bank"
+    },
+    {
+      "id": "short-1",
+      "size": "short",
+      "text": "Open the settings."
+    },
+    {
+      "id": "sentence-1",
+      "size": "sentence",
+      "text": "You can select a different language from the menu. Your choice will be remembered the next time you open the browser."
+    },
+    {
+      "id": "paragraph-1",
+      "size": "paragraph",
+      "text": "When you select text on a web page, a small translation button appears beside it. Click the button to open a panel with the translation. You can change the target language in that panel, and the browser will remember your choice for the next session. Press Escape or click outside the panel to close it. The selected text should remain highlighted so that you can compare the original with the translated version. If the request fails, the panel should explain what happened and offer a retry without losing your selection."
+    },
+    {
+      "id": "long-1",
+      "size": "long",
+      "text": "A reliable translation panel starts with a clear connection between the selected text and the request that represents it. The browser can generate several selection events while a person drags across a paragraph. Sending a request for every event wastes time and makes the interface feel unstable. Wait until the selection is complete, keep the source text in memory, and send the request when the translation button is clicked.\n\nThe user should see the panel immediately after clicking. Its position depends on the visible selection rectangle and the available space around it. Near the right edge of the page, the panel may need to move to the left. Near the bottom, it may need to open above the selection. Scrolling should not leave the panel floating over unrelated content. These adjustments should happen locally and should not delay the translation request.\n\nA second selection may be made before the first translation finishes. Give each request a unique identifier and compare it with the current selection before displaying the result. Cancel a request when the transport supports cancellation. If cancellation is unavailable, discard the stale response. The important behavior is that the result always belongs to the text the person most recently asked to translate.\n\nPersist the target language after it changes. For a person who normally translates into Ukrainian, a remembered preference removes an extra action from every request. The source language can be detected by the provider in the same translation call. Very short words are sometimes ambiguous, so the panel may also need an optional way to choose a source language when automatic detection produces the wrong result."
+    },
+    {
+      "id": "large-1",
+      "size": "large",
+      "text": "A reliable translation panel starts with a clear connection between the selected text and the request that represents it. The browser can generate several selection events while a person drags across a paragraph. Sending a request for every event wastes time and makes the interface feel unstable. Wait until the selection is complete, keep the source text in memory, and send the request when the translation button is clicked.\n\nThe user should see the panel immediately after clicking. Its position depends on the visible selection rectangle and the available space around it. Near the right edge of the page, the panel may need to move to the left. Near the bottom, it may need to open above the selection. Scrolling should not leave the panel floating over unrelated content. These adjustments should happen locally and should not delay the translation request.\n\nA second selection may be made before the first translation finishes. Give each request a unique identifier and compare it with the current selection before displaying the result. Cancel a request when the transport supports cancellation. If cancellation is unavailable, discard the stale response. The important behavior is that the result always belongs to the text the person most recently asked to translate.\n\nPersist the target language after it changes. For a person who normally translates into Ukrainian, a remembered preference removes an extra action from every request. The source language can be detected by the provider in the same translation call. Very short words are sometimes ambiguous, so the panel may also need an optional way to choose a source language when automatic detection produces the wrong result.\n\nNetwork connections make a measurable difference. The first request can include DNS lookup, a TCP connection, and a TLS handshake before the service receives any text. Later requests may reuse that connection. A benchmark should show both cases and should record the time until the entire translation is available. For a streamed response, also record when the first translated characters arrive.\n\nTranslation quality depends on context. A river bank and a financial bank share the same English spelling but require different Ukrainian words. Idioms such as feeling blue and spilling the beans should preserve their intended meaning. A fast engine that translates these expressions literally can make a paragraph harder to understand. Evaluate complete passages as well as isolated labels.\n\nLong passages need enough space in the panel to remain readable. Set a maximum height and allow the text to scroll inside it. Preserve paragraph boundaries where possible, and keep the close button accessible while scrolling. Keyboard users should be able to move focus into the panel, copy the translation, and return to the original page without losing their place.\n\nFailures should leave the source selection intact. A temporary network error, an exhausted allowance, and an invalid key require different recovery actions. Show a concise message with the relevant action. A retry should use the same source text and target language. Avoid repeatedly retrying a rejected credential because another request will not fix the configuration.\n\nMeasurements should describe the environment in which they were collected. Browser version, hardware, network connection, input length, model identifier, and source-language settings can all affect the result. Keep the raw timings together with the actual translations so that a later run can be compared against the same inputs. A single unusually fast request does not establish the normal experience.\n\nThe first prototype can concentrate on selection, translation, language preference, and closing the panel. Additional actions should be added only when they remove a frequent obstacle. A small interface can still be dependable if it handles stale requests, keyboard focus, page boundaries, and clear errors. These details matter more to everyday speed than a long list of optional features."
+    }
+  ],
+  "rounds": 3,
+  "models": [
+    {
+      "label": "Gemini 3.5 Flash-Lite",
+      "variant": "gemini-3.5-flash-lite-stream",
+      "source": "cloud-212815/results.json",
+      "settings": {
+        "id": "gemini-3.5-flash-lite-stream",
+        "provider": "gemini",
+        "endpoint": "https://generativelanguage.googleapis.com",
+        "model": "gemini-3.5-flash-lite",
+        "thinking_level": "MINIMAL",
+        "stream": true,
+        "detect": true
+      },
+      "warm": {
+        "attempted": 18,
+        "successful": 18,
+        "failed": 0,
+        "full": {
+          "median_ms": 1086.119,
+          "p95_ms": 4193.913,
+          "min_ms": 484.385,
+          "max_ms": 4193.913,
+          "observations": 18
+        },
+        "first_text": {
+          "median_ms": 556.408,
+          "p95_ms": 2032.226,
+          "min_ms": 478.539,
+          "max_ms": 2032.226,
+          "observations": 18
+        }
+      },
+      "sizes": {
+        "word": {
+          "attempted": 3,
+          "successful": 3,
+          "failed": 0,
+          "full": {
+            "median_ms": 496.005,
+            "p95_ms": 2039.464,
+            "min_ms": 484.385,
+            "max_ms": 2039.464,
+            "observations": 3
+          },
+          "first_text": {
+            "median_ms": 490.003,
+            "p95_ms": 2032.226,
+            "min_ms": 478.539,
+            "max_ms": 2032.226,
+            "observations": 3
+          }
+        },
+        "short": {
+          "attempted": 3,
+          "successful": 3,
+          "failed": 0,
+          "full": {
+            "median_ms": 624.523,
+            "p95_ms": 627.514,
+            "min_ms": 570.173,
+            "max_ms": 627.514,
+            "observations": 3
+          },
+          "first_text": {
+            "median_ms": 584.62,
+            "p95_ms": 623.46,
+            "min_ms": 528.749,
+            "max_ms": 623.46,
+            "observations": 3
+          }
+        },
+        "sentence": {
+          "attempted": 3,
+          "successful": 3,
+          "failed": 0,
+          "full": {
+            "median_ms": 640.762,
+            "p95_ms": 700.742,
+            "min_ms": 615.852,
+            "max_ms": 700.742,
+            "observations": 3
+          },
+          "first_text": {
+            "median_ms": 543.666,
+            "p95_ms": 660.716,
+            "min_ms": 534.126,
+            "max_ms": 660.716,
+            "observations": 3
+          }
+        },
+        "paragraph": {
+          "attempted": 3,
+          "successful": 3,
+          "failed": 0,
+          "full": {
+            "median_ms": 1198.506,
+            "p95_ms": 1216.863,
+            "min_ms": 973.731,
+            "max_ms": 1216.863,
+            "observations": 3
+          },
+          "first_text": {
+            "median_ms": 676.906,
+            "p95_ms": 697.265,
+            "min_ms": 529.194,
+            "max_ms": 697.265,
+            "observations": 3
+          }
+        },
+        "long": {
+          "attempted": 3,
+          "successful": 3,
+          "failed": 0,
+          "full": {
+            "median_ms": 1909.397,
+            "p95_ms": 1919.768,
+            "min_ms": 1819.376,
+            "max_ms": 1919.768,
+            "observations": 3
+          },
+          "first_text": {
+            "median_ms": 546.902,
+            "p95_ms": 565.913,
+            "min_ms": 523.723,
+            "max_ms": 565.913,
+            "observations": 3
+          }
+        },
+        "large": {
+          "attempted": 3,
+          "successful": 3,
+          "failed": 0,
+          "full": {
+            "median_ms": 3884.036,
+            "p95_ms": 4193.913,
+            "min_ms": 3759.945,
+            "max_ms": 4193.913,
+            "observations": 3
+          },
+          "first_text": {
+            "median_ms": 625.925,
+            "p95_ms": 716.751,
+            "min_ms": 533.927,
+            "max_ms": 716.751,
+            "observations": 3
+          }
+        }
+      },
+      "cold": {
+        "attempted": 1,
+        "successful": 1,
+        "failed": 0,
+        "full": {
+          "median_ms": 724.25,
+          "p95_ms": 724.25,
+          "min_ms": 724.25,
+          "max_ms": 724.25,
+          "observations": 1
+        },
+        "first_text": {
+          "median_ms": 672.746,
+          "p95_ms": 672.746,
+          "min_ms": 672.746,
+          "max_ms": 672.746,
+          "observations": 1
+        }
+      },
+      "fresh": {
+        "attempted": 3,
+        "successful": 3,
+        "failed": 0,
+        "full": {
+          "median_ms": 1068.544,
+          "p95_ms": 4033.977,
+          "min_ms": 612.507,
+          "max_ms": 4033.977,
+          "observations": 3
+        },
+        "first_text": {
+          "median_ms": 582.682,
+          "p95_ms": 752.093,
+          "min_ms": 570.908,
+          "max_ms": 752.093,
+          "observations": 3
+        }
+      },
+      "warm_reasoning_responses": 0,
+      "failures": []
+    },
+    {
+      "label": "Gemini 3.8 Flash",
+      "variant": "gemini-3.8-flash-stream",
+      "source": "cloud-212815/results.json",
+      "settings": {
+        "id": "gemini-3.8-flash-stream",
+        "provider": "gemini",
+        "endpoint": "https://generativelanguage.googleapis.com",
+        "model": "gemini-3.8-flash",
+        "thinking_level": "LOW",
+        "stream": true,
+        "detect": true
+      },
+      "warm": {
+        "attempted": 18,
+        "successful": 14,
+        "failed": 4,
+        "full": {
+          "median_ms": 4753.28,
+          "p95_ms": 9609.317,
+          "min_ms": 1341.654,
+          "max_ms": 9609.317,
+          "observations": 14
+        },
+        "first_text": {
+          "median_ms": 4161.407,
+          "p95_ms": 9602.518,
+          "min_ms": 892.126,
+          "max_ms": 9602.518,
+          "observations": 14
+        }
+      },
+      "sizes": {
+        "word": {
+          "attempted": 3,
+          "successful": 2,
+          "failed": 1,
+          "full": {
+            "median_ms": 5640.444,
+            "p95_ms": 7794.236,
+            "min_ms": 3486.652,
+            "max_ms": 7794.236,
+            "observations": 2
+          },
+          "first_text": {
+            "median_ms": 5631.682,
+            "p95_ms": 7784.46,
+            "min_ms": 3478.905,
+            "max_ms": 7784.46,
+            "observations": 2
+          }
+        },
+        "short": {
+          "attempted": 3,
+          "successful": 3,
+          "failed": 0,
+          "full": {
+            "median_ms": 4092.878,
+            "p95_ms": 4589.126,
+            "min_ms": 3858.713,
+            "max_ms": 4589.126,
+            "observations": 3
+          },
+          "first_text": {
+            "median_ms": 4080.755,
+            "p95_ms": 4577.147,
+            "min_ms": 3850.998,
+            "max_ms": 4577.147,
+            "observations": 3
+          }
+        },
+        "sentence": {
+          "attempted": 3,
+          "successful": 2,
+          "failed": 1,
+          "full": {
+            "median_ms": 5685.78,
+            "p95_ms": 5962.666,
+            "min_ms": 5408.893,
+            "max_ms": 5962.666,
+            "observations": 2
+          },
+          "first_text": {
+            "median_ms": 5671.124,
+            "p95_ms": 5948.962,
+            "min_ms": 5393.286,
+            "max_ms": 5948.962,
+            "observations": 2
+          }
+        },
+        "paragraph": {
+          "attempted": 3,
+          "successful": 3,
+          "failed": 0,
+          "full": {
+            "median_ms": 4253.828,
+            "p95_ms": 9609.317,
+            "min_ms": 1341.654,
+            "max_ms": 9609.317,
+            "observations": 3
+          },
+          "first_text": {
+            "median_ms": 4242.059,
+            "p95_ms": 9602.518,
+            "min_ms": 892.126,
+            "max_ms": 9602.518,
+            "observations": 3
+          }
+        },
+        "long": {
+          "attempted": 3,
+          "successful": 2,
+          "failed": 1,
+          "full": {
+            "median_ms": 4002.648,
+            "p95_ms": 4917.433,
+            "min_ms": 3087.862,
+            "max_ms": 4917.433,
+            "observations": 2
+          },
+          "first_text": {
+            "median_ms": 3768.003,
+            "p95_ms": 4889.917,
+            "min_ms": 2646.088,
+            "max_ms": 4889.917,
+            "observations": 2
+          }
+        },
+        "large": {
+          "attempted": 3,
+          "successful": 2,
+          "failed": 1,
+          "full": {
+            "median_ms": 5129.666,
+            "p95_ms": 5258.282,
+            "min_ms": 5001.049,
+            "max_ms": 5258.282,
+            "observations": 2
+          },
+          "first_text": {
+            "median_ms": 2108.211,
+            "p95_ms": 2248.214,
+            "min_ms": 1968.209,
+            "max_ms": 2248.214,
+            "observations": 2
+          }
+        }
+      },
+      "cold": {
+        "attempted": 1,
+        "successful": 1,
+        "failed": 0,
+        "full": {
+          "median_ms": 4560.207,
+          "p95_ms": 4560.207,
+          "min_ms": 4560.207,
+          "max_ms": 4560.207,
+          "observations": 1
+        },
+        "first_text": {
+          "median_ms": 4554.243,
+          "p95_ms": 4554.243,
+          "min_ms": 4554.243,
+          "max_ms": 4554.243,
+          "observations": 1
+        }
+      },
+      "fresh": {
+        "attempted": 3,
+        "successful": 2,
+        "failed": 1,
+        "full": {
+          "median_ms": 2904.377,
+          "p95_ms": 2905.294,
+          "min_ms": 2903.461,
+          "max_ms": 2905.294,
+          "observations": 2
+        },
+        "first_text": {
+          "median_ms": 2835.078,
+          "p95_ms": 2897.32,
+          "min_ms": 2772.836,
+          "max_ms": 2897.32,
+          "observations": 2
+        }
+      },
+      "warm_reasoning_responses": 0,
+      "failures": [
+        {
+          "phase": "warm",
+          "input_id": "word-1",
+          "round": 0,
+          "status": 503,
+          "error": null,
+          "provider_error": {
+            "error": {
+              "code": 503,
+              "message": "This model is currently experiencing high demand. Spikes in demand are usually temporary. Please try again later.",
+              "status": "UNAVAILABLE"
+            }
+          },
+          "stream_error": null,
+          "milliseconds": 5484.466,
+          "partial_translation_characters": 0
+        },
+        {
+          "phase": "warm",
+          "input_id": "long-1",
+          "round": 1,
+          "status": 200,
+          "error": "Generation did not complete",
+          "provider_error": null,
+          "stream_error": {
+            "code": 503,
+            "message": "This model is currently experiencing high demand. Spikes in demand are usually temporary. Please try again later.",
+            "status": "UNAVAILABLE"
+          },
+          "milliseconds": 7274.864,
+          "partial_translation_characters": 666
+        },
+        {
+          "phase": "warm",
+          "input_id": "large-1",
+          "round": 1,
+          "status": 200,
+          "error": "Generation did not complete",
+          "provider_error": null,
+          "stream_error": {
+            "code": 503,
+            "message": "This model is currently experiencing high demand. Spikes in demand are usually temporary. Please try again later.",
+            "status": "UNAVAILABLE"
+          },
+          "milliseconds": 6043.14,
+          "partial_translation_characters": 3104
+        },
+        {
+          "phase": "warm",
+          "input_id": "sentence-1",
+          "round": 2,
+          "status": 503,
+          "error": null,
+          "provider_error": {
+            "error": {
+              "code": 503,
+              "message": "This model is currently experiencing high demand. Spikes in demand are usually temporary. Please try again later.",
+              "status": "UNAVAILABLE"
+            }
+          },
+          "stream_error": null,
+          "milliseconds": 5408.451,
+          "partial_translation_characters": 0
+        },
+        {
+          "phase": "fresh",
+          "input_id": "large-1",
+          "round": -1,
+          "status": 429,
+          "error": null,
+          "provider_error": {
+            "error": {
+              "code": 429,
+              "message": "You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. \n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 20, model: gemini-3.8-flash\nPlease retry in 2h20m59.479666823s.",
+              "status": "RESOURCE_EXHAUSTED",
+              "details": [
+                {
+                  "@type": "type.googleapis.com/google.rpc.Help",
+                  "links": [
+                    {
+                      "description": "Learn more about Gemini API quotas",
+                      "url": "https://ai.google.dev/gemini-api/docs/rate-limits"
+                    }
+                  ]
+                },
+                {
+                  "@type": "type.googleapis.com/google.rpc.QuotaFailure",
+                  "violations": [
+                    {
+                      "quotaMetric": "generativelanguage.googleapis.com/generate_content_free_tier_requests",
+                      "quotaId": "GenerateRequestsPerDayPerProjectPerModel-FreeTier",
+                      "quotaDimensions": {
+                        "location": "global",
+                        "model": "gemini-3.8-flash"
+                      },
+                      "quotaValue": "20"
+                    }
+                  ]
+                },
+                {
+                  "@type": "type.googleapis.com/google.rpc.RetryInfo",
+                  "retryDelay": "8459s"
+                }
+              ]
+            }
+          },
+          "stream_error": null,
+          "milliseconds": 267.56,
+          "partial_translation_characters": 0
+        }
+      ]
+    },
+    {
+      "label": "Go GLM-5.3 Flash",
+      "variant": "go-glm-5.3-flash",
+      "source": "go-213015/results.json",
+      "settings": {
+        "reasoning_effort": "low"
+      },
+      "warm": {
+        "attempted": 18,
+        "successful": 15,
+        "failed": 3,
+        "full": {
+          "median_ms": 1011.168,
+          "p95_ms": 27207.277,
+          "min_ms": 567.533,
+          "max_ms": 27207.277,
+          "observations": 15
+        },
+        "first_text": {
+          "median_ms": 802.091,
+          "p95_ms": 10207.926,
+          "min_ms": 419.702,
+          "max_ms": 10207.926,
+          "observations": 15
+        }
+      },
+      "sizes": {
+        "word": {
+          "attempted": 3,
+          "successful": 3,
+          "failed": 0,
+          "full": {
+            "median_ms": 889.102,
+            "p95_ms": 1961.738,
+            "min_ms": 717.92,
+            "max_ms": 1961.738,
+            "observations": 3
+          },
+          "first_text": {
+            "median_ms": 884.287,
+            "p95_ms": 1961.533,
+            "min_ms": 695.974,
+            "max_ms": 1961.533,
+            "observations": 3
+          }
+        },
+        "short": {
+          "attempted": 3,
+          "successful": 3,
+          "failed": 0,
+          "full": {
+            "median_ms": 848.346,
+            "p95_ms": 1011.168,
+            "min_ms": 660.724,
+            "max_ms": 1011.168,
+            "observations": 3
+          },
+          "first_text": {
+            "median_ms": 802.091,
+            "p95_ms": 915.929,
+            "min_ms": 615.056,
+            "max_ms": 915.929,
+            "observations": 3
+          }
+        },
+        "sentence": {
+          "attempted": 3,
+          "successful": 3,
+          "failed": 0,
+          "full": {
+            "median_ms": 595.934,
+            "p95_ms": 609.302,
+            "min_ms": 567.533,
+            "max_ms": 609.302,
+            "observations": 3
+          },
+          "first_text": {
+            "median_ms": 436.596,
+            "p95_ms": 447.283,
+            "min_ms": 419.702,
+            "max_ms": 447.283,
+            "observations": 3
+          }
+        },
+        "paragraph": {
+          "attempted": 3,
+          "successful": 3,
+          "failed": 0,
+          "full": {
+            "median_ms": 9374.809,
+            "p95_ms": 21265.813,
+            "min_ms": 4871.803,
+            "max_ms": 21265.813,
+            "observations": 3
+          },
+          "first_text": {
+            "median_ms": 1616.737,
+            "p95_ms": 10207.926,
+            "min_ms": 1464.312,
+            "max_ms": 10207.926,
+            "observations": 3
+          }
+        },
+        "long": {
+          "attempted": 3,
+          "successful": 3,
+          "failed": 0,
+          "full": {
+            "median_ms": 19131.517,
+            "p95_ms": 27207.277,
+            "min_ms": 11642.348,
+            "max_ms": 27207.277,
+            "observations": 3
+          },
+          "first_text": {
+            "median_ms": 631.981,
+            "p95_ms": 3171.395,
+            "min_ms": 600.903,
+            "max_ms": 3171.395,
+            "observations": 3
+          }
+        },
+        "large": {
+          "attempted": 3,
+          "successful": 0,
+          "failed": 3
+        }
+      },
+      "cold": {
+        "attempted": 1,
+        "successful": 1,
+        "failed": 0,
+        "full": {
+          "median_ms": 16735.352,
+          "p95_ms": 16735.352,
+          "min_ms": 16735.352,
+          "max_ms": 16735.352,
+          "observations": 1
+        },
+        "first_text": {
+          "median_ms": 3752.734,
+          "p95_ms": 3752.734,
+          "min_ms": 3752.734,
+          "max_ms": 3752.734,
+          "observations": 1
+        }
+      },
+      "fresh": {
+        "attempted": 0,
+        "successful": 0,
+        "failed": 0
+      },
+      "warm_reasoning_responses": 6,
+      "failures": [
+        {
+          "phase": "warm",
+          "input_id": "large-1",
+          "round": 0,
+          "status": 200,
+          "error": "TimeoutError",
+          "provider_error": null,
+          "stream_error": null,
+          "milliseconds": 90178.063,
+          "partial_translation_characters": 2421
+        },
+        {
+          "phase": "warm",
+          "input_id": "large-1",
+          "round": 1,
+          "status": 200,
+          "error": "Generation was empty, truncated, or failed",
+          "provider_error": null,
+          "stream_error": {
+            "param": null,
+            "type": "server_error",
+            "message": "Streaming response failed: [server_error] upstream service timeout"
+          },
+          "milliseconds": 30317.54,
+          "partial_translation_characters": 0
+        },
+        {
+          "phase": "warm",
+          "input_id": "large-1",
+          "round": 2,
+          "status": 200,
+          "error": "TimeoutError",
+          "provider_error": null,
+          "stream_error": null,
+          "milliseconds": 90241.68,
+          "partial_translation_characters": 2628
+        }
+      ]
+    },
+    {
+      "label": "Go DeepSeek V4 Flash, reasoning off",
+      "variant": "go-deepseek-v4-flash",
+      "source": "go-213754/results.json",
+      "settings": {
+        "thinking": {
+          "type": "disabled"
+        },
+        "reasoning_effort": "none"
+      },
+      "warm": {
+        "attempted": 18,
+        "successful": 18,
+        "failed": 0,
+        "full": {
+          "median_ms": 984.002,
+          "p95_ms": 5608.187,
+          "min_ms": 534.34,
+          "max_ms": 5608.187,
+          "observations": 18
+        },
+        "first_text": {
+          "median_ms": 523.893,
+          "p95_ms": 864.575,
+          "min_ms": 486.795,
+          "max_ms": 864.575,
+          "observations": 18
+        }
+      },
+      "sizes": {
+        "word": {
+          "attempted": 3,
+          "successful": 3,
+          "failed": 0,
+          "full": {
+            "median_ms": 546.423,
+            "p95_ms": 929.502,
+            "min_ms": 534.34,
+            "max_ms": 929.502,
+            "observations": 3
+          },
+          "first_text": {
+            "median_ms": 546.276,
+            "p95_ms": 864.575,
+            "min_ms": 486.795,
+            "max_ms": 864.575,
+            "observations": 3
+          }
+        },
+        "short": {
+          "attempted": 3,
+          "successful": 3,
+          "failed": 0,
+          "full": {
+            "median_ms": 575.785,
+            "p95_ms": 654.592,
+            "min_ms": 561.195,
+            "max_ms": 654.592,
+            "observations": 3
+          },
+          "first_text": {
+            "median_ms": 559.36,
+            "p95_ms": 654.129,
+            "min_ms": 534.814,
+            "max_ms": 654.129,
+            "observations": 3
+          }
+        },
+        "sentence": {
+          "attempted": 3,
+          "successful": 3,
+          "failed": 0,
+          "full": {
+            "median_ms": 586.829,
+            "p95_ms": 975.088,
+            "min_ms": 584.854,
+            "max_ms": 975.088,
+            "observations": 3
+          },
+          "first_text": {
+            "median_ms": 511.166,
+            "p95_ms": 832.901,
+            "min_ms": 496.457,
+            "max_ms": 832.901,
+            "observations": 3
+          }
+        },
+        "paragraph": {
+          "attempted": 3,
+          "successful": 3,
+          "failed": 0,
+          "full": {
+            "median_ms": 1029.979,
+            "p95_ms": 1100.145,
+            "min_ms": 992.916,
+            "max_ms": 1100.145,
+            "observations": 3
+          },
+          "first_text": {
+            "median_ms": 543.632,
+            "p95_ms": 582.655,
+            "min_ms": 506.434,
+            "max_ms": 582.655,
+            "observations": 3
+          }
+        },
+        "long": {
+          "attempted": 3,
+          "successful": 3,
+          "failed": 0,
+          "full": {
+            "median_ms": 2173.573,
+            "p95_ms": 2281.679,
+            "min_ms": 2140.119,
+            "max_ms": 2281.679,
+            "observations": 3
+          },
+          "first_text": {
+            "median_ms": 496.457,
+            "p95_ms": 512.282,
+            "min_ms": 493.095,
+            "max_ms": 512.282,
+            "observations": 3
+          }
+        },
+        "large": {
+          "attempted": 3,
+          "successful": 3,
+          "failed": 0,
+          "full": {
+            "median_ms": 5217.993,
+            "p95_ms": 5608.187,
+            "min_ms": 4810.428,
+            "max_ms": 5608.187,
+            "observations": 3
+          },
+          "first_text": {
+            "median_ms": 512.973,
+            "p95_ms": 564.264,
+            "min_ms": 488.736,
+            "max_ms": 564.264,
+            "observations": 3
+          }
+        }
+      },
+      "cold": {
+        "attempted": 1,
+        "successful": 1,
+        "failed": 0,
+        "full": {
+          "median_ms": 1299.646,
+          "p95_ms": 1299.646,
+          "min_ms": 1299.646,
+          "max_ms": 1299.646,
+          "observations": 1
+        },
+        "first_text": {
+          "median_ms": 848.421,
+          "p95_ms": 848.421,
+          "min_ms": 848.421,
+          "max_ms": 848.421,
+          "observations": 1
+        }
+      },
+      "fresh": {
+        "attempted": 0,
+        "successful": 0,
+        "failed": 0
+      },
+      "warm_reasoning_responses": 0,
+      "failures": []
+    },
+    {
+      "label": "Go DeepSeek V4.1 Flash",
+      "variant": "go-deepseek-v4.1-flash",
+      "source": "go-212940/results.json",
+      "settings": {
+        "thinking": {
+          "type": "disabled"
+        }
+      },
+      "warm": {
+        "attempted": 18,
+        "successful": 18,
+        "failed": 0,
+        "full": {
+          "median_ms": 2337.012,
+          "p95_ms": 11278.253,
+          "min_ms": 1202.893,
+          "max_ms": 11278.253,
+          "observations": 18
+        },
+        "first_text": {
+          "median_ms": 1308.582,
+          "p95_ms": 4126.027,
+          "min_ms": 1090.165,
+          "max_ms": 4126.027,
+          "observations": 18
+        }
+      },
+      "sizes": {
+        "word": {
+          "attempted": 3,
+          "successful": 3,
+          "failed": 0,
+          "full": {
+            "median_ms": 1387.541,
+            "p95_ms": 4132.329,
+            "min_ms": 1325.825,
+            "max_ms": 4132.329,
+            "observations": 3
+          },
+          "first_text": {
+            "median_ms": 1383.621,
+            "p95_ms": 4126.027,
+            "min_ms": 1324.219,
+            "max_ms": 4126.027,
+            "observations": 3
+          }
+        },
+        "short": {
+          "attempted": 3,
+          "successful": 3,
+          "failed": 0,
+          "full": {
+            "median_ms": 1440.937,
+            "p95_ms": 1504.501,
+            "min_ms": 1202.893,
+            "max_ms": 1504.501,
+            "observations": 3
+          },
+          "first_text": {
+            "median_ms": 1410.361,
+            "p95_ms": 1422.588,
+            "min_ms": 1133.855,
+            "max_ms": 1422.588,
+            "observations": 3
+          }
+        },
+        "sentence": {
+          "attempted": 3,
+          "successful": 3,
+          "failed": 0,
+          "full": {
+            "median_ms": 1488.404,
+            "p95_ms": 1595.193,
+            "min_ms": 1378.828,
+            "max_ms": 1595.193,
+            "observations": 3
+          },
+          "first_text": {
+            "median_ms": 1296.544,
+            "p95_ms": 1320.619,
+            "min_ms": 1111.033,
+            "max_ms": 1320.619,
+            "observations": 3
+          }
+        },
+        "paragraph": {
+          "attempted": 3,
+          "successful": 3,
+          "failed": 0,
+          "full": {
+            "median_ms": 2364.606,
+            "p95_ms": 2432.553,
+            "min_ms": 2309.419,
+            "max_ms": 2432.553,
+            "observations": 3
+          },
+          "first_text": {
+            "median_ms": 1128.689,
+            "p95_ms": 1168.956,
+            "min_ms": 1090.165,
+            "max_ms": 1168.956,
+            "observations": 3
+          }
+        },
+        "long": {
+          "attempted": 3,
+          "successful": 3,
+          "failed": 0,
+          "full": {
+            "median_ms": 4867.203,
+            "p95_ms": 5012.21,
+            "min_ms": 4378.316,
+            "max_ms": 5012.21,
+            "observations": 3
+          },
+          "first_text": {
+            "median_ms": 1391.348,
+            "p95_ms": 1796.694,
+            "min_ms": 1118.553,
+            "max_ms": 1796.694,
+            "observations": 3
+          }
+        },
+        "large": {
+          "attempted": 3,
+          "successful": 3,
+          "failed": 0,
+          "full": {
+            "median_ms": 10206.371,
+            "p95_ms": 11278.253,
+            "min_ms": 9595.051,
+            "max_ms": 11278.253,
+            "observations": 3
+          },
+          "first_text": {
+            "median_ms": 1134.072,
+            "p95_ms": 2182.071,
+            "min_ms": 1121.728,
+            "max_ms": 2182.071,
+            "observations": 3
+          }
+        }
+      },
+      "cold": {
+        "attempted": 1,
+        "successful": 1,
+        "failed": 0,
+        "full": {
+          "median_ms": 2509.984,
+          "p95_ms": 2509.984,
+          "min_ms": 2509.984,
+          "max_ms": 2509.984,
+          "observations": 1
+        },
+        "first_text": {
+          "median_ms": 1387.697,
+          "p95_ms": 1387.697,
+          "min_ms": 1387.697,
+          "max_ms": 1387.697,
+          "observations": 1
+        }
+      },
+      "fresh": {
+        "attempted": 0,
+        "successful": 0,
+        "failed": 0
+      },
+      "warm_reasoning_responses": 0,
+      "failures": []
+    },
+    {
+      "label": "Go MiMo-V2.6 Flash",
+      "variant": "go-mimo-v2.6-flash",
+      "source": "go-212940/results.json",
+      "settings": {
+        "thinking": {
+          "type": "disabled"
+        }
+      },
+      "warm": {
+        "attempted": 18,
+        "successful": 18,
+        "failed": 0,
+        "full": {
+          "median_ms": 4156.117,
+          "p95_ms": 65879.414,
+          "min_ms": 1286.186,
+          "max_ms": 65879.414,
+          "observations": 18
+        },
+        "first_text": {
+          "median_ms": 1763.851,
+          "p95_ms": 7725.991,
+          "min_ms": 776.971,
+          "max_ms": 7725.991,
+          "observations": 18
+        }
+      },
+      "sizes": {
+        "word": {
+          "attempted": 3,
+          "successful": 3,
+          "failed": 0,
+          "full": {
+            "median_ms": 2201.745,
+            "p95_ms": 2933.796,
+            "min_ms": 1635.672,
+            "max_ms": 2933.796,
+            "observations": 3
+          },
+          "first_text": {
+            "median_ms": 2088.622,
+            "p95_ms": 2902.357,
+            "min_ms": 1573.828,
+            "max_ms": 2902.357,
+            "observations": 3
+          }
+        },
+        "short": {
+          "attempted": 3,
+          "successful": 3,
+          "failed": 0,
+          "full": {
+            "median_ms": 1625.909,
+            "p95_ms": 1652.595,
+            "min_ms": 1286.186,
+            "max_ms": 1652.595,
+            "observations": 3
+          },
+          "first_text": {
+            "median_ms": 1243.792,
+            "p95_ms": 1337.046,
+            "min_ms": 1052.159,
+            "max_ms": 1337.046,
+            "observations": 3
+          }
+        },
+        "sentence": {
+          "attempted": 3,
+          "successful": 3,
+          "failed": 0,
+          "full": {
+            "median_ms": 2204.752,
+            "p95_ms": 2219.128,
+            "min_ms": 1756.165,
+            "max_ms": 2219.128,
+            "observations": 3
+          },
+          "first_text": {
+            "median_ms": 1169.213,
+            "p95_ms": 1628.914,
+            "min_ms": 906.707,
+            "max_ms": 1628.914,
+            "observations": 3
+          }
+        },
+        "paragraph": {
+          "attempted": 3,
+          "successful": 3,
+          "failed": 0,
+          "full": {
+            "median_ms": 7255.129,
+            "p95_ms": 10795.262,
+            "min_ms": 5378.438,
+            "max_ms": 10795.262,
+            "observations": 3
+          },
+          "first_text": {
+            "median_ms": 3441.271,
+            "p95_ms": 7725.991,
+            "min_ms": 1290.61,
+            "max_ms": 7725.991,
+            "observations": 3
+          }
+        },
+        "long": {
+          "attempted": 3,
+          "successful": 3,
+          "failed": 0,
+          "full": {
+            "median_ms": 13242.909,
+            "p95_ms": 14202.485,
+            "min_ms": 12925.343,
+            "max_ms": 14202.485,
+            "observations": 3
+          },
+          "first_text": {
+            "median_ms": 1898.787,
+            "p95_ms": 2105.687,
+            "min_ms": 776.971,
+            "max_ms": 2105.687,
+            "observations": 3
+          }
+        },
+        "large": {
+          "attempted": 3,
+          "successful": 3,
+          "failed": 0,
+          "full": {
+            "median_ms": 56890.599,
+            "p95_ms": 65879.414,
+            "min_ms": 47630.343,
+            "max_ms": 65879.414,
+            "observations": 3
+          },
+          "first_text": {
+            "median_ms": 3732.508,
+            "p95_ms": 6649.447,
+            "min_ms": 2300.031,
+            "max_ms": 6649.447,
+            "observations": 3
+          }
+        }
+      },
+      "cold": {
+        "attempted": 1,
+        "successful": 1,
+        "failed": 0,
+        "full": {
+          "median_ms": 5426.053,
+          "p95_ms": 5426.053,
+          "min_ms": 5426.053,
+          "max_ms": 5426.053,
+          "observations": 1
+        },
+        "first_text": {
+          "median_ms": 1384.227,
+          "p95_ms": 1384.227,
+          "min_ms": 1384.227,
+          "max_ms": 1384.227,
+          "observations": 1
+        }
+      },
+      "fresh": {
+        "attempted": 0,
+        "successful": 0,
+        "failed": 0
+      },
+      "warm_reasoning_responses": 0,
+      "failures": []
+    },
+    {
+      "label": "Go Qwen3.8 Flash",
+      "variant": "go-qwen3.8-flash",
+      "source": "go-213754/results.json",
+      "settings": {
+        "thinking": {
+          "type": "disabled"
+        }
+      },
+      "warm": {
+        "attempted": 18,
+        "successful": 18,
+        "failed": 0,
+        "full": {
+          "median_ms": 2456.923,
+          "p95_ms": 24881.433,
+          "min_ms": 1017.723,
+          "max_ms": 24881.433,
+          "observations": 18
+        },
+        "first_text": {
+          "median_ms": 1259.505,
+          "p95_ms": 1809.466,
+          "min_ms": 957.026,
+          "max_ms": 1809.466,
+          "observations": 18
+        }
+      },
+      "sizes": {
+        "word": {
+          "attempted": 3,
+          "successful": 3,
+          "failed": 0,
+          "full": {
+            "median_ms": 1221.728,
+            "p95_ms": 1231.426,
+            "min_ms": 1017.723,
+            "max_ms": 1231.426,
+            "observations": 3
+          },
+          "first_text": {
+            "median_ms": 1167.05,
+            "p95_ms": 1180.656,
+            "min_ms": 957.026,
+            "max_ms": 1180.656,
+            "observations": 3
+          }
+        },
+        "short": {
+          "attempted": 3,
+          "successful": 3,
+          "failed": 0,
+          "full": {
+            "median_ms": 1282.758,
+            "p95_ms": 1363.143,
+            "min_ms": 1133.205,
+            "max_ms": 1363.143,
+            "observations": 3
+          },
+          "first_text": {
+            "median_ms": 1125.839,
+            "p95_ms": 1258.811,
+            "min_ms": 1044.554,
+            "max_ms": 1258.811,
+            "observations": 3
+          }
+        },
+        "sentence": {
+          "attempted": 3,
+          "successful": 3,
+          "failed": 0,
+          "full": {
+            "median_ms": 1650.123,
+            "p95_ms": 1727.444,
+            "min_ms": 1577.445,
+            "max_ms": 1727.444,
+            "observations": 3
+          },
+          "first_text": {
+            "median_ms": 1206.054,
+            "p95_ms": 1260.198,
+            "min_ms": 985.483,
+            "max_ms": 1260.198,
+            "observations": 3
+          }
+        },
+        "paragraph": {
+          "attempted": 3,
+          "successful": 3,
+          "failed": 0,
+          "full": {
+            "median_ms": 4400.336,
+            "p95_ms": 4879.285,
+            "min_ms": 3186.402,
+            "max_ms": 4879.285,
+            "observations": 3
+          },
+          "first_text": {
+            "median_ms": 1520.693,
+            "p95_ms": 1809.466,
+            "min_ms": 1183.026,
+            "max_ms": 1809.466,
+            "observations": 3
+          }
+        },
+        "long": {
+          "attempted": 3,
+          "successful": 3,
+          "failed": 0,
+          "full": {
+            "median_ms": 9281.27,
+            "p95_ms": 10000.026,
+            "min_ms": 8438.666,
+            "max_ms": 10000.026,
+            "observations": 3
+          },
+          "first_text": {
+            "median_ms": 1685.223,
+            "p95_ms": 1763.691,
+            "min_ms": 1302.952,
+            "max_ms": 1763.691,
+            "observations": 3
+          }
+        },
+        "large": {
+          "attempted": 3,
+          "successful": 3,
+          "failed": 0,
+          "full": {
+            "median_ms": 18078.884,
+            "p95_ms": 24881.433,
+            "min_ms": 18010.734,
+            "max_ms": 24881.433,
+            "observations": 3
+          },
+          "first_text": {
+            "median_ms": 1324.767,
+            "p95_ms": 1666.751,
+            "min_ms": 1304.011,
+            "max_ms": 1666.751,
+            "observations": 3
+          }
+        }
+      },
+      "cold": {
+        "attempted": 1,
+        "successful": 1,
+        "failed": 0,
+        "full": {
+          "median_ms": 4828.954,
+          "p95_ms": 4828.954,
+          "min_ms": 4828.954,
+          "max_ms": 4828.954,
+          "observations": 1
+        },
+        "first_text": {
+          "median_ms": 2094.49,
+          "p95_ms": 2094.49,
+          "min_ms": 2094.49,
+          "max_ms": 2094.49,
+          "observations": 1
+        }
+      },
+      "fresh": {
+        "attempted": 0,
+        "successful": 0,
+        "failed": 0
+      },
+      "warm_reasoning_responses": 0,
+      "failures": []
+    }
+  ],
+  "earlier_matched_baselines": [
+    {
+      "label": "Azure auto",
+      "variant": "azure-auto",
+      "source": "cloud-191659/results.json",
+      "earlier_separate_batch": true,
+      "sizes": {
+        "word": {
+          "attempted": 3,
+          "successful": 3,
+          "failed": 0,
+          "full": {
+            "median_ms": 47.772,
+            "p95_ms": 77.418,
+            "min_ms": 43.448,
+            "max_ms": 77.418,
+            "observations": 3
+          }
+        },
+        "short": {
+          "attempted": 3,
+          "successful": 3,
+          "failed": 0,
+          "full": {
+            "median_ms": 49.049,
+            "p95_ms": 117.537,
+            "min_ms": 45.487,
+            "max_ms": 117.537,
+            "observations": 3
+          }
+        },
+        "sentence": {
+          "attempted": 3,
+          "successful": 3,
+          "failed": 0,
+          "full": {
+            "median_ms": 156.506,
+            "p95_ms": 215.428,
+            "min_ms": 115.893,
+            "max_ms": 215.428,
+            "observations": 3
+          }
+        },
+        "paragraph": {
+          "attempted": 3,
+          "successful": 3,
+          "failed": 0,
+          "full": {
+            "median_ms": 481.394,
+            "p95_ms": 558.527,
+            "min_ms": 337.922,
+            "max_ms": 558.527,
+            "observations": 3
+          }
+        },
+        "long": {
+          "attempted": 3,
+          "successful": 3,
+          "failed": 0,
+          "full": {
+            "median_ms": 387.211,
+            "p95_ms": 481.56,
+            "min_ms": 322.145,
+            "max_ms": 481.56,
+            "observations": 3
+          }
+        },
+        "large": {
+          "attempted": 3,
+          "successful": 3,
+          "failed": 0,
+          "full": {
+            "median_ms": 398.12,
+            "p95_ms": 556.369,
+            "min_ms": 336.46,
+            "max_ms": 556.369,
+            "observations": 3
+          }
+        }
+      }
+    },
+    {
+      "label": "Groq Qwen3.8 27B",
+      "variant": "groq-qwen-stream",
+      "source": "cloud-210448/results.json",
+      "earlier_separate_batch": true,
+      "sizes": {
+        "word": {
+          "attempted": 3,
+          "successful": 3,
+          "failed": 0,
+          "full": {
+            "median_ms": 79.044,
+            "p95_ms": 125.192,
+            "min_ms": 55.886,
+            "max_ms": 125.192,
+            "observations": 3
+          },
+          "first_text": {
+            "median_ms": 76.967,
+            "p95_ms": 121.438,
+            "min_ms": 54.077,
+            "max_ms": 121.438,
+            "observations": 3
+          }
+        },
+        "short": {
+          "attempted": 3,
+          "successful": 3,
+          "failed": 0,
+          "full": {
+            "median_ms": 136.73,
+            "p95_ms": 147.002,
+            "min_ms": 68.776,
+            "max_ms": 147.002,
+            "observations": 3
+          },
+          "first_text": {
+            "median_ms": 118.92,
+            "p95_ms": 132.568,
+            "min_ms": 53.149,
+            "max_ms": 132.568,
+            "observations": 3
+          }
+        },
+        "sentence": {
+          "attempted": 3,
+          "successful": 3,
+          "failed": 0,
+          "full": {
+            "median_ms": 260.862,
+            "p95_ms": 738.998,
+            "min_ms": 214.32,
+            "max_ms": 738.998,
+            "observations": 3
+          },
+          "first_text": {
+            "median_ms": 197.156,
+            "p95_ms": 677.103,
+            "min_ms": 155.812,
+            "max_ms": 677.103,
+            "observations": 3
+          }
+        },
+        "paragraph": {
+          "attempted": 3,
+          "successful": 3,
+          "failed": 0,
+          "full": {
+            "median_ms": 443.886,
+            "p95_ms": 703.233,
+            "min_ms": 424.95,
+            "max_ms": 703.233,
+            "observations": 3
+          },
+          "first_text": {
+            "median_ms": 64.212,
+            "p95_ms": 295.211,
+            "min_ms": 61.175,
+            "max_ms": 295.211,
+            "observations": 3
+          }
+        },
+        "long": {
+          "attempted": 3,
+          "successful": 3,
+          "failed": 0,
+          "full": {
+            "median_ms": 1168.43,
+            "p95_ms": 1251.352,
+            "min_ms": 1118.131,
+            "max_ms": 1251.352,
+            "observations": 3
+          },
+          "first_text": {
+            "median_ms": 92.113,
+            "p95_ms": 209.626,
+            "min_ms": 82.421,
+            "max_ms": 209.626,
+            "observations": 3
+          }
+        },
+        "large": {
+          "attempted": 0,
+          "successful": 0,
+          "failed": 0
+        }
+      }
+    },
+    {
+      "label": "Gemini 3.1 Flash-Lite",
+      "variant": "gemini-flash-lite-stream",
+      "source": "cloud-204004/results.json",
+      "earlier_separate_batch": true,
+      "sizes": {
+        "word": {
+          "attempted": 3,
+          "successful": 3,
+          "failed": 0,
+          "full": {
+            "median_ms": 631.437,
+            "p95_ms": 851.533,
+            "min_ms": 534.153,
+            "max_ms": 851.533,
+            "observations": 3
+          },
+          "first_text": {
+            "median_ms": 627.493,
+            "p95_ms": 849.153,
+            "min_ms": 526.55,
+            "max_ms": 849.153,
+            "observations": 3
+          }
+        },
+        "short": {
+          "attempted": 3,
+          "successful": 3,
+          "failed": 0,
+          "full": {
+            "median_ms": 911.415,
+            "p95_ms": 2401.333,
+            "min_ms": 902.753,
+            "max_ms": 2401.333,
+            "observations": 3
+          },
+          "first_text": {
+            "median_ms": 870.484,
+            "p95_ms": 2380.022,
+            "min_ms": 861.573,
+            "max_ms": 2380.022,
+            "observations": 3
+          }
+        },
+        "sentence": {
+          "attempted": 3,
+          "successful": 3,
+          "failed": 0,
+          "full": {
+            "median_ms": 831.612,
+            "p95_ms": 979.817,
+            "min_ms": 668.932,
+            "max_ms": 979.817,
+            "observations": 3
+          },
+          "first_text": {
+            "median_ms": 754.434,
+            "p95_ms": 888.089,
+            "min_ms": 590.253,
+            "max_ms": 888.089,
+            "observations": 3
+          }
+        },
+        "paragraph": {
+          "attempted": 3,
+          "successful": 3,
+          "failed": 0,
+          "full": {
+            "median_ms": 1798.113,
+            "p95_ms": 3440.775,
+            "min_ms": 1260.496,
+            "max_ms": 3440.775,
+            "observations": 3
+          },
+          "first_text": {
+            "median_ms": 1357.523,
+            "p95_ms": 2990.815,
+            "min_ms": 806.585,
+            "max_ms": 2990.815,
+            "observations": 3
+          }
+        },
+        "long": {
+          "attempted": 3,
+          "successful": 3,
+          "failed": 0,
+          "full": {
+            "median_ms": 2169.827,
+            "p95_ms": 2349.233,
+            "min_ms": 2046.436,
+            "max_ms": 2349.233,
+            "observations": 3
+          },
+          "first_text": {
+            "median_ms": 805.813,
+            "p95_ms": 1038.642,
+            "min_ms": 772.504,
+            "max_ms": 1038.642,
+            "observations": 3
+          }
+        },
+        "large": {
+          "attempted": 3,
+          "successful": 3,
+          "failed": 0,
+          "full": {
+            "median_ms": 4661.702,
+            "p95_ms": 5734.033,
+            "min_ms": 4220.477,
+            "max_ms": 5734.033,
+            "observations": 3
+          },
+          "first_text": {
+            "median_ms": 940.358,
+            "p95_ms": 2334.557,
+            "min_ms": 852.857,
+            "max_ms": 2334.557,
+            "observations": 3
+          }
+        }
+      }
+    }
+  ],
+  "sources": [
+    {
+      "path": "cloud-212815/results.json",
+      "sha256": "7667f9ef2bcfbbf0bcc24a0b8bb7fd8c4270b1b19cf8c6c57aecbfbf94d33e21",
+      "metadata": {
+        "started_at": "2026-10-02T21:28:15.132847+00:00",
+        "pair": "en->uk",
+        "transport": "Python http.client HTTP/1.1",
+        "rounds": 3,
+        "seed": 42,
+        "local_cache": false,
+        "measurement_mode": "repeated",
+        "input_file": "docs/benchmarks/inputs-groq-paced-en-uk.json",
+        "llm_output_limit": "max(512, source characters), capped at 4000 tokens; Groq also capped by GROQ_MAX_OUTPUT_TOKENS",
+        "groq_max_output_tokens": 1000,
+        "timing": "request start to entire response body; network included",
+        "cohere_minimum_start_interval_seconds": 3.2,
+        "deepl_minimum_start_interval_seconds": 2.0,
+        "new_provider_pacing": {
+          "groq": "30 RPM and conservative 8000 TPM reservation",
+          "groq_output_tokens_per_minute": 1000,
+          "gemini_minimum_seconds": 15.0,
+          "cerebras_minimum_seconds": 2.1,
+          "azure_characters_per_second": 500
+        },
+        "harness_sha256": "689217b81626bb8c24d9d55f20c2ffe5da4af15e424a84213b916a84dca4f15c",
+        "input_sha256": "6754f9ede48659704044aa1fa2130a795df37a424b882eef30860df8c61e4181",
+        "configuration": {
+          "providers": {
+            "azure": {
+              "configured": true,
+              "region": "",
+              "endpoint": "https://api.cognitive.microsofttranslator.com",
+              "api_version": "2026-06-06"
+            },
+            "deepl": {
+              "configured": true,
+              "endpoint": "https://api-free.deepl.com"
+            },
+            "cohere": {
+              "configured": true,
+              "endpoint": "https://api.cohere.com",
+              "model": "north-small-translate-09-2026"
+            },
+            "google": {
+              "configured": false,
+              "endpoint": "https://translation.googleapis.com"
+            },
+            "groq": {
+              "configured": true,
+              "endpoint": "https://api.groq.com",
+              "model": "qwen/qwen3.8-27b"
+            },
+            "gemini": {
+              "configured": true,
+              "endpoint": "https://generativelanguage.googleapis.com",
+              "model": "gemini-3.1-flash-lite"
+            },
+            "cerebras": {
+              "configured": false,
+              "endpoint": "https://api.cerebras.ai",
+              "model": "qwen-3.8-27b"
+            },
+            "cloudflare": {
+              "configured": true,
+              "endpoint": "https://api.cloudflare.com",
+              "model": "@cf/meta/m2m100-1.2b",
+              "token_present": true,
+              "account_id_present": true
+            }
+          }
+        },
+        "finished_at": "2026-10-02T21:39:00.536788+00:00"
+      },
+      "timed_attempts": 44,
+      "failures": 5
+    },
+    {
+      "path": "go-212940/results.json",
+      "sha256": "f4d4743efb8ae1e447f3fa7a555104567afdd34bf5b951b3d377a983e0c7f1e5",
+      "metadata": {
+        "started_at": "2026-10-02T21:29:40.721584+00:00",
+        "pair": "en->uk",
+        "rounds": 3,
+        "endpoint": "https://opencode.ai/zen/go/v1/chat/completions",
+        "route": "go",
+        "wire_models": [
+          "glm-5.3-flash",
+          "mimo-v2.6-flash",
+          "deepseek-v4-flash",
+          "deepseek-v4.1-flash"
+        ],
+        "models": {
+          "glm-5.3-flash": {
+            "thinking": {
+              "type": "enabled"
+            },
+            "reasoning_effort": "low"
+          },
+          "mimo-v2.6-flash": {
+            "thinking": {
+              "type": "disabled"
+            }
+          },
+          "deepseek-v4-flash": {
+            "thinking": {
+              "type": "disabled"
+            }
+          },
+          "deepseek-v4.1-flash": {
+            "thinking": {
+              "type": "disabled"
+            }
+          }
+        },
+        "purpose": "Internal model evaluation; Go documents coding-agent traffic, not a general translation service",
+        "transport": "Python http.client HTTP/1.1",
+        "one_request_at_a_time": true,
+        "local_cache": false,
+        "provider_caching": "uncontrolled; session stable for each input across rounds",
+        "retries": 0,
+        "seed": 42,
+        "go_minimum_start_interval_seconds": 2,
+        "max_tokens": 4096,
+        "temperature": 0,
+        "input_file": "docs/benchmarks/inputs-groq-paced-en-uk.json",
+        "input_sha256": "6754f9ede48659704044aa1fa2130a795df37a424b882eef30860df8c61e4181",
+        "harness_sha256": "25bff0b8c3762b59a65caae26bc4ad590fc1e502b1e6a62c6f58e40bbca06077",
+        "completed_at": "2026-10-02T21:37:49.720493+00:00",
+        "comparison_complete": false
+      },
+      "timed_attempts": 58,
+      "failures": 1
+    },
+    {
+      "path": "go-213015/results.json",
+      "sha256": "3b68b4402c3a6779275647a51b1263dc0bdf14489ec18936cf5353e9350b6d19",
+      "metadata": {
+        "started_at": "2026-10-02T21:30:15.627447+00:00",
+        "pair": "en->uk",
+        "rounds": 3,
+        "endpoint": "https://opencode.ai/zen/go/v1/chat/completions",
+        "route": "go",
+        "wire_models": [
+          "glm-5.3-flash"
+        ],
+        "models": {
+          "glm-5.3-flash": {
+            "reasoning_effort": "low"
+          }
+        },
+        "purpose": "Internal model evaluation; Go documents coding-agent traffic, not a general translation service",
+        "transport": "Python http.client HTTP/1.1",
+        "one_request_at_a_time": true,
+        "local_cache": false,
+        "provider_caching": "uncontrolled; session stable for each input across rounds",
+        "retries": 0,
+        "seed": 42,
+        "go_minimum_start_interval_seconds": 2,
+        "max_tokens": 4096,
+        "temperature": 0,
+        "input_file": "docs/benchmarks/inputs-groq-paced-en-uk.json",
+        "input_sha256": "6754f9ede48659704044aa1fa2130a795df37a424b882eef30860df8c61e4181",
+        "harness_sha256": "755136ebdc47b056dfb65145bca2f686b0d7ff5218368854849e801f1f333fc8",
+        "completed_at": "2026-10-02T21:35:54.641692+00:00",
+        "comparison_complete": false
+      },
+      "timed_attempts": 19,
+      "failures": 3
+    },
+    {
+      "path": "go-213626/results.json",
+      "sha256": "993cba991ae78b91a4917519c20bad3785aaf869c194607c631833c38c0c18e0",
+      "metadata": {
+        "started_at": "2026-10-02T21:36:26.187494+00:00",
+        "pair": "en->uk",
+        "rounds": 3,
+        "endpoint": "https://opencode.ai/zen/go/v1/chat/completions",
+        "model_endpoints": {
+          "qwen3.8-flash": "https://opencode.ai/zen/go/v1/messages",
+          "deepseek-v4-flash": "https://opencode.ai/zen/go/v1/chat/completions"
+        },
+        "route": "go",
+        "smoke_only": true,
+        "wire_models": [
+          "qwen3.8-flash",
+          "deepseek-v4-flash"
+        ],
+        "models": {
+          "qwen3.8-flash": {
+            "thinking": {
+              "type": "disabled"
+            }
+          },
+          "deepseek-v4-flash": {
+            "thinking": {
+              "type": "disabled"
+            },
+            "reasoning_effort": "none"
+          }
+        },
+        "purpose": "Internal model evaluation; Go documents coding-agent traffic, not a general translation service",
+        "transport": "Python http.client HTTP/1.1",
+        "one_request_at_a_time": true,
+        "local_cache": false,
+        "provider_caching": "uncontrolled; session stable for each input across rounds",
+        "retries": 0,
+        "seed": 42,
+        "go_minimum_start_interval_seconds": 2,
+        "max_tokens": 4096,
+        "temperature": 0,
+        "input_file": "docs/benchmarks/inputs-groq-paced-en-uk.json",
+        "input_sha256": "6754f9ede48659704044aa1fa2130a795df37a424b882eef30860df8c61e4181",
+        "harness_sha256": "fb5b6633322054f5a967fb8c641b8296d194925cb0c31f61f73da436b6d4db61",
+        "completed_at": "2026-10-02T21:36:32.006250+00:00",
+        "comparison_complete": false
+      },
+      "timed_attempts": 2,
+      "failures": 0
+    },
+    {
+      "path": "go-213754/results.json",
+      "sha256": "8a8189a3cfdf68be1be5dd7afc5b8a9dc55f3fff7fe0725500dc8b8d93430ed8",
+      "metadata": {
+        "started_at": "2026-10-02T21:37:54.502518+00:00",
+        "pair": "en->uk",
+        "rounds": 3,
+        "endpoint": "https://opencode.ai/zen/go/v1/chat/completions",
+        "model_endpoints": {
+          "qwen3.8-flash": "https://opencode.ai/zen/go/v1/messages",
+          "deepseek-v4-flash": "https://opencode.ai/zen/go/v1/chat/completions"
+        },
+        "route": "go",
+        "smoke_only": false,
+        "wire_models": [
+          "qwen3.8-flash",
+          "deepseek-v4-flash"
+        ],
+        "models": {
+          "qwen3.8-flash": {
+            "thinking": {
+              "type": "disabled"
+            }
+          },
+          "deepseek-v4-flash": {
+            "thinking": {
+              "type": "disabled"
+            },
+            "reasoning_effort": "none"
+          }
+        },
+        "purpose": "Internal model evaluation; Go documents coding-agent traffic, not a general translation service",
+        "transport": "Python http.client HTTP/1.1",
+        "one_request_at_a_time": true,
+        "local_cache": false,
+        "provider_caching": "uncontrolled; session stable for each input across rounds",
+        "retries": 0,
+        "seed": 42,
+        "go_minimum_start_interval_seconds": 2,
+        "max_tokens": 4096,
+        "temperature": 0,
+        "input_file": "docs/benchmarks/inputs-groq-paced-en-uk.json",
+        "input_sha256": "6754f9ede48659704044aa1fa2130a795df37a424b882eef30860df8c61e4181",
+        "harness_sha256": "fb5b6633322054f5a967fb8c641b8296d194925cb0c31f61f73da436b6d4db61",
+        "completed_at": "2026-10-02T21:40:46.837875+00:00",
+        "comparison_complete": true
+      },
+      "timed_attempts": 38,
+      "failures": 0
+    }
+  ],
+  "archive_attempts": 161,
+  "archive_failures": 9,
+  "selected_warm_attempts": 126,
+  "selected_warm_successes": 119,
+  "limits": [
+    "One distinct source per size, three repeats; nearest-rank P95 is the observed maximum for three successful samples.",
+    "Failures excluded from successful latency statistics, retained in counts and raw outputs.",
+    "Gemini and initial Go batches overlapped in time; GLM ran in a separate overlapping Go batch. Corrected DeepSeek V4 and Qwen ran together after other Go repeated batches finished.",
+    "Earlier baselines used the same source IDs in separate earlier runs. No inference-host identity is established.",
+    "This measures HTTP response timing, not extension click-to-visible timing or independently scored translation accuracy."
+  ]
+}
