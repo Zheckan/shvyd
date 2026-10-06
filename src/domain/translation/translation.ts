@@ -7,7 +7,9 @@ import { isProvider } from '@/domain/settings/settings'
 import { isRecord } from '@/utils/isRecord'
 
 export const MAX_SELECTION_LENGTH = 10_000
+
 export type TranslationFormat = 'plain' | 'html'
+
 export type Translation = {
   text: string
   format: TranslationFormat
@@ -16,12 +18,14 @@ export type Translation = {
   cached: boolean
   durationMs: number
 }
+
 export type TranslationRequest = {
   text: string
   format?: TranslationFormat
   target: Language
   provider?: Provider
 }
+
 export type ErrorCode =
   | 'selection'
   | 'configuration'
@@ -59,6 +63,7 @@ export function parseTranslationRequest(value: unknown): TranslationRequest {
       'Choose some text and a target language.'
     )
   }
+
   return {
     text: value.text,
     format: value.format ?? 'plain',
@@ -83,6 +88,7 @@ export function parseTranslation(value: unknown): Translation {
       'The translation response could not be read.'
     )
   }
+
   return {
     text: value.text,
     format: value.format ?? 'plain',

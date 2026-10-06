@@ -5,6 +5,7 @@ test('validates formatting at message boundaries and accepts older plain-text re
   expect(parseTranslationRequest({ text: 'Hello', target: 'uk' }).format).toBe(
     'plain'
   )
+
   expect(() =>
     parseTranslationRequest({
       text: 'Hello',
@@ -12,6 +13,7 @@ test('validates formatting at message boundaries and accepts older plain-text re
       format: 'markdown',
     })
   ).toThrow()
+
   expect(() =>
     parseTranslation({
       text: 'Hello',
@@ -22,6 +24,7 @@ test('validates formatting at message boundaries and accepts older plain-text re
       format: 'markdown',
     })
   ).toThrow()
+
   expect(
     parseTranslation({
       text: 'Hello',

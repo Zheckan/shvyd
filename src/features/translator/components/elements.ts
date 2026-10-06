@@ -20,6 +20,9 @@ export function make<K extends keyof HTMLElementTagNameMap>(
 ): HTMLElementTagNameMap[K] {
   const element = document.createElement(tag)
   element.className = className
-  if (text) element.textContent = text
+  if (text) {
+    element.textContent = text
+  }
+
   return element
 }

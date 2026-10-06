@@ -15,9 +15,11 @@ describe('selected-text translation', () => {
         return Response.json({})
       },
     })
+
     await expect(
       service.translate({ text: 'Hello', target: 'en-us' })
     ).rejects.toMatchObject({ code: 'configuration' })
+
     expect(sent).toBe(false)
   })
 
@@ -35,14 +37,16 @@ describe('selected-text translation', () => {
         })
       },
     })
+
     expect(
       await service.translate({ text: 'Good morning', target: 'zh-hant' })
     ).toMatchObject({ text: '早安', target: 'zh-hant' })
+
     expect(await requests[0]?.json()).toEqual({
       inputs: [{ text: 'Good morning', targets: [{ language: 'zh-Hant' }] }],
     })
   })
-  
+
   test('receives an automatic-source Azure translation in the selected target language', async () => {
     const requests: Request[] = []
     const service = createTranslationService({
@@ -62,6 +66,7 @@ describe('selected-text translation', () => {
         })
       },
     })
+
     const result = await service.translate({ text: 'Hello', target: 'uk' })
     expect(result).toMatchObject({
       text: 'Привіт',
@@ -69,10 +74,12 @@ describe('selected-text translation', () => {
       provider: 'azure',
       cached: false,
     })
+
     const request = requests[0]
     expect(request?.url).toBe(
       'https://api.cognitive.microsofttranslator.com/translate?api-version=2026-06-06'
     )
+
     expect(await request?.json()).toEqual({
       inputs: [{ text: 'Hello', targets: [{ language: 'uk' }] }],
     })
@@ -98,6 +105,7 @@ describe('selected-text translation', () => {
         })
       },
     })
+
     const text = '<div><p>Hello.</p><p>Second paragraph.</p></div>'
     expect(
       await service.translate({ text, format: 'html', target: 'uk' })
@@ -105,6 +113,7 @@ describe('selected-text translation', () => {
       text: '<div><p>Привіт.</p><p>Другий абзац.</p></div>',
       format: 'html',
     })
+
     expect(requests).toHaveLength(1)
     expect(await requests[0]?.json()).toEqual({
       inputs: [{ text, textType: 'html', targets: [{ language: 'uk' }] }],
@@ -131,6 +140,7 @@ describe('selected-text translation', () => {
         })
       },
     })
+
     expect(
       await service.translate({ text: 'I am feeling blue.', target: 'uk' })
     ).toMatchObject({
@@ -138,6 +148,7 @@ describe('selected-text translation', () => {
       provider: 'deepl',
       target: 'uk',
     })
+
     expect(requests).toHaveLength(1)
     expect(requests[0]?.url).toBe('https://api-free.deepl.com/v2/translate')
     expect(await requests[0]?.json()).toEqual({
@@ -162,10 +173,12 @@ describe('selected-text translation', () => {
         })
       },
     })
+
     const text = '<div><ul><li>Hello.</li></ul></div>'
     expect(
       await service.translate({ text, format: 'html', target: 'uk' })
     ).toMatchObject({ format: 'html' })
+
     expect(requests).toHaveLength(1)
     expect(await requests[0]?.json()).toEqual({
       text: [text],
@@ -190,10 +203,12 @@ describe('selected-text translation', () => {
         })
       },
     })
+
     await service.translate({ text: 'Hello', target: 'uk' })
     expect(
       await service.translate({ text: 'Hello', target: 'uk' })
     ).toMatchObject({ cached: true })
+
     await service.translate({ text: 'Hello', target: 'pl' })
     expect(calls).toBe(2)
   })
@@ -207,6 +222,7 @@ describe('selected-text translation', () => {
       fetcher: async () =>
         new Response('Rejected private-test-key', { status: 401 }),
     })
+
     await expect(
       service.translate({ text: 'Hello', target: 'uk' })
     ).rejects.toMatchObject({
@@ -229,17 +245,21 @@ describe('selected-text translation', () => {
         })
       },
     })
+
     const request = { text: '<p>Hello</p>', target: 'uk' }
     expect(await service.translate(request)).toMatchObject({
       format: 'plain',
       cached: false,
     })
+
     expect(
       await service.translate({ ...request, format: 'html' })
     ).toMatchObject({ format: 'html', cached: false })
+
     expect(
       await service.translate({ ...request, format: 'html' })
     ).toMatchObject({ format: 'html', cached: true })
+
     expect(calls).toBe(2)
   })
 })

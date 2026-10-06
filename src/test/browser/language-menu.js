@@ -10,14 +10,18 @@
     const { x, y, width, height } = element.getBoundingClientRect()
     return { x, y, width, height }
   }
+
   const wait = async (condition, description) => {
     const deadline = performance.now() + 3000
     while (!condition()) {
-      if (performance.now() > deadline)
+      if (performance.now() > deadline) {
         throw new Error(`Popup did not become ready: ${description}`)
+      }
+
       await new Promise((resolve) => setTimeout(resolve, 20))
     }
   }
+
   const assertStable = (before, action) => {
     const after = bounds(panel)
     if (
@@ -28,6 +32,7 @@
       )
     }
   }
+
   const assertAnchored = () => {
     const box = menu.getBoundingClientRect()
     const anchor = root.querySelector('.target').getBoundingClientRect()
@@ -35,6 +40,7 @@
       Math.abs(box.top - anchor.bottom),
       Math.abs(anchor.top - box.bottom)
     )
+
     if (
       box.left < 11 ||
       box.top < 11 ||
@@ -47,6 +53,7 @@
       )
     }
   }
+
   window.fetch = async (input, init) => {
     if (input === '/api' && init?.body) {
       const request = JSON.parse(init.body)
@@ -64,6 +71,7 @@
           },
         })
       }
+
       if (request.kind === 'translate') {
         return Response.json({
           ok: true,
@@ -78,8 +86,10 @@
         })
       }
     }
+
     return originalFetch.call(window, input, init)
   }
+
   try {
     root.querySelector('button[aria-label="Close translation"]').click()
     const passage = document.getElementById('short-text')
@@ -97,6 +107,7 @@
       () => !panel.hidden && panel.getAttribute('aria-busy') === 'false',
       'translation'
     )
+
     const before = bounds(panel)
     root.querySelector('.target').click()
     assertStable(before, 'Opening preferred languages')
@@ -104,14 +115,19 @@
     checks.push('preferred-menu-keeps-panel-stable')
     root.querySelector('.more-languages').click()
     assertStable(before, 'Opening additional languages')
-    if (menu.hidden) throw new Error('Language choices must be visible')
+    if (menu.hidden) {
+      throw new Error('Language choices must be visible')
+    }
+
     assertAnchored()
     checks.push('additional-menu-keeps-panel-stable')
     const search = root.querySelector('.language-search')
     search.value = 'Chinese'
     search.dispatchEvent(new Event('input'))
-    if (!menu.querySelector('[data-language="zh-hant"]'))
+    if (!menu.querySelector('[data-language="zh-hant"]')) {
       throw new Error('Language search must find Traditional Chinese')
+    }
+
     assertStable(before, 'Searching languages')
     assertAnchored()
     checks.push('language-search-keeps-panel-stable')
@@ -122,8 +138,11 @@
         composed: true,
       })
     )
-    if (root.activeElement?.getAttribute('role') !== 'option')
+
+    if (root.activeElement?.getAttribute('role') !== 'option') {
       throw new Error('ArrowDown must focus a language')
+    }
+
     root.activeElement.dispatchEvent(
       new KeyboardEvent('keydown', {
         key: 'End',
@@ -131,8 +150,11 @@
         composed: true,
       })
     )
-    if (root.activeElement?.dataset.language !== 'zh-hant')
+
+    if (root.activeElement?.dataset.language !== 'zh-hant') {
       throw new Error('End must focus the last matching language')
+    }
+
     checks.push('language-menu-keyboard-navigation')
     root.activeElement.dispatchEvent(
       new KeyboardEvent('keydown', {
@@ -141,12 +163,15 @@
         composed: true,
       })
     )
+
     if (
       !menu.hidden ||
       panel.hidden ||
       root.activeElement !== root.querySelector('.target')
-    )
+    ) {
       throw new Error('Escape must close only the menu and restore focus')
+    }
+
     assertStable(before, 'Closing languages with Escape')
     checks.push('escape-closes-only-language-menu')
     root.querySelector('.target').click()
@@ -155,10 +180,12 @@
       .dispatchEvent(
         new PointerEvent('pointerdown', { bubbles: true, composed: true })
       )
-    if (!menu.hidden || panel.hidden)
+    if (!menu.hidden || panel.hidden) {
       throw new Error(
         'Clicking the translation must dismiss only the language menu'
       )
+    }
+
     assertStable(before, 'Clicking outside the language menu')
     checks.push('translation-click-closes-only-language-menu')
     root.querySelector('.target').click()
@@ -169,8 +196,11 @@
         root.querySelector('.translation').lang === 'en',
       'new target'
     )
-    if (!menu.hidden)
+
+    if (!menu.hidden) {
       throw new Error('Choosing a language must close the language menu')
+    }
+
     checks.push('choosing-language-translates-and-closes-menu')
     root.querySelector('.target').click()
     root.querySelector('.more-languages').click()

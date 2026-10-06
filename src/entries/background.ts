@@ -10,6 +10,7 @@ import { isRecord } from '@/utils/isRecord'
 const ready = chrome.storage.local.setAccessLevel({
   accessLevel: 'TRUSTED_CONTEXTS',
 })
+
 const store = createSettingsStore({
   read: async () => {
     await ready
@@ -28,14 +29,17 @@ const store = createSettingsStore({
     }
   },
 })
+
 const translator = createTranslationService({ readSettings: store.settings })
 
 async function handle(
   value: unknown,
   sender: chrome.runtime.MessageSender
 ): Promise<unknown> {
-  if (sender.id !== chrome.runtime.id || !isRecord(value))
+  if (sender.id !== chrome.runtime.id || !isRecord(value)) {
     throw new Error('Invalid extension request.')
+  }
+
   switch (value.kind) {
     case 'preferences':
       return store.preferences()
@@ -53,7 +57,11 @@ async function handle(
       ) {
         throw new Error('Open the extension settings to change API keys.')
       }
-      if (value.kind === 'get-settings') return store.settings()
+
+      if (value.kind === 'get-settings') {
+        return store.settings()
+      }
+
       const settings = await store.save(value.value)
       translator.clearCache()
       return settings
@@ -76,8 +84,10 @@ chrome.runtime.onMessage.addListener((request: unknown, sender, respond) => {
             : 'Shvyd could not finish this request.',
       })
   )
+
   return true
 })
+
 chrome.action.onClicked.addListener(() => {
   void chrome.runtime.openOptionsPage()
 })

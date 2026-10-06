@@ -3,6 +3,12 @@
   "categories": {
     "correctness": "error"
   },
+  "rules": {
+    "curly": ["error", "all"],
+    "one-var": ["error", "never"],
+    "no-multi-assign": "error",
+    "no-nested-ternary": "error"
+  },
   "env": {
     "browser": true
   },

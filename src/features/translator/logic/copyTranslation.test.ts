@@ -13,5 +13,6 @@ test('offers manual copying when browser permission is denied', async () => {
       throw new DOMException('Permission denied', 'NotAllowedError')
     },
   }
+
   expect(await copyTranslation({ text: 'Привіт', clipboard })).toBe('manual')
 })

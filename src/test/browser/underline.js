@@ -25,16 +25,21 @@
         })
       }
     }
+
     return originalFetch.call(window, input, init)
   }
+
   const wait = async (condition) => {
     const deadline = performance.now() + 3000
     while (!condition()) {
-      if (performance.now() > deadline)
+      if (performance.now() > deadline) {
         throw new Error('Underline fixture did not finish translating')
+      }
+
       await new Promise((resolve) => setTimeout(resolve, 20))
     }
   }
+
   try {
     root.querySelector('button[aria-label="Close translation"]').click()
     fixture.scrollIntoView({ block: 'center' })
@@ -48,24 +53,31 @@
     await wait(
       () => root.querySelector('.panel').getAttribute('aria-busy') === 'false'
     )
+
     const output = root.querySelector('.translation')
     const underlined = output.querySelector('u')
     if (
       underlined?.textContent !== 'Underlined link' ||
       !getComputedStyle(underlined).textDecorationLine.includes('underline')
-    )
+    ) {
       throw new Error(
         'The translated link must remain underlined; surrounding plain text must not be underlined'
       )
-    if (!underlined.querySelector('strong'))
+    }
+
+    if (!underlined.querySelector('strong')) {
       throw new Error('Underlining must preserve nested bold text')
+    }
+
     if (
       output.querySelector('a,[href],[style],[onclick]') ||
       /href=|style=|onclick=/.test(request.text)
-    )
+    ) {
       throw new Error(
         'Underlining must not copy source attributes or link destinations'
       )
+    }
+
     return {
       passed: true,
       checks: [

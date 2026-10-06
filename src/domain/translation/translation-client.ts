@@ -15,13 +15,16 @@ export interface TranslationClient {
 }
 
 export async function unwrapResponse(value: unknown): Promise<unknown> {
-  if (!isRecord(value) || typeof value.ok !== 'boolean')
+  if (!isRecord(value) || typeof value.ok !== 'boolean') {
     throw new Error('Shvyd could not connect. Reload this page and try again.')
+  }
+
   if (!value.ok) {
     const message =
       typeof value.message === 'string'
         ? value.message
         : 'Translation could not finish. Try again.'
+
     if (
       value.code === 'selection' ||
       value.code === 'configuration' ||
@@ -32,8 +35,10 @@ export async function unwrapResponse(value: unknown): Promise<unknown> {
     ) {
       throw new TranslationError(value.code, message)
     }
+
     throw new Error(message)
   }
+
   return value.data
 }
 
@@ -41,6 +46,7 @@ export function createClient(
   call: (request: unknown) => Promise<unknown>
 ): TranslationClient {
   const send = async (request: unknown) => unwrapResponse(await call(request))
+
   return {
     preferences: async () =>
       parsePreferences(await send({ kind: 'preferences' })),

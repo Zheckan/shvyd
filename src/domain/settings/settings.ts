@@ -15,6 +15,7 @@ export type Preferences = {
   targetMode: 'last' | 'fixed'
   defaultTarget: Language
 }
+
 export type Settings = Preferences & {
   azure: { key: string; region: string }
   deepl: {
@@ -48,6 +49,7 @@ export function parsePreferences(value: unknown): Preferences {
   ) {
     throw new Error('Invalid translation preferences.')
   }
+
   const rawFavorites =
     value.favoriteLanguages ?? DEFAULT_SETTINGS.favoriteLanguages
   if (
@@ -58,6 +60,7 @@ export function parsePreferences(value: unknown): Preferences {
   ) {
     throw new Error('Choose at least one preferred language from the list.')
   }
+
   const favoriteLanguages = [...new Set(rawFavorites)]
   const showOtherLanguages = value.showOtherLanguages ?? true
   const targetMode = value.targetMode ?? 'last'
@@ -69,9 +72,11 @@ export function parsePreferences(value: unknown): Preferences {
   ) {
     throw new Error('Check the target language preferences.')
   }
+
   const provider = value.provider
   const fallback =
     favoriteLanguages.find((code) => supportsLanguage(code, provider)) ?? 'uk'
+
   return {
     provider: value.provider,
     target: supportsLanguage(value.target, value.provider)
@@ -97,14 +102,17 @@ function credential(value: unknown): string {
   if (typeof value !== 'string' || value.length > 512 || /[\r\n]/.test(value)) {
     throw new Error('Check the API key. It should be a single line.')
   }
+
   return value.trim()
 }
 
 export function parseSettings(value: unknown): Settings {
   const preferences = parsePreferences(value)
+
   if (!isRecord(value) || !isRecord(value.azure) || !isRecord(value.deepl)) {
     throw new Error('Invalid provider settings.')
   }
+
   if (
     typeof value.azure.region !== 'string' ||
     !/^[a-z0-9-]{0,64}$/i.test(value.azure.region)
@@ -113,12 +121,14 @@ export function parseSettings(value: unknown): Settings {
       'Check the Azure location code, or leave it empty for Global.'
     )
   }
+
   if (
     value.deepl.endpoint !== 'https://api-free.deepl.com' &&
     value.deepl.endpoint !== 'https://api.deepl.com'
   ) {
     throw new Error('Choose an official DeepL endpoint.')
   }
+
   return {
     ...preferences,
     azure: {

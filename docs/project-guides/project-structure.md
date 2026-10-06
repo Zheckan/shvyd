@@ -177,6 +177,22 @@ not fetch data or hold business rules.
 - A helper that knows a product term belongs in `domain`, not `utils`.
 - Prefer one function per file, named after the function.
 
+## Readable code
+
+Write code for the next person who reads it, not for the fewest lines.
+
+- Leave a blank line between functions, between top-level declarations, and
+  between the logical steps inside a function.
+- Always use braces for `if`, `for`, and `while` bodies, even for one line.
+- Write one declaration and one assignment per statement.
+- Replace nested ternaries with `if` statements or a lookup table.
+- Give magic numbers a named constant.
+- Extract a named helper when a function does several distinct steps or no
+  longer fits on one screen.
+- Enforce what tools can enforce. Formatters wrap long lines but do not add
+  blank lines, so add those by hand. Turn on linter rules such as `curly`,
+  `one-var` (`never`), `no-multi-assign`, and `no-nested-ternary`.
+
 ## Imports
 
 - Use the `@/` alias, mapped to `src/*`, for imports that cross folders.

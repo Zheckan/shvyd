@@ -47,6 +47,9 @@ Conventions:
   `parse*` functions in `src/domain` before using it.
 - Never send API keys to the content script. It receives only
   `publicPreferences` and translated text.
+- Follow "Readable code" in the structure guide. Oxlint enforces braces,
+  one declaration per statement, no chained assignment, and no nested
+  ternaries. Prettier does not add blank lines; add them yourself.
 - Prettier: single quotes, no semicolons, two-space indent. Oxlint denies
   warnings. TypeScript 7 runs in strict mode.
 

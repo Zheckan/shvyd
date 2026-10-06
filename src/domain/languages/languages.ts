@@ -2,12 +2,14 @@ import snapshot from './language-data.json'
 
 export type Language = string
 export type Provider = 'azure' | 'deepl'
+
 export const LANGUAGES = snapshot.languages.map((language) => ({
   ...language,
   direction: language.direction === 'rtl' ? ('rtl' as const) : ('ltr' as const),
 }))
 
 const byCode = new Map(LANGUAGES.map((language) => [language.code, language]))
+
 export function isLanguage(value: unknown): value is Language {
   return typeof value === 'string' && byCode.has(value)
 }
@@ -30,9 +32,13 @@ export function languageLabel(code: Language): string {
 
 export function languageTitle(code: Language): string {
   const language = getLanguage(code)
-  return language
-    ? language.name === language.label
-      ? language.name
-      : `${language.label} · ${language.name}`
-    : code
+  if (!language) {
+    return code
+  }
+
+  if (language.name === language.label) {
+    return language.name
+  }
+
+  return `${language.label} · ${language.name}`
 }

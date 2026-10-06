@@ -15,8 +15,14 @@ function preferenceField<T>(
   fallback: T
 ): T {
   const raw = value[key]
-  if (raw === undefined) return fallback
-  if (!valid(raw)) throw new Error('Invalid preferences.')
+  if (raw === undefined) {
+    return fallback
+  }
+
+  if (!valid(raw)) {
+    throw new Error('Invalid preferences.')
+  }
+
   return raw
 }
 
@@ -27,6 +33,7 @@ export function createSettingsStore(storage: {
 }) {
   let current = structuredClone(DEFAULT_SETTINGS)
   let queue = Promise.resolve()
+
   const ready = (async () => {
     const persisted = await storage.read()
     if (persisted !== undefined) {
@@ -51,10 +58,12 @@ export function createSettingsStore(storage: {
       current = next
       return structuredClone(current)
     })
+
     queue = operation.then(
       () => undefined,
       () => undefined
     )
+
     return operation
   }
 
@@ -63,7 +72,10 @@ export function createSettingsStore(storage: {
     preferences: async () => publicPreferences(await settings()),
     save: (value: unknown) => update(() => parseSettings(value)),
     updatePreferences: async (value: unknown) => {
-      if (!isRecord(value)) throw new Error('Invalid preferences.')
+      if (!isRecord(value)) {
+        throw new Error('Invalid preferences.')
+      }
+
       const isTextMode = (raw: unknown): raw is 'last' | 'fixed' =>
         raw === 'last' || raw === 'fixed'
       const isBoolean = (raw: unknown): raw is boolean =>
@@ -73,6 +85,7 @@ export function createSettingsStore(storage: {
         raw.length > 0 &&
         raw.length <= 300 &&
         raw.every(isLanguage)
+
       return publicPreferences(
         await update((current) =>
           parseSettings({

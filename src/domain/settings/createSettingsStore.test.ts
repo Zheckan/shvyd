@@ -14,12 +14,14 @@ test('remembers the last target across restarts without exposing credentials to 
       azure: { key: 'private-key', region: '' },
     }),
   }
+
   const first = createSettingsStore(storage)
   expect(await first.preferences()).toMatchObject({
     target: 'uk',
     provider: 'azure',
     adaptToPage: true,
   })
+
   await first.updatePreferences({ target: 'pl' })
   const restarted = createSettingsStore(storage)
   expect(await restarted.preferences()).toMatchObject({
@@ -27,6 +29,7 @@ test('remembers the last target across restarts without exposing credentials to 
     provider: 'azure',
     adaptToPage: true,
   })
+
   expect((await restarted.settings()).azure.key).toBe('private-key')
 })
 
@@ -39,12 +42,14 @@ test('keeps a fixed default separate from the remembered language across restart
     },
     seed: async () => structuredClone(DEFAULT_SETTINGS),
   }
+
   const store = createSettingsStore(storage)
   await store.updatePreferences({
     target: 'pl',
     targetMode: 'fixed',
     defaultTarget: 'uk',
   })
+
   const restarted = createSettingsStore(storage)
   const fixed = await restarted.preferences()
   expect(initialTarget(fixed)).toBe('uk')
@@ -66,12 +71,14 @@ test('loads old settings with language defaults while preserving the previous ta
     write: async () => {},
     seed: async () => structuredClone(DEFAULT_SETTINGS),
   })
+
   expect(await store.preferences()).toMatchObject({
     target: 'de',
     targetMode: 'last',
     favoriteLanguages: ['uk', 'en', 'pl'],
     showOtherLanguages: true,
   })
+
   expect((await store.settings()).azure.key).toBe('existing-key')
 })
 
@@ -81,11 +88,13 @@ test('uses an available preferred language after changing to a provider that lac
     write: async () => {},
     seed: async () => structuredClone(DEFAULT_SETTINGS),
   })
+
   await store.updatePreferences({
     provider: 'deepl',
     target: 'en-us',
     favoriteLanguages: ['en-us', 'uk'],
   })
+
   expect(await store.updatePreferences({ provider: 'azure' })).toMatchObject({
     target: 'uk',
     favoriteLanguages: ['en-us', 'uk'],
@@ -101,11 +110,13 @@ test('remembers preferred languages and whether additional languages are shown',
     },
     seed: async () => structuredClone(DEFAULT_SETTINGS),
   }
+
   const first = createSettingsStore(storage)
   await first.updatePreferences({
     favoriteLanguages: ['uk', 'ko', 'ar'],
     showOtherLanguages: false,
   })
+
   const restarted = createSettingsStore(storage)
   expect(await restarted.preferences()).toMatchObject({
     favoriteLanguages: ['uk', 'ko', 'ar'],
@@ -119,11 +130,14 @@ test('rejects invalid preference values instead of silently keeping the old ones
     write: async () => {},
     seed: async () => structuredClone(DEFAULT_SETTINGS),
   })
+
   await expect(store.updatePreferences({ target: null })).rejects.toThrow(
     'Invalid preferences.'
   )
+
   await expect(
     store.updatePreferences({ favoriteLanguages: [] })
   ).rejects.toThrow('Invalid preferences.')
+
   expect(await store.preferences()).toMatchObject({ target: 'uk' })
 })

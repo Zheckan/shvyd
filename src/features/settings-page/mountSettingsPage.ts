@@ -24,21 +24,33 @@ export function mountSettingsPage(
     !summary ||
     !(envFile instanceof HTMLInputElement) ||
     !languageContainer
-  )
+  ) {
     throw new Error('Settings could not load.')
+  }
+
+  // Hoisted function declarations below do not keep the checks above.
   const fields = form
   const languageSettings = mountLanguageSettings(languageContainer)
 
+  async function call(request: unknown): Promise<unknown> {
+    return unwrapResponse(await send(request))
+  }
+
   function input(name: string): HTMLInputElement {
     const value = fields.elements.namedItem(name)
-    if (!(value instanceof HTMLInputElement))
+    if (!(value instanceof HTMLInputElement)) {
       throw new Error('Settings could not load.')
+    }
+
     return value
   }
+
   function select(name: string): HTMLSelectElement {
     const value = fields.elements.namedItem(name)
-    if (!(value instanceof HTMLSelectElement))
+    if (!(value instanceof HTMLSelectElement)) {
       throw new Error('Settings could not load.')
+    }
+
     return value
   }
 
@@ -50,14 +62,17 @@ export function mountSettingsPage(
     input('azureRegion').value = settings.azure.region
     input('deeplKey').value = settings.deepl.key
     select('deeplEndpoint').value = settings.deepl.endpoint
-    if (summary)
+
+    if (summary) {
       summary.textContent = [
         settings.azure.key ? 'Azure ready' : '',
         settings.deepl.key ? 'DeepL ready' : '',
       ]
         .filter(Boolean)
         .join(' · ')
+    }
   }
+
   function read(): Settings {
     return parseSettings({
       ...languageSettings.read(),
@@ -73,17 +88,18 @@ export function mountSettingsPage(
       },
     })
   }
+
   select('provider').addEventListener('change', () => {
     const provider = select('provider').value
-    if (isProvider(provider)) languageSettings.setProvider(provider)
+    if (isProvider(provider)) {
+      languageSettings.setProvider(provider)
+    }
   })
-  async function call(request: unknown): Promise<unknown> {
-    return unwrapResponse(await send(request))
-  }
 
   void call({ kind: 'get-settings' })
     .then((value) => {
       const settings = parseSettings(value)
+
       fill(settings)
       details.open = !settings[settings.provider].key
     })
@@ -97,6 +113,7 @@ export function mountSettingsPage(
       const result = parseSettings(
         await call({ kind: 'save-settings', value: read() })
       )
+
       fill(result)
       status.textContent =
         'Saved. Your next translation will use these settings.'
@@ -105,13 +122,20 @@ export function mountSettingsPage(
         error instanceof Error ? error.message : 'Settings could not be saved.'
     }
   })
+
   envFile.addEventListener('change', async () => {
     const file = envFile.files?.[0]
-    if (!file) return
+    if (!file) {
+      return
+    }
+
     try {
-      if (file.size > 64_000)
+      if (file.size > 64_000) {
         throw new Error("Choose the project's small .env file.")
+      }
+
       const imported = settingsFromEnv(parseEnvFile(await file.text()))
+
       fill({ ...read(), azure: imported.azure, deepl: imported.deepl })
       status.textContent = 'Keys imported. Save settings to use them.'
     } catch (error) {
@@ -120,6 +144,7 @@ export function mountSettingsPage(
           ? error.message
           : 'The file could not be imported.'
     }
+
     envFile.value = ''
   })
 }
