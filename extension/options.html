@@ -1,0 +1,105 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Shvyd · Settings</title>
+    <link rel="stylesheet" href="options.css" />
+    <script src="options.js" defer></script>
+  </head>
+  <body>
+    <main>
+      <div class="brand">
+        <span class="mark" aria-hidden="true">↗</span> Shvyd
+        <span class="badge">Prototype</span>
+      </div>
+      <h1>Translation, where you read.</h1>
+      <p class="intro">
+        Select text on a page, click Translate, and keep reading.
+      </p>
+      <form id="settings">
+        <section>
+          <h2>Preferences</h2>
+          <div class="row">
+            <label
+              >Translate with<select name="provider">
+                <option value="azure">
+                  Azure · fastest complete results in our tests
+                </option>
+                <option value="deepl">DeepL · alternative wording</option>
+              </select></label
+            >
+          </div>
+          <label class="toggle"
+            ><input type="checkbox" name="adaptToPage" /><span
+              >Match the page's style<small
+                >Use nearby colors, borders, and corners. Keep SF Pro / system
+                typography.</small
+              ></span
+            ></label
+          >
+          <div id="language-settings"></div>
+        </section>
+        <details id="credentials">
+          <summary>
+            API keys <span class="hint" id="key-summary"></span>
+          </summary>
+          <div class="keys">
+            <div class="import-row">
+              <p>Use your existing keys, or import the project's .env file.</p>
+              <label class="import-button"
+                >Import .env<input
+                  id="import-env"
+                  type="file"
+                  accept=".env,text/plain"
+                  hidden
+              /></label>
+            </div>
+            <h3>Azure Translator</h3>
+            <label
+              >API key<input
+                name="azureKey"
+                type="password"
+                autocomplete="off"
+                spellcheck="false"
+                placeholder="Paste your Translator key"
+            /></label>
+            <label
+              >Location code<input
+                name="azureRegion"
+                type="text"
+                autocomplete="off"
+                spellcheck="false"
+                placeholder="Leave empty for Global"
+            /></label>
+            <h3>DeepL</h3>
+            <label
+              >API key<input
+                name="deeplKey"
+                type="password"
+                autocomplete="off"
+                spellcheck="false"
+                placeholder="Paste your DeepL API key"
+            /></label>
+            <label
+              >API endpoint<select name="deeplEndpoint">
+                <option value="https://api-free.deepl.com">
+                  API Free / Developer
+                </option>
+                <option value="https://api.deepl.com">API Pro / Growth</option>
+              </select></label
+            >
+          </div>
+        </details>
+        <div class="save-row">
+          <button type="submit">Save settings</button
+          ><output id="status" aria-live="polite"></output>
+        </div>
+      </form>
+      <p class="privacy">
+        Keys stay in this browser. Selected text goes to your chosen provider
+        when you click Translate.
+      </p>
+    </main>
+  </body>
+</html>

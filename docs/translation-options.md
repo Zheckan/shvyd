@@ -4,7 +4,7 @@ Updated 2026-10-03. Measurements were collected on 2026-10-02, translating Engli
 
 ## Working recommendation
 
-**Use a dedicated translation API for the first prototype: Azure as the default, with DeepL as a selectable alternative.** This is a recommendation based on the recorded tests, not an implemented provider choice.
+**Use a dedicated translation API for the first prototype: Azure as the default, with DeepL as a selectable alternative.** The prototype now implements this choice. See the [setup and development guide](../README.md).
 
 Azure best fits the priorities of fast complete translations, lightweight client code, and a useful recurring free allowance. DeepL is worth keeping because it handled our sampled idioms more naturally. Start its alternative route with `latency_optimized`; the tested speed and quality modes produced identical outputs on those idioms, while quality mode took longer on the realistic passages.
 
@@ -12,14 +12,14 @@ The choice is about the API contract as well as the model. A dedicated service a
 
 ## What our practical choices are
 
-| Choice | Proposed role | Why consider it | Main limitation observed |
-|---|---|---|---|
-| Azure Translator, standard NMT | Default for the prototype | Fast completed results across the tested sizes; automatic source detection in the translation request | Some idiom wording was awkward |
-| DeepL, latency optimized | Selectable alternative | More natural wording on our small idiom sample; completed the full realistic repeated corpus | Slower than Azure; the configured free allowance is finite |
-| Groq, Qwen3.8 27B, reasoning off | Optional short-text streaming experiment | Fastest observed first text for the matched paragraph; competitive completion time | Account output limits prevented reliable repeated large-text tests |
-| Gemini 3.5 Flash-Lite, minimal thinking | General LLM alternative if needed | All 18 selected warm requests completed, covering all six sizes | Slower complete translations than Azure and DeepL in the matched samples |
-| Cohere North Small Translate | Translation-focused LLM alternative | Starts text quickly; natural handling of the sampled idioms | Long translations take much longer to finish; trial and production terms need to fit usage |
-| OpenCode Go, DeepSeek V4 Flash, reasoning off | Recorded experiment | Strongest tested Go route across the text sizes after correcting reasoning settings | Slower completion than the dedicated APIs; Go is intended for coding-agent use rather than being our translation service |
+| Choice                                        | Proposed role                            | Why consider it                                                                                       | Main limitation observed                                                                                                 |
+| --------------------------------------------- | ---------------------------------------- | ----------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------ |
+| Azure Translator, standard NMT                | Default for the prototype                | Fast completed results across the tested sizes; automatic source detection in the translation request | Some idiom wording was awkward                                                                                           |
+| DeepL, latency optimized                      | Selectable alternative                   | More natural wording on our small idiom sample; completed the full realistic repeated corpus          | Slower than Azure; the configured free allowance is finite                                                               |
+| Groq, Qwen3.8 27B, reasoning off              | Optional short-text streaming experiment | Fastest observed first text for the matched paragraph; competitive completion time                    | Account output limits prevented reliable repeated large-text tests                                                       |
+| Gemini 3.5 Flash-Lite, minimal thinking       | General LLM alternative if needed        | All 18 selected warm requests completed, covering all six sizes                                       | Slower complete translations than Azure and DeepL in the matched samples                                                 |
+| Cohere North Small Translate                  | Translation-focused LLM alternative      | Starts text quickly; natural handling of the sampled idioms                                           | Long translations take much longer to finish; trial and production terms need to fit usage                               |
+| OpenCode Go, DeepSeek V4 Flash, reasoning off | Recorded experiment                      | Strongest tested Go route across the text sizes after correcting reasoning settings                   | Slower completion than the dedicated APIs; Go is intended for coding-agent use rather than being our translation service |
 
 North Small Translate is a purpose-built generative translation model, between the usual dedicated NMT service and a general chat model. Its [official documentation](https://docs.cohere.com/docs/north-small-translate-1.0) describes free-tier access and separate commercial terms. The working model ID in our account was `north-small-translate-09-2026`.
 
@@ -29,15 +29,15 @@ OpenCode Go's intended use and subscription limits are described in its [officia
 
 Seconds, medians of three successful warm repeats of each identical source. The sentence has 21 words, the paragraph 90 words, and the large passage 623 words. Earlier and later providers ran in different batches; service load and provider caching were not controlled.
 
-| Route | Sentence complete | Paragraph first text | Paragraph complete | Large passage complete |
-|---|---:|---:|---:|---:|
-| Azure, automatic source | 0.157 | 0.481, complete response | 0.481 | 0.398 |
-| DeepL speed, automatic source | 0.242 | 0.758, complete response | 0.758 | 1.007 |
-| DeepL quality, automatic source | 0.281 | 1.003, complete response | 1.003 | 1.315 |
-| Groq Qwen3.8 27B | 0.261 | 0.064 | 0.444 | Not measured reliably |
-| North Small Translate | 0.331 | 0.216 | 1.023 | 6.303 |
-| Gemini 3.5 Flash-Lite | 0.641 | 0.677 | 1.199 | 3.884 |
-| Go DeepSeek V4 Flash, reasoning off | 0.587 | 0.544 | 1.030 | 5.218 |
+| Route                               | Sentence complete |     Paragraph first text | Paragraph complete | Large passage complete |
+| ----------------------------------- | ----------------: | -----------------------: | -----------------: | ---------------------: |
+| Azure, automatic source             |             0.157 | 0.481, complete response |              0.481 |                  0.398 |
+| DeepL speed, automatic source       |             0.242 | 0.758, complete response |              0.758 |                  1.007 |
+| DeepL quality, automatic source     |             0.281 | 1.003, complete response |              1.003 |                  1.315 |
+| Groq Qwen3.8 27B                    |             0.261 |                    0.064 |              0.444 |  Not measured reliably |
+| North Small Translate               |             0.331 |                    0.216 |              1.023 |                  6.303 |
+| Gemini 3.5 Flash-Lite               |             0.641 |                    0.677 |              1.199 |                  3.884 |
+| Go DeepSeek V4 Flash, reasoning off |             0.587 |                    0.544 |              1.030 |                  5.218 |
 
 Azure and DeepL return complete responses on the tested routes; the other rows stream. Starting text quickly can make a popup feel responsive, but it does not mean the translation is finished. Groq shows that LLMs are not universally slower. Its paragraph completion was slightly faster than Azure's in these batches, while the account's 1,000-output-token restriction blocked the largest repeated request.
 
@@ -65,29 +65,13 @@ Provider credentials and setup instructions are in [api-keys.md](api-keys.md). K
 
 Build the Chromium extension around the requested interaction: select text, click the small translation button, and read the result in a larger popup. Default the target to Ukrainian and remember the last chosen target language. Use Azure automatic source detection in the same request, and expose DeepL as an alternative provider.
 
-Open the popup immediately and populate it when the translation arrives. A small session cache can make repeat selections immediate, keyed by source text, target language, and provider. This is proposed behavior; the benchmark deliberately used no local cache.
+The popup opens immediately and populates when the translation arrives. A bounded in-memory cache reuses repeat selections, keyed by source text, target language, and provider. It clears when the background worker restarts. The benchmark deliberately used no local cache.
 
 The next useful validation is the real Helium extension: measure click to visible translation, including worker startup, messaging, network, and rendering. Review Ukrainian outputs on actual reading selections as well. Those results should decide whether the default needs changing.
 
-## Future idea: offline mode? Maybe useful, maybe unnecessary
+## Future ideas
 
-**Status: speculative, outside the first prototype. Its usefulness is unproven. It may be dropped entirely.**
-
-Local translation is extremely fast once ready. In the earlier short-text engine tests, Chrome's native Translator had a 3.10 ms warm median and portable Bergamot in Helium had an 11.40 ms median. Those tests used a different, shorter corpus than the realistic cloud comparison and excluded the extension UI.
-
-The trade-offs are unresolved. Helium's native Translator did not finish initialization within 30 seconds. The tested Bergamot wrapper allocated a 522.625 MiB Wasm heap, which is allocated linear memory rather than a measurement of physical RAM. Its compressed model assets plus runtime were about 29 MB to download. Both tested local engines translated several idioms literally.
-
-Questions before treating offline support as a feature:
-
-- Would we actually use it enough to justify the download and maintenance?
-- Is offline availability or keeping selected text on the device valuable for this use case?
-- Can Helium reliably initialize a native engine for the required language pairs?
-- Can a portable engine produce Ukrainian wording good enough for everyday reading, including idioms and long passages?
-- What memory, battery, and startup cost is acceptable for a lightweight extension?
-- Can model loading and browser worker eviction be handled without making the first translation feel slow?
-- Would a small dedicated translation model be a better fit than a tiny general LLM?
-
-A tiny open-weight browser LLM is a separate speculative option, not something we tested. Roughly 0.5 to 1 billion parameters at four bits imply about 250 to 500 MB of raw weights before runtime buffers and caches. Its Ukrainian quality, actual download size, and responsiveness would depend on the chosen model and implementation. No browser LLM was downloaded or benchmarked.
+Offline mode and a tiny open-weight browser LLM remain speculative, outside the first prototype. Their usefulness is unproven, and they may be dropped entirely. The discussion, local test evidence, and unanswered questions are saved in [future.md](future.md).
 
 ## Evidence
 

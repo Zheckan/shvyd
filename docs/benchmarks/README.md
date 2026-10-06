@@ -1,6 +1,6 @@
 # Translation benchmarks
 
-The current [translation options and prototype recommendation](../translation-options.md) consolidates these results, provider allowances, and the speculative offline-mode idea.
+The current [translation options and prototype recommendation](../translation-options.md) consolidates these results and provider allowances. Speculative offline support and browser-model ideas are recorded in [future.md](../future.md).
 
 | Date | Pair | Hardware | Scope | Report | Raw data |
 |---|---|---|---|---|---|

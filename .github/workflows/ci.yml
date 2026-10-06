@@ -1,0 +1,87 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
+jobs:
+  ci:
+    name: Format, Lint, Typecheck, Tests, and Build
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - uses: oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6 # v2.2.0
+
+      - name: Install dependencies
+        id: install
+        run: bun install
+
+      # Keep running the remaining checks after a failure, while retaining
+      # each failed step's effect on the overall job result.
+      - name: Format
+        id: format
+        if: ${{ !cancelled() && steps.install.outcome == 'success' }}
+        run: bun run format:check
+
+      - name: Lint with Oxlint
+        id: lint
+        if: ${{ !cancelled() && steps.install.outcome == 'success' }}
+        run: bun run lint
+
+      - name: Typecheck
+        id: typecheck
+        if: ${{ !cancelled() && steps.install.outcome == 'success' }}
+        run: bun run typecheck
+
+      - name: Unit Tests
+        id: tests
+        if: ${{ !cancelled() && steps.install.outcome == 'success' }}
+        run: bun run test
+
+      - name: Build
+        id: build
+        if: ${{ !cancelled() && steps.install.outcome == 'success' }}
+        run: bun run build
+
+      - name: Python benchmark tests
+        id: pytest
+        if: ${{ !cancelled() && steps.install.outcome == 'success' }}
+        run: |
+          python3 -m pip install --quiet pytest
+          python3 -m pytest scripts/test_benchmark_cloud.py scripts/test_benchmark_opencode_go.py -q
+
+      - name: Results
+        if: ${{ always() }}
+        env:
+          INSTALL_RESULT: ${{ steps.install.outcome || 'skipped' }}
+          FORMAT_RESULT: ${{ steps.format.outcome || 'skipped' }}
+          LINT_RESULT: ${{ steps.lint.outcome || 'skipped' }}
+          TYPECHECK_RESULT: ${{ steps.typecheck.outcome || 'skipped' }}
+          TEST_RESULT: ${{ steps.tests.outcome || 'skipped' }}
+          PYTEST_RESULT: ${{ steps.pytest.outcome || 'skipped' }}
+          BUILD_RESULT: ${{ steps.build.outcome || 'skipped' }}
+        run: |
+          {
+            printf '## CI results\n\n'
+            printf 'Dependency installation: %s\n\n' "$INSTALL_RESULT"
+            printf '| Check | Result |\n| --- | --- |\n'
+            printf '| Format | %s |\n' "$FORMAT_RESULT"
+            printf '| Lint with Oxlint | %s |\n' "$LINT_RESULT"
+            printf '| Typecheck | %s |\n' "$TYPECHECK_RESULT"
+            printf '| Unit Tests | %s |\n' "$TEST_RESULT"
+            printf '| Python benchmark tests | %s |\n' "$PYTEST_RESULT"
+            printf '| Build | %s |\n' "$BUILD_RESULT"
+          } >> "$GITHUB_STEP_SUMMARY"
