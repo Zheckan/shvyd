@@ -1,5 +1,10 @@
 import { createSettingsStore } from '@/domain/settings/createSettingsStore'
-import { DEFAULT_SETTINGS } from '@/domain/settings/settings'
+import {
+  DEFAULT_SETTINGS,
+  isProvider,
+  parseSettings,
+} from '@/domain/settings/settings'
+import { testConnection } from '@/domain/translation/testConnection'
 import { createTranslationService } from '@/domain/translation/createTranslationService'
 import {
   parseTranslationRequest,
@@ -51,6 +56,7 @@ async function handle(
       await chrome.runtime.openOptionsPage()
       return null
     case 'get-settings':
+    case 'test-connection':
     case 'save-settings': {
       if (
         sender.url?.split(/[?#]/)[0] !== chrome.runtime.getURL('options.html')
@@ -60,6 +66,17 @@ async function handle(
 
       if (value.kind === 'get-settings') {
         return store.settings()
+      }
+
+      if (value.kind === 'test-connection') {
+        if (!isProvider(value.provider)) {
+          throw new Error('Choose a translation provider.')
+        }
+
+        return testConnection({
+          settings: parseSettings(value.value),
+          provider: value.provider,
+        })
       }
 
       const settings = await store.save(value.value)
