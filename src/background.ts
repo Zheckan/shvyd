@@ -68,7 +68,7 @@ chrome.runtime.onMessage.addListener((request: unknown, sender, respond) => {
     (error) =>
       respond({
         ok: false,
-        code: error instanceof TranslationError ? error.code : 'configuration',
+        ...(error instanceof TranslationError ? { code: error.code } : {}),
         message:
           error instanceof Error
             ? error.message

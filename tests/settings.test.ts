@@ -112,3 +112,18 @@ test('remembers preferred languages and whether additional languages are shown',
     showOtherLanguages: false,
   })
 })
+
+test('rejects invalid preference values instead of silently keeping the old ones', async () => {
+  const store = createSettingsStore({
+    read: async () => structuredClone(DEFAULT_SETTINGS),
+    write: async () => {},
+    seed: async () => structuredClone(DEFAULT_SETTINGS),
+  })
+  await expect(store.updatePreferences({ target: null })).rejects.toThrow(
+    'Invalid preferences.'
+  )
+  await expect(
+    store.updatePreferences({ favoriteLanguages: [] })
+  ).rejects.toThrow('Invalid preferences.')
+  expect(await store.preferences()).toMatchObject({ target: 'uk' })
+})
