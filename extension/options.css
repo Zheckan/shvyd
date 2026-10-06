@@ -167,6 +167,7 @@ select:focus-visible,
 }
 .segments button {
   flex: 1;
+  white-space: nowrap;
 }
 .segments button[aria-pressed='true'],
 .segments label:has(:checked) span {
@@ -386,7 +387,7 @@ hr {
 }
 .language-mode-row {
   display: grid;
-  grid-template-columns: 1.2fr 1fr;
+  grid-template-columns: 1.6fr 1fr;
   gap: 16px;
 }
 .language-mode-row > label,
@@ -441,7 +442,7 @@ hr {
   color: var(--muted);
   font-size: 16px;
 }
-.chip-field input.favorite-search {
+.chip-field input.favorite-search[type='search'] {
   flex: 1;
   min-width: 140px;
   width: 140px;
@@ -549,7 +550,7 @@ hr {
   height: 38px;
   padding: 0 4px 0 10px;
 }
-.key-field input:not([type='checkbox']) {
+.key-field input[name][type] {
   flex: 1;
   border: 0;
   height: 30px;
@@ -789,7 +790,7 @@ hr {
     width: 100%;
   }
   .language-mode-row {
-    grid-template-columns: 1.2fr 1fr;
+    grid-template-columns: 1.6fr 1fr;
   }
 }
 @media (max-width: 600px) {
@@ -835,5 +836,15 @@ hr {
 @media (prefers-reduced-motion: reduce) {
   .switch::after {
     transition: none;
+  }
+}
+
+.preview-pages {
+  display: flex;
+  gap: 8px;
+}
+@media (max-width: 400px) {
+  .language-mode-row .segments {
+    flex-direction: column;
   }
 }

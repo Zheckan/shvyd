@@ -53,7 +53,12 @@
                 <legend>Translate with</legend>
                 <div class="provider-grid">
                   <label class="provider-card">
-                    <input type="radio" name="provider" value="azure" />
+                    <input
+                      type="radio"
+                      name="provider"
+                      value="azure"
+                      aria-label="Azure"
+                    />
                     <span
                       ><strong>Azure</strong
                       ><small>Fastest complete results in our tests</small
@@ -63,7 +68,12 @@
                     >
                   </label>
                   <label class="provider-card">
-                    <input type="radio" name="provider" value="deepl" />
+                    <input
+                      type="radio"
+                      name="provider"
+                      value="deepl"
+                      aria-label="DeepL"
+                    />
                     <span
                       ><strong>DeepL</strong><small>Alternative wording</small
                       ><span class="provider-ready" data-key-state="deepl"
@@ -98,7 +108,7 @@
                 <h2 id="keys-heading">API keys</h2>
                 <span id="key-summary" class="hint">No keys yet</span>
                 <label class="button import-button"
-                  >Import .env<input id="import-env" type="file" hidden
+                  >Import .env<input id="import-env" type="file"
                 /></label>
               </div>
               <div class="provider-credentials" data-credentials="azure">

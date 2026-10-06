@@ -1,0 +1,53 @@
+{
+  "browser": "Helium",
+  "isolatedProfile": true,
+  "checks": [
+    {
+      "check": "azure-settings-connection-test",
+      "passed": true,
+      "liveProvider": true
+    },
+    {
+      "check": "deepl-settings-connection-test",
+      "passed": true,
+      "liveProvider": true
+    },
+    {
+      "check": "settings-key-show-hide",
+      "passed": true
+    },
+    {
+      "check": "settings-theme-persists",
+      "passed": true
+    },
+    {
+      "check": "settings-first-use-without-keys",
+      "passed": true
+    },
+    {
+      "check": "settings-env-import",
+      "passed": true
+    },
+    {
+      "check": "settings-reflow-1280",
+      "passed": true
+    },
+    {
+      "check": "settings-reflow-640",
+      "passed": true
+    },
+    {
+      "check": "settings-reflow-390",
+      "passed": true
+    },
+    {
+      "check": "settings-reflow-320",
+      "passed": true
+    }
+  ],
+  "providerKeysPresent": {
+    "azure": true,
+    "deepl": true
+  },
+  "passed": true
+}

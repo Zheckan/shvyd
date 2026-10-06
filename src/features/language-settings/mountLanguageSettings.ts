@@ -155,13 +155,17 @@ export function mountLanguageSettings(
   }
 
   function choose(code: Language, selected: boolean): void {
-    if (!selected && favorites.length === 1) {
+    if (options.compact && !selected && favorites.length === 1) {
       if (notice) {
         notice.hidden = false
         notice.textContent = 'Keep at least one preferred language.'
       }
 
       return
+    }
+
+    if (notice) {
+      notice.hidden = true
     }
 
     favorites = selected
@@ -205,13 +209,14 @@ export function mountLanguageSettings(
     )
 
     const query = search.value.trim().toLocaleLowerCase()
-    const matches = LANGUAGES.filter(
+    const allMatches = LANGUAGES.filter(
       (language) =>
         (!options.compact || !favorites.includes(language.code)) &&
         `${language.name} ${language.label} ${language.code}`
           .toLocaleLowerCase()
           .includes(query)
     )
+    const matches = options.compact ? allMatches.slice(0, 6) : allMatches
 
     list.replaceChildren(
       ...matches.map((language) => {
@@ -318,6 +323,13 @@ export function mountLanguageSettings(
     })
     container.addEventListener('keydown', (event) => {
       if (event.key === 'Escape') {
+        if (
+          event.target === search ||
+          (event.target instanceof Node && list.contains(event.target))
+        ) {
+          search.focus()
+        }
+
         setListOpen(false)
 
         return
@@ -333,7 +345,10 @@ export function mountLanguageSettings(
         list.querySelector<HTMLButtonElement>('button')?.focus()
       } else if (event.key === 'Enter') {
         event.preventDefault()
-        list.querySelector<HTMLButtonElement>('button')?.click()
+
+        if (!list.hidden) {
+          list.querySelector<HTMLButtonElement>('button')?.click()
+        }
       } else if (event.key === 'Backspace' && !search.value) {
         const last = favorites.at(-1)
 

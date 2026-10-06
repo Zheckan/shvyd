@@ -206,7 +206,6 @@ export function mountSettingsPage(
       const provider = element.name.startsWith('azure') ? 'azure' : 'deepl'
       const result = required(`#${provider}-test-status`, HTMLOutputElement)
       delete result.dataset.state
-      result.removeAttribute('data-fingerprint')
       changed()
     })
   }

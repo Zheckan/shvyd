@@ -3,11 +3,13 @@
 
 Run `bun run build:local` and `bun run dev` first. Requires websocket-client,
 already used by the local benchmark harness. Never uses the regular browser profile.
+Pass --settings-only for focused connection, import, appearance, and reflow checks.
 """
 import base64
 import json
 from pathlib import Path
 import subprocess
+import sys
 import tempfile
 import time
 import urllib.request
@@ -15,7 +17,7 @@ import urllib.request
 import websocket
 
 ROOT = Path(__file__).resolve().parent.parent
-OUTPUT = ROOT / '.preview' / 'extension-check'
+OUTPUT = ROOT / '.preview' / ('settings-extension-check' if '--settings-only' in sys.argv else 'extension-check')
 BROWSER = '/Applications/Helium.app/Contents/MacOS/Helium'
 
 
@@ -151,11 +153,11 @@ def main():
 
             def options():
                 page.call('Page.navigate', {'url': f'chrome-extension://{extension_id}/options.html'})
-                wait_for(lambda: page.evaluate("!!document.querySelector('[name=provider]') && document.getElementById('key-summary').textContent.includes('Azure ready')"), 'settings bootstrap')
+                wait_for(lambda: page.evaluate("!!document.querySelector('[name=provider]') && !document.getElementById('settings-fields').disabled"), 'settings bootstrap')
 
             def save_options():
                 page.evaluate("document.getElementById('settings').requestSubmit()")
-                wait_for(lambda: page.evaluate("document.getElementById('status').textContent.startsWith('Saved.')"), 'saved provider setting')
+                wait_for(lambda: page.evaluate("document.getElementById('status').textContent==='All changes saved'"), 'saved provider setting')
 
             def screenshot(name):
                 shot = page.call('Page.captureScreenshot', {'format': 'png'})
@@ -173,6 +175,50 @@ def main():
             readiness = wait_for(lambda: worker.evaluate("chrome.storage.local.get('settings').then(({settings})=>settings?({azure:!!settings.azure.key,deepl:!!settings.deepl.key}):null)"), 'initialized provider settings')
             assert readiness['azure'] and readiness['deepl'], 'Use build:local with both provider keys configured.'
             results['providerKeysPresent'] = readiness
+
+            if '--settings-only' in sys.argv:
+                options()
+                for provider in ['azure', 'deepl']:
+                    page.evaluate("document.querySelector('[data-test-provider=PROVIDER]').click()".replace('PROVIDER', provider))
+                    wait_for(lambda: page.evaluate("document.getElementById('PROVIDER-test-status').dataset.state==='success'".replace('PROVIDER', provider)), provider + ' connection verified')
+                    record(provider + '-settings-connection-test', {'passed': True, 'liveProvider': True})
+
+                page.evaluate("document.querySelector('[data-show-key=azureKey]').click()")
+                assert page.evaluate("document.querySelector('[name=azureKey]').type==='text'")
+                page.evaluate("document.querySelector('[data-show-key=azureKey]').click()")
+                assert page.evaluate("document.querySelector('[name=azureKey]').type==='password'")
+                record('settings-key-show-hide', {'passed': True})
+
+                page.evaluate("document.querySelector('[data-theme-choice=dark]').click()")
+                options()
+                assert page.evaluate("document.documentElement.dataset.theme==='dark'")
+                record('settings-theme-persists', {'passed': True})
+
+                # Each profile is temporary; removing these copies cannot alter the owner's settings.
+                page.evaluate("""(() => {
+                  for(const name of ['azureKey','deeplKey']) {const input=document.querySelector('[name='+name+']');input.value='';input.dispatchEvent(new Event('input'));}
+                  document.getElementById('settings').requestSubmit();
+                })()""")
+                wait_for(lambda: page.evaluate("document.getElementById('status').textContent==='All changes saved'"), 'credential removal saved')
+                assert page.evaluate("document.getElementById('key-summary').textContent==='No keys yet'")
+                record('settings-first-use-without-keys', {'passed': True})
+
+                page.evaluate("""(() => {
+                  const input=document.getElementById('import-env'),transfer=new DataTransfer();
+                  transfer.items.add(new File(['AZURE_TRANSLATOR_KEY=fixture-key\\nAZURE_TRANSLATOR_REGION=global\\nDEEPL_API_KEY=fixture-deepl-key'],'.env',{type:'text/plain'}));
+                  input.files=transfer.files;input.dispatchEvent(new Event('change'));
+                })()""")
+                wait_for(lambda: page.evaluate("document.getElementById('key-summary').textContent.includes('DeepL key added') && document.getElementById('status').textContent==='All changes saved'"), 'env import saved')
+                assert page.evaluate("document.querySelector('[name=azureRegion]').value===''")
+                record('settings-env-import', {'passed': True})
+
+                for width in [1280, 640, 390, 320]:
+                    page.call('Emulation.setDeviceMetricsOverride', {'width':width,'height':900,'deviceScaleFactor':1,'mobile':False})
+                    assert page.evaluate("document.documentElement.scrollWidth<=innerWidth"), 'Settings overflowed at width ' + str(width)
+                    record('settings-reflow-' + str(width), {'passed': True})
+                results['passed'] = True
+                print(json.dumps({'passed': True, 'checks': len(results['checks']), 'evidence': str(OUTPUT / 'results.json')}), flush=True)
+                return
 
             for style in ['editorial', 'technical', 'journal', 'warm', 'forest', 'contrast', 'neon', 'gradient']:
                 navigate(style)
@@ -282,7 +328,7 @@ def main():
             page.evaluate("""(() => {
               const mode=document.querySelector('[name=targetMode]');mode.value='fixed';mode.dispatchEvent(new Event('change'));
               const target=document.querySelector('[name=target]');target.value='uk';target.dispatchEvent(new Event('change'));
-              for(const code of ['en','ar']) {const c=document.querySelector('.favorite-list input[value="'+code+'"]');c.checked=code==='ar';c.dispatchEvent(new Event('change'));}
+              document.querySelector('.language-chip[aria-label*=English]').click();const search=document.querySelector('.favorite-search');search.value='Arabic';search.dispatchEvent(new Event('input'));document.querySelector('.favorite-choice[data-language=ar]').click();
             })()""")
             save_options()
             screenshot('language-settings')
@@ -341,7 +387,7 @@ def main():
             record('page-scroll-still-dismisses-language-and-translation',{'passed':True})
 
             options()
-            assert page.evaluate("[...document.querySelectorAll('.favorite-list input:checked')].map(x=>x.value).sort().join(',')") == 'ar,pl,uk'
+            assert page.evaluate("[...document.querySelectorAll('.language-chip')].map(x=>x.textContent.replace('×','').trim()).sort().join(',')") == 'Polski · Polish,Українська · Ukrainian,العربية · Arabic'
             record('preferred-language-persistence', {'languages': ['uk','pl','ar']})
             page.evaluate("document.querySelector('[name=showOtherLanguages]').checked=false")
             save_options()
@@ -366,7 +412,7 @@ def main():
             record('nested-dark-card-adaptation', value)
 
             options()
-            page.evaluate("""(() => {const p=document.querySelector('[name=provider]');p.value='deepl';p.dispatchEvent(new Event('change'));document.querySelector('[name=showOtherLanguages]').checked=true;})()""")
+            page.evaluate("""(() => {const p=document.querySelector('[name=provider][value=deepl]');p.checked=true;p.dispatchEvent(new Event('change'));document.querySelector('[name=showOtherLanguages]').checked=true;})()""")
             save_options()
             navigate('warm')
             value = translate_selection(target='uk')

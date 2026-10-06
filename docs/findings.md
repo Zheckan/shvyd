@@ -26,3 +26,8 @@ confusion, and non-obvious constraints.
 - TypeScript 7 has no `baseUrl`. The `@/*` alias in `tsconfig.json` uses a
   `paths` entry relative to the config file, and Bun reads the same mapping
   for builds, tests, and scripts.
+- `python3 scripts/check-extension.py --settings-only` checks the installed
+  options page in a temporary Helium profile, including real Azure and DeepL
+  connection tests. Each test translates `Hello`, using five source characters.
+  Results go to `.preview/settings-extension-check/`; the full extension run
+  keeps its separate `.preview/extension-check/` output.
