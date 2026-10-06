@@ -1,11 +1,10 @@
+import { isLanguage, type Language } from '@/domain/languages/languages'
+import { isRecord } from '@/utils/isRecord'
 import {
   DEFAULT_SETTINGS,
-  isLanguage,
   isProvider,
-  isRecord,
   parseSettings,
   publicPreferences,
-  type Language,
   type Settings,
 } from './settings'
 

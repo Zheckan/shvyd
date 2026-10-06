@@ -1,4 +1,5 @@
-import { isRecord, parsePreferences, type Preferences } from './settings'
+import { parsePreferences, type Preferences } from '@/domain/settings/settings'
+import { isRecord } from '@/utils/isRecord'
 import {
   parseTranslation,
   TranslationError,

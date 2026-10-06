@@ -49,7 +49,7 @@ jobs:
       - name: Unit Tests
         id: tests
         if: ${{ !cancelled() && steps.install.outcome == 'success' }}
-        run: bun test tests
+        run: bun run test
 
       - name: Build
         id: build

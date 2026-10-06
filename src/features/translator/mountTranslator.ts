@@ -1,95 +1,24 @@
-import type { TranslationClient } from './client'
+import {
+  getLanguage,
+  supportsLanguage,
+  type Language,
+} from '@/domain/languages/languages'
 import {
   DEFAULT_SETTINGS,
   initialTarget,
   publicPreferences,
-  type Language,
-} from './settings'
-import { getLanguage, supportsLanguage } from './languages'
-import { createLanguagePicker } from './language-picker'
-import { applyPageStyle, samplePageStyle } from './page-style'
-import { MAX_SELECTION_LENGTH, TranslationError } from './translation'
-import { copyTranslation } from './clipboard'
-import { captureSelection, renderTranslation } from './formatted-text'
-
-const CSS = `
-:host { all: initial; }
-:host::backdrop { background: transparent; pointer-events: none; }
-* { box-sizing: border-box; }
-[hidden] { display: none !important; }
-button, input { font: inherit; color: inherit; }
-button { cursor: pointer; }
-button:focus-visible, select:focus-visible { outline: 2px solid var(--shvyd-accent); outline-offset: 3px; }
-.bubble, .panel, .language-menu { position: fixed; color: var(--shvyd-foreground); background: var(--shvyd-background); border: 1px solid var(--shvyd-border); box-shadow: var(--shvyd-shadow); font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", system-ui, sans-serif; letter-spacing: normal; }
-.bubble { display: flex; align-items: center; gap: 7px; padding: 7px 11px; border-radius: max(4px, var(--shvyd-radius)); font-size: 13px; line-height: 18px; white-space: nowrap; }
-.bubble svg { color: var(--shvyd-accent); }
-.panel { width: min(410px, calc(100vw - 24px)); max-height: calc(100dvh - 24px); border-radius: var(--shvyd-radius); overflow: auto; overscroll-behavior: contain; }
-.toolbar { display: flex; align-items: center; gap: 8px; padding: 10px 12px 0 15px; cursor: grab; user-select: none; touch-action: none; }
-.toolbar.dragging { cursor: grabbing; }
-.target { min-width: 0; max-width: 250px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; border: 0; background: transparent; font-size: 12px; padding: 4px 2px; color: var(--shvyd-accent); cursor: pointer; }
-.language-menu { z-index: 1; width: min(280px, calc(100vw - 24px)); max-height: calc(100dvh - 24px); overflow: auto; overscroll-behavior: contain; padding: 8px; border-radius: max(4px, var(--shvyd-radius)); }
-.language-list { max-height: 170px; overflow: auto; overscroll-behavior: contain; font-size: 12px; }
-.language-option { display: block; width: 100%; border: 0; background: transparent; padding: 8px; text-align: start; border-radius: 4px; font-size: 12px; }
-.language-option:hover, .language-option[aria-selected=true] { background: color-mix(in srgb, var(--shvyd-foreground) 8%, transparent); }
-.more-languages { border: 0; border-top: 1px solid var(--shvyd-border); width: 100%; text-align: start; padding: 10px 8px 2px; background: transparent; color: var(--shvyd-accent); font-size: 12px; }
-.language-search { width: 100%; border: 1px solid var(--shvyd-border); background: var(--shvyd-background); padding: 8px; border-radius: 4px; font-size: 12px; margin: 8px 0; }
-.language-search:focus-visible { outline: 2px solid var(--shvyd-accent); outline-offset: 1px; }
-.spacer { flex: 1; min-width: 24px; align-self: stretch; }
-.icon { width: 28px; height: 28px; display: grid; place-items: center; background: transparent; border: 0; border-radius: 4px; padding: 4px; opacity: .65; }
-.icon:hover { opacity: 1; background: color-mix(in srgb, var(--shvyd-foreground) 7%, transparent); }
-.icon:disabled { opacity: .25; cursor: default; }
-svg { display: block; width: 16px; height: 16px; flex-shrink: 0; }
-.translation { padding: 13px 17px 18px; font-size: 15px; line-height: 1.6; white-space: pre-wrap; overflow-wrap: anywhere; text-align: start; user-select: text; max-height: min(55dvh, 480px); overflow: auto; }
-.translation.formatted { white-space: normal; }
-.formatted p, .formatted h1, .formatted h2, .formatted h3, .formatted h4, .formatted h5, .formatted h6, .formatted pre, .formatted table, .formatted dl { margin: 0 0 .8em; }
-.formatted h1, .formatted h2, .formatted h3, .formatted h4, .formatted h5, .formatted h6 { font-size: 1em; font-weight: 650; line-height: 1.5; }
-.formatted strong, .formatted th, .formatted dt { font-weight: 650; }
-.formatted u { text-decoration-line: underline; }
-.formatted ul, .formatted ol { padding-inline-start: 1.5em; margin: 0 0 .8em; }
-.formatted li + li { margin-block-start: .35em; }
-.formatted li > ul, .formatted li > ol { margin-block: .35em 0; }
-.formatted div + div { margin-block-start: .8em; }
-.formatted blockquote { margin: 0 0 .8em; padding-inline-start: 12px; border-inline-start: 2px solid var(--shvyd-border); }
-.formatted pre, .formatted code { font: inherit; white-space: pre-wrap; }
-.formatted pre { padding: 8px 10px; border: 1px solid var(--shvyd-border); border-radius: 4px; }
-.formatted table { width: 100%; border-collapse: collapse; table-layout: fixed; }
-.formatted td, .formatted th { border: 1px solid var(--shvyd-border); padding: 6px 8px; text-align: start; vertical-align: top; }
-.formatted dd { margin-inline-start: 1em; }
-.formatted :last-child { margin-block-end: 0; }
-.status { padding: 0 17px 16px; font-size: 13px; line-height: 1.5; }
-.actions { padding: 0 17px 16px; display: flex; gap: 14px; }
-.text-button { border: 0; padding: 0; background: transparent; text-decoration: underline; text-underline-offset: 3px; color: var(--shvyd-accent); font-size: 13px; }
-.loading { padding: 18px 17px; }
-.line { height: 10px; margin: 7px 0 12px; border-radius: 3px; background: color-mix(in srgb, var(--shvyd-foreground) 10%, transparent); }
-.line:last-child { width: 64%; }
-.sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
-`
-
-function icon(path: string): SVGElement {
-  const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg')
-  svg.setAttribute('viewBox', '0 0 24 24')
-  svg.setAttribute('fill', 'none')
-  svg.setAttribute('stroke', 'currentColor')
-  svg.setAttribute('stroke-width', '1.6')
-  svg.setAttribute('stroke-linecap', 'round')
-  svg.setAttribute('stroke-linejoin', 'round')
-  svg.setAttribute('aria-hidden', 'true')
-  const shape = document.createElementNS(svg.namespaceURI, 'path')
-  shape.setAttribute('d', path)
-  svg.append(shape)
-  return svg
-}
-
-function make<K extends keyof HTMLElementTagNameMap>(
-  tag: K,
-  className: string,
-  text?: string
-): HTMLElementTagNameMap[K] {
-  const element = document.createElement(tag)
-  element.className = className
-  if (text) element.textContent = text
-  return element
-}
+} from '@/domain/settings/settings'
+import {
+  MAX_SELECTION_LENGTH,
+  TranslationError,
+} from '@/domain/translation/translation'
+import type { TranslationClient } from '@/domain/translation/translation-client'
+import { createLanguagePicker } from './components/createLanguagePicker'
+import { icon, make } from './components/elements'
+import { copyTranslation } from './logic/copyTranslation'
+import { captureSelection, renderTranslation } from './logic/formatted-text'
+import { applyPageStyle, samplePageStyle } from './logic/page-style'
+import { TRANSLATOR_STYLES } from './translatorStyles'
 
 export function mountTranslator(client: TranslationClient): () => void {
   if (document.getElementById('shvyd-root')) return () => undefined
@@ -112,7 +41,7 @@ export function mountTranslator(client: TranslationClient): () => void {
   host.setAttribute('popover', 'manual')
   const root = host.attachShadow({ mode: 'open' })
   const style = document.createElement('style')
-  style.textContent = CSS
+  style.textContent = TRANSLATOR_STYLES
   const bubble = make('button', 'bubble')
   bubble.type = 'button'
   bubble.setAttribute('aria-label', 'Translate selected text')

@@ -5,14 +5,14 @@ import {
   supportsLanguage,
   type Language,
   type Provider,
-} from './languages'
+} from '@/domain/languages/languages'
 import {
   DEFAULT_SETTINGS,
   initialTarget,
   parsePreferences,
   publicPreferences,
   type Preferences,
-} from './settings'
+} from '@/domain/settings/settings'
 
 export function mountLanguageSettings(container: HTMLElement) {
   container.innerHTML = `

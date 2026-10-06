@@ -1,6 +1,6 @@
 import { expect, test } from 'bun:test'
-import { unwrapResponse } from '../src/client'
-import { TranslationError } from '../src/translation'
+import { unwrapResponse } from './translation-client'
+import { TranslationError } from './translation'
 
 test('errors without a translation code stay retryable generic failures', async () => {
   const error = await unwrapResponse({

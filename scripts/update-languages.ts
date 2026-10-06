@@ -1,4 +1,5 @@
-import { settingsFromEnv, isRecord } from '../src/settings'
+import { settingsFromEnv } from '@/domain/settings/settings'
+import { isRecord } from '@/utils/isRecord'
 
 type Entry = {
   code: string
@@ -105,7 +106,7 @@ if (
 )
   throw new Error('Incomplete catalog; keeping the previous snapshot.')
 await Bun.write(
-  new URL('../src/language-data.json', import.meta.url),
+  new URL('../src/domain/languages/language-data.json', import.meta.url),
   JSON.stringify(
     {
       updated: new Date().toISOString().slice(0, 10),

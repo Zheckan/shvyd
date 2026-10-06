@@ -3,13 +3,9 @@ import {
   supportsLanguage,
   type Language,
   type Provider,
-} from './languages'
-export {
-  LANGUAGES,
-  isLanguage,
-  type Language,
-  type Provider,
-} from './languages'
+} from '@/domain/languages/languages'
+import { isRecord } from '@/utils/isRecord'
+
 export type Preferences = {
   provider: Provider
   target: Language
@@ -37,10 +33,6 @@ export const DEFAULT_SETTINGS: Settings = {
   defaultTarget: 'uk',
   azure: { key: '', region: '' },
   deepl: { key: '', endpoint: 'https://api-free.deepl.com' },
-}
-
-export function isRecord(value: unknown): value is Record<string, unknown> {
-  return typeof value === 'object' && value !== null && !Array.isArray(value)
 }
 
 export function isProvider(value: unknown): value is Provider {
@@ -168,24 +160,4 @@ export function settingsFromEnv(
       ).replace(/\/$/, ''),
     },
   })
-}
-
-export function parseEnvFile(text: string): Record<string, string> {
-  const values: Record<string, string> = {}
-  for (const raw of text.split(/\r?\n/)) {
-    const line = raw.trim().replace(/^export\s+/, '')
-    const match = /^([A-Z_][A-Z_0-9]*)\s*=\s*(.*)$/.exec(line)
-    if (!match?.[1] || match[2] === undefined) continue
-    let value = match[2].trim()
-    if (
-      (value.startsWith('"') && value.endsWith('"')) ||
-      (value.startsWith("'") && value.endsWith("'"))
-    ) {
-      value = value.slice(1, -1)
-    } else {
-      value = value.replace(/\s+#.*$/, '').trim()
-    }
-    values[match[1]] = value
-  }
-  return values
 }

@@ -1,10 +1,11 @@
-import { DEFAULT_SETTINGS, isRecord } from './settings'
-import { createSettingsStore } from './settings-store'
+import { createSettingsStore } from '@/domain/settings/createSettingsStore'
+import { DEFAULT_SETTINGS } from '@/domain/settings/settings'
+import { createTranslationService } from '@/domain/translation/createTranslationService'
 import {
-  createTranslationService,
   parseTranslationRequest,
   TranslationError,
-} from './translation'
+} from '@/domain/translation/translation'
+import { isRecord } from '@/utils/isRecord'
 
 const ready = chrome.storage.local.setAccessLevel({
   accessLevel: 'TRUSTED_CONTEXTS',

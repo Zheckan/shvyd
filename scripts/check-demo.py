@@ -93,9 +93,9 @@ with tempfile.TemporaryDirectory(prefix='shvyd-demo-') as profile:
         screenshot=page.call('Page.captureScreenshot',{'format':'png'})
         (output/'search-menu.png').write_bytes(base64.b64decode(screenshot['data']))
 
-        menu_checks=page.evaluate((ROOT/'tests/browser/language-menu.js').read_text())
+        menu_checks=page.evaluate((ROOT/'src/test/browser/language-menu.js').read_text())
         checks.extend({'check':check,'passed':True,'controlledResponse':True} for check in menu_checks['checks'])
-        underline_checks=page.evaluate((ROOT/'tests/browser/underline.js').read_text())
+        underline_checks=page.evaluate((ROOT/'src/test/browser/underline.js').read_text())
         checks.extend({'check':check,'passed':True,'controlledResponse':True} for check in underline_checks['checks'])
 
         # Controlled provider responses exercise the public popup without sending attack fixtures to a cloud API.

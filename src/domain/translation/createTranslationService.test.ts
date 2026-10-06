@@ -1,10 +1,6 @@
 import { describe, expect, test } from 'bun:test'
-import { DEFAULT_SETTINGS } from '../src/settings'
-import {
-  createTranslationService,
-  parseTranslation,
-  parseTranslationRequest,
-} from '../src/translation'
+import { DEFAULT_SETTINGS } from '@/domain/settings/settings'
+import { createTranslationService } from './createTranslationService'
 
 describe('selected-text translation', () => {
   test('rejects a target unavailable with the provider before sending selected text', async () => {
@@ -24,6 +20,7 @@ describe('selected-text translation', () => {
     ).rejects.toMatchObject({ code: 'configuration' })
     expect(sent).toBe(false)
   })
+
   test("uses the provider's script-specific language code for Traditional Chinese", async () => {
     const requests: Request[] = []
     const service = createTranslationService({
@@ -45,6 +42,7 @@ describe('selected-text translation', () => {
       inputs: [{ text: 'Good morning', targets: [{ language: 'zh-Hant' }] }],
     })
   })
+  
   test('receives an automatic-source Azure translation in the selected target language', async () => {
     const requests: Request[] = []
     const service = createTranslationService({
@@ -243,37 +241,5 @@ describe('selected-text translation', () => {
       await service.translate({ ...request, format: 'html' })
     ).toMatchObject({ format: 'html', cached: true })
     expect(calls).toBe(2)
-  })
-
-  test('validates formatting at message boundaries and accepts older plain-text responses', () => {
-    expect(
-      parseTranslationRequest({ text: 'Hello', target: 'uk' }).format
-    ).toBe('plain')
-    expect(() =>
-      parseTranslationRequest({
-        text: 'Hello',
-        target: 'uk',
-        format: 'markdown',
-      })
-    ).toThrow()
-    expect(() =>
-      parseTranslation({
-        text: 'Hello',
-        target: 'uk',
-        provider: 'azure',
-        cached: false,
-        durationMs: 1,
-        format: 'markdown',
-      })
-    ).toThrow()
-    expect(
-      parseTranslation({
-        text: 'Hello',
-        target: 'uk',
-        provider: 'azure',
-        cached: false,
-        durationMs: 1,
-      }).format
-    ).toBe('plain')
   })
 })

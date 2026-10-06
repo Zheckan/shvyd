@@ -1,6 +1,6 @@
 import { expect, test } from 'bun:test'
-import { createSettingsStore } from '../src/settings-store'
-import { DEFAULT_SETTINGS, initialTarget } from '../src/settings'
+import { createSettingsStore } from './createSettingsStore'
+import { DEFAULT_SETTINGS, initialTarget } from './settings'
 
 test('remembers the last target across restarts without exposing credentials to the popup', async () => {
   let persisted: unknown

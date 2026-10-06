@@ -1,98 +1,15 @@
+import { getLanguage, isLanguage } from '@/domain/languages/languages'
+import { isProvider, type Settings } from '@/domain/settings/settings'
+import { isRecord } from '@/utils/isRecord'
 import {
-  isLanguage,
-  isProvider,
-  isRecord,
-  type Language,
-  type Provider,
-  type Settings,
-} from './settings'
-import { getLanguage } from './languages'
+  isTranslationFormat,
+  MAX_SELECTION_LENGTH,
+  TranslationError,
+  type Translation,
+  type TranslationRequest,
+} from './translation'
 
-export const MAX_SELECTION_LENGTH = 10_000
-export type TranslationFormat = 'plain' | 'html'
-export type Translation = {
-  text: string
-  format: TranslationFormat
-  target: Language
-  provider: Provider
-  cached: boolean
-  durationMs: number
-}
-export type TranslationRequest = {
-  text: string
-  format?: TranslationFormat
-  target: Language
-  provider?: Provider
-}
 export type Fetcher = (url: string, init: RequestInit) => Promise<Response>
-export type ErrorCode =
-  | 'selection'
-  | 'configuration'
-  | 'authentication'
-  | 'quota'
-  | 'network'
-  | 'provider'
-
-export class TranslationError extends Error {
-  constructor(
-    readonly code: ErrorCode,
-    message: string
-  ) {
-    super(message)
-    this.name = 'TranslationError'
-  }
-}
-
-function isTranslationFormat(value: unknown): value is TranslationFormat {
-  return value === 'plain' || value === 'html'
-}
-
-export function parseTranslationRequest(value: unknown): TranslationRequest {
-  if (
-    !isRecord(value) ||
-    typeof value.text !== 'string' ||
-    !isLanguage(value.target) ||
-    (value.provider !== undefined && !isProvider(value.provider)) ||
-    (value.format !== undefined && !isTranslationFormat(value.format))
-  ) {
-    throw new TranslationError(
-      'selection',
-      'Choose some text and a target language.'
-    )
-  }
-  return {
-    text: value.text,
-    format: value.format ?? 'plain',
-    target: value.target,
-    provider: value.provider,
-  }
-}
-
-export function parseTranslation(value: unknown): Translation {
-  if (
-    !isRecord(value) ||
-    typeof value.text !== 'string' ||
-    !isLanguage(value.target) ||
-    !isProvider(value.provider) ||
-    typeof value.cached !== 'boolean' ||
-    typeof value.durationMs !== 'number' ||
-    !Number.isFinite(value.durationMs) ||
-    (value.format !== undefined && !isTranslationFormat(value.format))
-  ) {
-    throw new TranslationError(
-      'provider',
-      'The translation response could not be read.'
-    )
-  }
-  return {
-    text: value.text,
-    format: value.format ?? 'plain',
-    target: value.target,
-    provider: value.provider,
-    cached: value.cached,
-    durationMs: value.durationMs,
-  }
-}
 
 function readAzureText(payload: unknown): string {
   const first: unknown =

@@ -15,4 +15,4 @@ docs/benchmarks/
 docs/prototype/
 
 # Provider catalog snapshot, maintained by languages:update.
-src/language-data.json
+src/domain/languages/language-data.json

@@ -1,15 +1,16 @@
 import { resolve } from 'node:path'
-import { isRecord, settingsFromEnv, type Settings } from '../src/settings'
-import { createSettingsStore } from '../src/settings-store'
+import { createSettingsStore } from '@/domain/settings/createSettingsStore'
+import { settingsFromEnv, type Settings } from '@/domain/settings/settings'
+import { createTranslationService } from '@/domain/translation/createTranslationService'
 import {
-  createTranslationService,
   parseTranslationRequest,
   TranslationError,
-} from '../src/translation'
+} from '@/domain/translation/translation'
+import { isRecord } from '@/utils/isRecord'
 
 const root = resolve(import.meta.dir, '..')
 const result = await Bun.build({
-  entrypoints: [resolve(root, 'src/demo.ts')],
+  entrypoints: [resolve(root, 'src/entries/demo.ts')],
   outdir: resolve(root, '.preview'),
   target: 'browser',
   format: 'iife',

@@ -1,5 +1,10 @@
-import { languageLabel, languageTitle, supportedLanguages } from './languages'
-import type { Language, Preferences } from './settings'
+import {
+  languageLabel,
+  languageTitle,
+  supportedLanguages,
+  type Language,
+} from '@/domain/languages/languages'
+import type { Preferences } from '@/domain/settings/settings'
 
 export function createLanguagePicker({
   onSelect,

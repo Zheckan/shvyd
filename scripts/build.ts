@@ -1,14 +1,14 @@
 import { chmod, mkdir, copyFile } from 'node:fs/promises'
 import { resolve } from 'node:path'
-import { DEFAULT_SETTINGS, settingsFromEnv } from '../src/settings'
+import { DEFAULT_SETTINGS, settingsFromEnv } from '@/domain/settings/settings'
 
 export async function build(local = false): Promise<void> {
   const root = resolve(import.meta.dir, '..')
   const output = resolve(root, 'dist')
   await mkdir(output, { recursive: true })
   const result = await Bun.build({
-    entrypoints: ['src/content.ts', 'src/background.ts', 'src/options.ts'].map(
-      (path) => resolve(root, path)
+    entrypoints: ['content.ts', 'background.ts', 'options.ts'].map((name) =>
+      resolve(root, 'src/entries', name)
     ),
     outdir: output,
     target: 'browser',

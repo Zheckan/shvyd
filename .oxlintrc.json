@@ -8,7 +8,7 @@
   },
   "overrides": [
     {
-      "files": ["scripts/**/*.ts", "tests/**/*.ts"],
+      "files": ["scripts/**/*.ts", "src/**/*.test.ts"],
       "env": {
         "node": true
       },

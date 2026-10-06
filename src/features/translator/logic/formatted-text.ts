@@ -2,7 +2,7 @@ import {
   MAX_SELECTION_LENGTH,
   type Translation,
   type TranslationFormat,
-} from './translation'
+} from '@/domain/translation/translation'
 
 type SelectedContent = { text: string; format: TranslationFormat }
 const TAGS = new Set([
