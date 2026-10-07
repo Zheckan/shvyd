@@ -17,6 +17,10 @@ Updated 2026-10-07. This is a proposed plan for the first stable release, intend
 | Distribution       | Begin with a versioned, credential-free ZIP for manual installation. A Chrome Web Store listing is a separate distribution task. |
 | Offline            | Still speculative. See [future ideas](future.md).                                                                                |
 
+The release icon is the supplied **3c-acid** version. Its SVG source and
+16, 32, 48, and 128 px PNG exports live in `extension/icons/`. The extension
+manager, toolbar, settings header, and settings tab use this identity.
+
 DeepL's provider picker, masked key input, and official endpoint choice already exist. They need a clearer first-use experience, rather than a new integration. The current free API Developer plan provides one million characters total without a reset. That allowance belongs to the user's provider account. Azure F0 provides two million characters per month. [DeepL plans](https://support.deepl.com/hc/en-us/articles/360021200939-DeepL-API-plans), [Azure pricing](https://azure.microsoft.com/en-us/pricing/details/translator/)
 
 Friends can configure their own Azure resource as well. Included access consumes the owner's allowance through a relay; its key stays on the server. Never include it in a distributed ZIP, repository, screenshot, or settings export. The relay is deployed and verified from the installed extension with empty key fields. See [shared Azure setup](shared-azure.md) for deployment, limits, and the one-time removal of legacy credentials.
@@ -123,7 +127,7 @@ Measure click-to-visible translation and popup responsiveness on representative 
 
 ## Decisions still needed before publication
 
-- The final settings design and product icons.
+- Final review of the implemented settings design and selected 3c-acid icons.
 - The license, operator/contact information, and final privacy/usage text.
 - Whether distribution should stay a manual ZIP or also use an unlisted/public store listing.
 - Whether central diagnostics answer a real need after local exports are available.
