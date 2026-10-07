@@ -347,6 +347,12 @@ export function mountTranslator(client: TranslationClient): () => void {
 
   async function chooseTarget(code: Language): Promise<void> {
     const choice = ++choiceGeneration
+    generation++
+    sessionTarget = code
+    showLoading()
+    picker.update({ preferences, target: code })
+    panel.setAttribute('aria-busy', 'true')
+    position(panel)
 
     try {
       if (preferences.targetMode === 'last') {
@@ -357,10 +363,16 @@ export function mountTranslator(client: TranslationClient): () => void {
         return
       }
 
-      sessionTarget = code
       await translate()
     } catch {
+      if (choice !== choiceGeneration || !selected || destroyed) {
+        return
+      }
+
+      loading.hidden = true
+      panel.setAttribute('aria-busy', 'false')
       showMessage('The target language could not be saved. Reload this page.')
+      position(panel)
     }
   }
 
