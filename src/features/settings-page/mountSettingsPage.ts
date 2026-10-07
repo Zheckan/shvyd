@@ -211,6 +211,7 @@ export function mountSettingsPage(
       status.textContent =
         error instanceof Error ? error.message : 'Check the settings fields.'
       retry.hidden = true
+      updateKeyLabels()
       input('azureRegion').setAttribute(
         'aria-invalid',
         String(!/^[a-z0-9-]{0,64}$/i.test(input('azureRegion').value.trim()))

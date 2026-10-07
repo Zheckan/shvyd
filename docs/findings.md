@@ -49,3 +49,8 @@ confusion, and non-obvious constraints.
   `src/config/release.ts`. `SHVYD_AZURE_PROXY_URL` overrides it; explicitly
   empty disables included access. Both key fields remained empty during the
   installed extension's successful shared connection and selection tests.
+
+- CSS `:has()` cannot be nested. Inside a forgiving `:is()` list, a nested
+  `:has(:checked)` branch is dropped without warning while the other branches
+  keep working. `extension/options.css` matches radio segments with a
+  descendant selector, such as `:has(> :nth-child(2) :checked)`.

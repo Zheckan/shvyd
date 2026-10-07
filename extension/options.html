@@ -89,8 +89,8 @@
                 <span
                   ><strong>Match the page’s style</strong
                   ><small
-                    >Use nearby colors, borders and corners. Typography stays SF
-                    Pro / system.</small
+                    >Adapts the popup’s colors, border, corners and shadow to
+                    the page. The font stays the same.</small
                   ></span
                 >
                 <input class="switch" name="adaptToPage" type="checkbox" />
@@ -131,7 +131,7 @@
                     type="password"
                     autocomplete="off"
                     spellcheck="false"
-                    placeholder="Add your own key to replace included access"
+                    placeholder="Paste a key to replace included access"
                     aria-describedby="connection-note azure-test-status"
                   />
                   <button
@@ -222,15 +222,17 @@
                   </button>
                 </div>
               </div>
-              <p class="hint">
-                Azure uses included access until you add your own key. Removing
-                your Azure key restores included access. DeepL is available only
-                with your own key.
-              </p>
-              <p id="connection-note" class="hint">
-                Test connection sends “Hello” to that provider for translation
-                into Ukrainian. Each test uses 5 characters of your allowance.
-              </p>
+              <div class="credential-notes">
+                <p class="hint">
+                  Azure uses included access until you add your own key.
+                  Removing your Azure key restores included access. DeepL is
+                  available only with your own key.
+                </p>
+                <p id="connection-note" class="hint">
+                  Test connection sends “Hello” to that provider for translation
+                  into Ukrainian. Each test uses 5 characters of your allowance.
+                </p>
+              </div>
             </section>
           </fieldset>
         </form>

@@ -209,13 +209,22 @@ export function mountLanguageSettings(
     )
 
     const query = search.value.trim().toLocaleLowerCase()
+    // Names that start with the query rank above names that merely contain it.
+    function rank(language: (typeof LANGUAGES)[number]): number {
+      return [language.name, language.label, language.code].some((text) =>
+        text.toLocaleLowerCase().startsWith(query)
+      )
+        ? 0
+        : 1
+    }
+
     const allMatches = LANGUAGES.filter(
       (language) =>
         (!options.compact || !favorites.includes(language.code)) &&
         `${language.name} ${language.label} ${language.code}`
           .toLocaleLowerCase()
           .includes(query)
-    )
+    ).sort((a, b) => rank(a) - rank(b))
     const matches = options.compact ? allMatches.slice(0, 6) : allMatches
 
     list.replaceChildren(
