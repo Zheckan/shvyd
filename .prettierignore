@@ -16,3 +16,5 @@ docs/prototype/
 
 # Provider catalog snapshot, maintained by languages:update.
 src/domain/languages/language-data.json
+
+.wrangler/

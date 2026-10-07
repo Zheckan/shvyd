@@ -1,0 +1,17 @@
+{
+  "name": "shvyd-azure-relay",
+  "main": "src/entries/azure-relay.ts",
+  "compatibility_date": "2026-10-07",
+  "vars": {
+    "AZURE_TRANSLATOR_REGION": "",
+    "ALLOWED_EXTENSION_ORIGINS": ""
+  },
+  "ratelimits": [
+    {
+      "name": "REQUEST_LIMITER",
+      "namespace_id": "2026100701",
+      "simple": { "limit": 20, "period": 60 }
+    }
+  ],
+  "observability": { "enabled": false }
+}

@@ -12,3 +12,6 @@ node_modules/
 dist/
 .preview/
 test-results/
+
+# Worker deployment state
+.wrangler/
