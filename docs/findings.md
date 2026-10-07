@@ -54,3 +54,7 @@ confusion, and non-obvious constraints.
   `:has(:checked)` branch is dropped without warning while the other branches
   keep working. `extension/options.css` matches radio segments with a
   descendant selector, such as `:has(> :nth-child(2) :checked)`.
+
+- Generated browser screenshots and raw verification results stay in the ignored
+  `.preview/` directory. The former `docs/prototype/` archive is retained locally
+  at `.preview/prototype/`; the legacy output path is also ignored by Git.

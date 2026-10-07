@@ -10,9 +10,8 @@ pnpm-lock.yaml
 package-lock.json
 yarn.lock
 
-# Saved benchmark inputs, outputs, and prototype verification evidence.
+# Saved benchmark inputs and outputs.
 docs/benchmarks/
-docs/prototype/
 
 # Provider catalog snapshot, maintained by languages:update.
 src/domain/languages/language-data.json

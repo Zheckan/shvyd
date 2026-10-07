@@ -36,8 +36,9 @@ before adding or moving files.
 - `demo/`: playground HTML, CSS, and script.
 - `scripts/`: build, playground server, catalog update, live browser checks,
   and Python benchmark tools.
-- `docs/`: provider research, language and formatting notes, benchmark and
-  verification archives.
+- `docs/`: provider research, language and formatting notes, benchmark
+  archives, and release documentation.
+- `.preview/`: local screenshots and raw browser-check results, ignored by Git.
 
 Conventions:
 

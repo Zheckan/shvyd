@@ -28,6 +28,4 @@ The cache includes plain versus HTML format as well as provider, target, and tex
 
 The request limit remains 10,000 characters. If formatting would exceed that limit, or the DOM structure exceeds 4,000 visited nodes or 40 levels, capture falls back to the selected plain text. Unusual page markup can also use this fallback. This is structural preservation, not an exact copy of the page's layout. Providers may move inline emphasis while translating word order.
 
-Use the **Paragraphs and lists** passage and **Code, tables, and scroll containers** section on [the playground](http://localhost:5173/fixture). The [formatting verification report](prototype/2026-10-03/formatting/report.md) records live provider checks and controlled response checks for partial selections, safe rendering, and copying.
-
-The [underlining and movable-window report](prototype/2026-10-04/popup-interactions/report.md) adds live Azure and DeepL underline checks plus a controlled regression for CSS underlining, nested bold text, and removal of source attributes.
+Use the **Paragraphs and lists** passage and **Code, tables, and scroll containers** section on [the playground](http://localhost:5173/fixture). `scripts/check-extension.py` checks live provider formatting, underlining, and copying. `scripts/check-demo.py` also checks controlled responses for partial selections, safe rendering, CSS underlining, nested bold text, and removal of source attributes. Screenshots and raw results stay in the ignored `.preview/` directory.

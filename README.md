@@ -68,7 +68,7 @@ python3 scripts/check-extension.py
 python3 scripts/check-demo.py
 ```
 
-The live check uses a temporary Helium profile, leaving the regular profile alone. It covers both providers, eight page styles, preferred and additional languages, remembered and fixed targets, right-to-left output, formatted paragraphs and lists, underlined links, table cells, unchanged code, long selections, nested cards, window dragging, language-menu anchoring, viewport bounds, and Escape dismissal. The demo check also uses controlled provider responses to verify partial selections, safe HTML rendering, and copying. These scripts use the `websocket-client` Python dependency already required by the local benchmark harness. Screenshots and results are written under the ignored `.preview/extension-check` and `.preview/demo-check` directories.
+The live check uses a temporary Helium profile, leaving the regular profile alone. It covers both providers, eight page styles, preferred and additional languages, remembered and fixed targets, right-to-left output, formatted paragraphs and lists, underlined links, table cells, unchanged code, long selections, nested cards, window dragging, language-menu anchoring, viewport bounds, and Escape dismissal. The demo check also uses controlled provider responses to verify partial selections, safe HTML rendering, and copying. These scripts use the `websocket-client` Python dependency already required by the local benchmark harness. Screenshots and results are written under the ignored `.preview/extension-check` and `.preview/demo-check` directories. Earlier verification artifacts are retained locally in `.preview/prototype/`. Generated verification artifacts are not tracked in Git.
 
 ## Prototype boundaries
 
@@ -85,8 +85,3 @@ The live check uses a temporary Helium profile, leaving the regular profile alon
 - [Future ideas and open questions](docs/future.md)
 - [API key setup](docs/api-keys.md)
 - [Benchmark archive](docs/benchmarks/README.md)
-- [Prototype verification and screenshots](docs/prototype/2026-10-03/report.md)
-- [Language settings and playground verification](docs/prototype/2026-10-03/languages/report.md)
-- [Selection formatting verification](docs/prototype/2026-10-03/formatting/report.md)
-- [Language popover and resize verification](docs/prototype/2026-10-03/language-popover/report.md)
-- [Movable window and underlining verification](docs/prototype/2026-10-04/popup-interactions/report.md)

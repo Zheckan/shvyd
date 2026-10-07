@@ -30,7 +30,7 @@ Friends can configure their own Azure resource as well. Included access consumes
 - Copying, dragging, viewport placement, and language-menu anchoring.
 - Local settings persistence with credentials restricted to trusted extension contexts.
 - A 32-entry in-memory cache, keyed by provider, target, format, and source. Saving full settings clears it; worker restart also clears it.
-- A playground and saved browser verification. See [README](../README.md) and [popup verification](prototype/2026-10-04/popup-interactions/report.md).
+- A playground and repeatable browser checks. See [README](../README.md) for commands; generated screenshots and results stay in `.preview/`.
 
 The selection limit is currently 10,000 serialized input characters. Browser internal pages, protected store pages, browser PDF viewers, and text inputs are documented prototype exclusions. Decide whether to retain these exclusions for 1.0; they do not need to become new features to release.
 
