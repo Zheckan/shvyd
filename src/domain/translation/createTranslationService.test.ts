@@ -3,6 +3,141 @@ import { DEFAULT_SETTINGS, type Settings } from '@/domain/settings/settings'
 import { createTranslationService } from './createTranslationService'
 
 describe('selected-text translation', () => {
+  test('the request deadline also covers a stalled response body and permits a fresh retry', async () => {
+    let calls = 0
+    const service = createTranslationService({
+      requestTimeoutMs: 10,
+      readSettings: async () => ({
+        ...DEFAULT_SETTINGS,
+        azure: { key: 'test-key', region: '' },
+      }),
+      fetcher: async (_url, init) => {
+        calls++
+        if (calls > 1) {
+          return Response.json({
+            value: [{ translations: [{ text: 'Recovered' }] }],
+          })
+        }
+        return new Response(
+          new ReadableStream({
+            start(controller) {
+              init.signal?.addEventListener(
+                'abort',
+                () =>
+                  controller.error(
+                    new DOMException('aborted body', 'AbortError')
+                  ),
+                { once: true }
+              )
+            },
+          })
+        )
+      },
+    })
+    await expect(
+      service.translate({ text: 'Hello', target: 'uk' })
+    ).rejects.toMatchObject({ code: 'timeout' })
+    expect(
+      await service.translate({ text: 'Hello', target: 'uk' })
+    ).toMatchObject({ text: 'Recovered', cached: false })
+  }, 20_000)
+
+  test('a provider timeout has its own retryable error instead of a connection failure', async () => {
+    const service = createTranslationService({
+      readSettings: async () => ({
+        ...DEFAULT_SETTINGS,
+        azure: { key: 'test-key', region: '' },
+      }),
+      fetcher: async () => {
+        throw new DOMException('deadline', 'TimeoutError')
+      },
+    })
+    await expect(
+      service.translate({ text: 'Hello', target: 'uk' })
+    ).rejects.toMatchObject({
+      code: 'timeout',
+      message: 'Translation took too long. Try again.',
+    })
+  })
+
+  test('DeepL 456 reports exhausted allowance without interpreting provider text', async () => {
+    const service = createTranslationService({
+      readSettings: async () => ({
+        ...DEFAULT_SETTINGS,
+        provider: 'deepl',
+        deepl: { key: 'test-key', endpoint: 'https://api-free.deepl.com' },
+      }),
+      fetcher: async () =>
+        new Response('private provider details', { status: 456 }),
+    })
+    await expect(
+      service.translate({ text: 'Hello', target: 'uk' })
+    ).rejects.toMatchObject({
+      code: 'quota',
+      message:
+        "The provider's character allowance is exhausted. Check your quota or choose another provider in settings.",
+    })
+  })
+
+  test('malformed or unknown Azure 403 responses still report authentication failure', async () => {
+    for (const body of [
+      'not JSON',
+      '{"error":{"code":403000,"message":"private"}}',
+    ]) {
+      const service = createTranslationService({
+        readSettings: async () => ({
+          ...DEFAULT_SETTINGS,
+          azure: { key: 'test-key', region: '' },
+        }),
+        fetcher: async () => new Response(body, { status: 403 }),
+      })
+      await expect(
+        service.translate({ text: 'Hello', target: 'uk' })
+      ).rejects.toMatchObject({
+        code: 'authentication',
+        message: 'The API key was rejected. Check Shvyd settings.',
+      })
+    }
+  })
+
+  test('Azure error 403001 is exhausted allowance rather than a rejected API key', async () => {
+    const service = createTranslationService({
+      readSettings: async () => ({
+        ...DEFAULT_SETTINGS,
+        azure: { key: 'test-key', region: '' },
+      }),
+      fetcher: async () =>
+        Response.json(
+          { error: { code: 403001, message: 'private upstream details' } },
+          { status: 403 }
+        ),
+    })
+    await expect(
+      service.translate({ text: 'Hello', target: 'uk' })
+    ).rejects.toMatchObject({
+      code: 'quota',
+      message:
+        "The provider's character allowance is exhausted. Check your quota or choose another provider in settings.",
+    })
+  })
+
+  test('temporary request limiting is retryable and distinct from character quota exhaustion', async () => {
+    const service = createTranslationService({
+      readSettings: async () => ({
+        ...DEFAULT_SETTINGS,
+        azure: { key: 'test-key', region: '' },
+      }),
+      fetcher: async () =>
+        new Response('Do not expose provider details', { status: 429 }),
+    })
+    await expect(
+      service.translate({ text: 'Hello', target: 'uk' })
+    ).rejects.toMatchObject({
+      code: 'rate-limit',
+      message: 'Too many translation requests. Wait a moment and try again.',
+    })
+  })
+
   test('keeps the 32-entry cache limit and refreshes recently read entries', async () => {
     const service = createTranslationService({
       readSettings: async () => ({

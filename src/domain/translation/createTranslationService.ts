@@ -21,6 +21,10 @@ const AZURE_TRANSLATE_URL =
 const REQUEST_TIMEOUT_MS = 15_000
 const CACHE_LIMIT = 32
 const CACHE_BYTE_LIMIT = 512 * 1024
+const QUOTA_MESSAGE =
+  "The provider's character allowance is exhausted. Check your quota or choose another provider in settings."
+
+const TIMEOUT_MESSAGE = 'Translation took too long. Try again.'
 
 type ProviderRequest = {
   url: string
@@ -81,7 +85,34 @@ function providerRequest({
   }
 }
 
-function assertResponseOk(response: Response): void {
+async function assertResponseOk(
+  response: Response,
+  provider: Provider,
+  signal: AbortSignal
+): Promise<void> {
+  if (response.status === 504) {
+    throw new TranslationError('timeout', TIMEOUT_MESSAGE)
+  }
+
+  if (provider === 'azure' && response.status === 403) {
+    let payload: unknown
+    try {
+      payload = await response.json()
+    } catch {
+      // Unknown or malformed errors keep the ordinary authentication classification.
+    }
+    if (signal.aborted) {
+      throw new TranslationError('timeout', TIMEOUT_MESSAGE)
+    }
+    if (
+      isRecord(payload) &&
+      isRecord(payload.error) &&
+      (payload.error.code === 403001 || payload.error.code === '403001')
+    ) {
+      throw new TranslationError('quota', QUOTA_MESSAGE)
+    }
+  }
+
   if (response.status === 401 || response.status === 403) {
     throw new TranslationError(
       'authentication',
@@ -89,11 +120,15 @@ function assertResponseOk(response: Response): void {
     )
   }
 
-  if (response.status === 429 || response.status === 456) {
+  if (response.status === 429) {
     throw new TranslationError(
-      'quota',
-      "The provider's usage limit was reached. Try later or choose another provider in settings."
+      'rate-limit',
+      'Too many translation requests. Wait a moment and try again.'
     )
+  }
+
+  if (response.status === 456) {
+    throw new TranslationError('quota', QUOTA_MESSAGE)
   }
 
   if (!response.ok) {
@@ -154,10 +189,12 @@ export function createTranslationService({
   readSettings,
   fetcher = fetch,
   managedAzureUrl,
+  requestTimeoutMs = REQUEST_TIMEOUT_MS,
 }: {
   readSettings: () => Promise<Settings>
   fetcher?: Fetcher
   managedAzureUrl?: string
+  requestTimeoutMs?: number
 }) {
   const cache = new Map<string, { translation: Translation; bytes: number }>()
   const encoder = new TextEncoder()
@@ -247,27 +284,37 @@ export function createTranslationService({
           : directRequest
 
       const started = performance.now()
+      const signal = AbortSignal.timeout(requestTimeoutMs)
       let response: Response
       try {
         response = await fetcher(url, {
           method: 'POST',
           headers,
           body: JSON.stringify(body),
-          signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS),
+          signal,
         })
-      } catch {
+      } catch (error) {
+        if (
+          signal.aborted ||
+          (error instanceof Error && error.name === 'TimeoutError')
+        ) {
+          throw new TranslationError('timeout', TIMEOUT_MESSAGE)
+        }
         throw new TranslationError(
           'network',
           'Translation could not connect. Check your connection and try again.'
         )
       }
 
-      assertResponseOk(response)
+      await assertResponseOk(response, provider, signal)
 
       let payload: unknown
       try {
         payload = await response.json()
       } catch {
+        if (signal.aborted) {
+          throw new TranslationError('timeout', TIMEOUT_MESSAGE)
+        }
         throw new TranslationError(
           'provider',
           'The provider returned an unreadable response. Try again.'

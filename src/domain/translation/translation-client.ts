@@ -30,6 +30,8 @@ export async function unwrapResponse(value: unknown): Promise<unknown> {
       value.code === 'configuration' ||
       value.code === 'authentication' ||
       value.code === 'quota' ||
+      value.code === 'rate-limit' ||
+      value.code === 'timeout' ||
       value.code === 'network' ||
       value.code === 'provider'
     ) {
