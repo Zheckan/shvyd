@@ -2,9 +2,12 @@ import { mkdir, copyFile, rm } from 'node:fs/promises'
 import { resolve } from 'node:path'
 import { parseReleaseConfig } from '@/domain/settings/release-config'
 
-export async function build(local = false): Promise<void> {
+export async function build(
+  local = false,
+  outputDirectory?: string
+): Promise<void> {
   const root = resolve(import.meta.dir, '..')
-  const output = resolve(root, 'dist')
+  const output = outputDirectory ?? resolve(root, 'dist')
   await mkdir(output, { recursive: true })
   const config = parseReleaseConfig({
     managedAzureUrl: Bun.env.SHVYD_AZURE_PROXY_URL ?? '',

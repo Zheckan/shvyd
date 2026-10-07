@@ -1,10 +1,5 @@
 import { createSettingsStore } from '@/domain/settings/createSettingsStore'
-import {
-  DEFAULT_SETTINGS,
-  isProvider,
-  migrateUserSettings,
-  parseSettings,
-} from '@/domain/settings/settings'
+import { isProvider, parseSettings } from '@/domain/settings/settings'
 import { parseReleaseConfig } from '@/domain/settings/release-config'
 import { testConnection } from '@/domain/translation/testConnection'
 import { createTranslationService } from '@/domain/translation/createTranslationService'
@@ -19,25 +14,13 @@ const ready = chrome.storage.local.setAccessLevel({
 })
 
 const store = createSettingsStore({
+  credentialMode: 'byok',
   read: async () => {
     await ready
     const result = await chrome.storage.local.get('settings')
-    if (result.settings === undefined) {
-      return undefined
-    }
-
-    const settings = migrateUserSettings(result.settings)
-    await chrome.storage.local.set({
-      settings: { ...settings, credentialOrigin: 'byok' },
-    })
-
-    return settings
+    return result.settings
   },
-  write: (settings) =>
-    chrome.storage.local.set({
-      settings: { ...settings, credentialOrigin: 'byok' },
-    }),
-  seed: async () => structuredClone(DEFAULT_SETTINGS),
+  write: (settings) => chrome.storage.local.set({ settings }),
 })
 
 const config = fetch(chrome.runtime.getURL('release-config.json')).then(

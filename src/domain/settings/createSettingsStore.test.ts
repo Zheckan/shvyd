@@ -144,3 +144,63 @@ test('rejects invalid preference values instead of silently keeping the old ones
 
   expect(await store.preferences()).toMatchObject({ target: 'uk' })
 })
+
+test('BYOK storage removes legacy owner credentials but retains preferences and new user keys across restarts', async () => {
+  let persisted: unknown = {
+    ...structuredClone(DEFAULT_SETTINGS),
+    target: 'pl',
+    azure: { key: 'owner-bootstrap-azure', region: '' },
+    deepl: {
+      key: 'owner-bootstrap-deepl',
+      endpoint: 'https://api-free.deepl.com',
+    },
+  }
+  const storage = {
+    credentialMode: 'byok' as const,
+    read: async () => persisted,
+    write: async (value: unknown) => {
+      persisted = structuredClone(value)
+    },
+    seed: async () => ({
+      ...DEFAULT_SETTINGS,
+      azure: { key: 'owner-seed-key', region: '' },
+    }),
+  }
+  const first = createSettingsStore(storage)
+  expect(await first.settings()).toMatchObject({
+    target: 'pl',
+    azure: { key: '' },
+    deepl: { key: '' },
+  })
+  expect(JSON.stringify(persisted)).not.toContain('owner-bootstrap')
+  await first.save({
+    ...(await first.settings()),
+    azure: { key: 'user-key', region: '' },
+  })
+  const restarted = createSettingsStore(storage)
+  expect((await restarted.settings()).azure.key).toBe('user-key')
+  expect(await restarted.preferences()).not.toHaveProperty('azure')
+  persisted = undefined
+  const fresh = createSettingsStore(storage)
+  expect((await fresh.settings()).azure.key).toBe('')
+})
+
+test('DeepL can only be selected with BYOK and removing its key restores Azure', async () => {
+  const store = createSettingsStore({
+    credentialMode: 'byok',
+    read: async () => undefined,
+    write: async () => {},
+  })
+  expect(await store.updatePreferences({ provider: 'deepl' })).toMatchObject({
+    provider: 'azure',
+  })
+  const own = {
+    ...(await store.settings()),
+    provider: 'deepl',
+    deepl: { key: 'user-deepl', endpoint: 'https://api-free.deepl.com' },
+  }
+  expect(await store.save(own)).toMatchObject({ provider: 'deepl' })
+  expect(
+    await store.save({ ...own, deepl: { ...own.deepl, key: '' } })
+  ).toMatchObject({ provider: 'azure' })
+})
