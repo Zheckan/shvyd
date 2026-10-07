@@ -60,6 +60,14 @@ python3 -m unittest scripts.test_benchmark_cloud scripts.test_benchmark_opencode
 
 Development tools are installed with `bun install`; `pnpm` runs the commands using those local dependencies. Linting uses Oxlint. Prettier uses single quotes, no semicolons, and two-space indentation. Type checking uses TypeScript 7.
 
+Run the reliability checks without provider keys or a playground server:
+
+```sh
+bun run test:reliability
+```
+
+This builds the extension and checks delayed replies, language-save failures, rapid target changes, closing, network retry, error classifications, and an actual background-worker restart in an isolated Helium profile. It requires Helium and Python's `websocket-client`. Results stay in `.preview/reliability-check/`. These browser checks run locally; CI runs the unit tests. See [request reliability](docs/translation-reliability.md) for cache behavior and verification details.
+
 To run live checks, configure provider keys in `.env` and leave the demo server running in another terminal. The extension harness explicitly adds BYOK credentials to an isolated profile; it does not embed them in the build:
 
 ```sh
@@ -74,7 +82,7 @@ The live check uses a temporary Helium profile, leaving the regular profile alon
 
 - Translation is sent after clicking the selection button. Source detection happens in the same provider request.
 - The selected-text limit is 10,000 characters. Browser internal pages, protected store pages, browser PDF viewers, and text inputs are outside this first pass.
-- Repeated selections use a bounded in-memory cache, separated by provider and target language. It clears when the background worker restarts. Saved preferences and keys remain in browser storage.
+- Repeated selections use an in-memory cache capped at 32 entries and 512 KiB of UTF-8 payloads. Identical simultaneous requests share one provider call. Saving full settings or restarting the background worker clears the cache; saved preferences and keys remain in browser storage.
 - Page styling is sampled from computed styles. Image backgrounds, unusual layouts, and custom web components may need a neutral fallback or further refinement.
 
 ## Project notes

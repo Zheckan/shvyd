@@ -1,6 +1,6 @@
 # First stable release plan
 
-Updated 2026-10-07. This is a proposed plan for the first stable release, intended for personal use and one or two friends. It does not require a beta programme or promotion. The prototype is working; the remaining work is setup, reliability, diagnostics, documentation, and packaging. This PR records the plan without implementing these additions or publishing a release.
+Updated 2026-10-07. This plan is for the first stable release, intended for personal use and one or two friends. It does not require a beta programme or promotion. Settings and request reliability are implemented on the stacked implementation branches. The remaining release work includes local usage and diagnostics, documentation, and packaging. No release has been published.
 
 ## Decisions for this release
 
@@ -10,7 +10,7 @@ Updated 2026-10-07. This is a proposed plan for the first stable release, intend
 | Azure account      | Keep the owner's existing resource on F0. Monitoring is already arranged by the owner. No pricing-tier change is planned.        |
 | Credentials        | All builds contain empty credentials. Azure BYOK overrides included access. DeepL requires BYOK.                                 |
 | Application server | Included Azure uses a server relay holding the owner's key. BYOK requests go directly to the provider. No user accounts.         |
-| Cache              | Keep the bounded in-memory cache. Add protection against duplicate simultaneous requests.                                        |
+| Cache              | Keep 32 entries and a 512 KiB payload cap; identical simultaneous requests share one provider call.                              |
 | Storage            | Use `chrome.storage.local` for settings and small local usage summaries. No application database is needed.                      |
 | Diagnostics        | Keep bounded, optional local error records and provide an export for support.                                                    |
 | Central reporting  | Optional follow-up, disabled by default if introduced. It is a separate decision from local diagnostics.                         |
@@ -33,7 +33,8 @@ Friends can configure their own Azure resource as well. Included access consumes
 - Paragraphs, headings, lists, emphasis, underlines, table structure, and unchanged code.
 - Copying, dragging, viewport placement, and language-menu anchoring.
 - Local settings persistence with credentials restricted to trusted extension contexts.
-- A 32-entry in-memory cache, keyed by provider, target, format, and source. Saving full settings clears it; worker restart also clears it.
+- An in-memory cache capped at 32 entries and 512 KiB of UTF-8 payloads, keyed by provider configuration, target, format, and source. Identical in-flight requests share one call. Saving full settings and worker restarts clear it.
+- Distinct messages for rate limiting, exhausted quota, connection failures, and timeouts. Popup results are guarded against closing and rapid target changes, including delayed preference saves.
 - A playground and repeatable browser checks. See [README](../README.md) for commands; generated screenshots and results stay in `.preview/`.
 
 The selection limit is currently 10,000 serialized input characters. Browser internal pages, protected store pages, browser PDF viewers, and text inputs are documented prototype exclusions. Decide whether to retain these exclusions for 1.0; they do not need to become new features to release.
@@ -52,9 +53,9 @@ Keep provider selection explicit. Errors should offer a retry or a link to setti
 
 ## Caching and storage
 
-The existing cache already avoids repeated provider calls while the worker stays alive. Keep its 32-entry limit for the first release and measure hit rate before expanding it. Add a byte limit so the memory bound also accounts for long outputs. Identical in-flight requests should share one provider call. Cancelled or failed requests must not become successful cache entries.
+The cache now keeps at most 32 entries and 512 KiB of UTF-8 encoded keys and serialized results. Oversized results are returned without caching. Identical in-flight requests share one provider call; failures are not cached. Saving full settings invalidates pending cache writes as well as stored entries. Measure hit rate before expanding it. See [request reliability](translation-reliability.md) for the implemented behavior and regression checks.
 
-Invalidate results when credentials or translation configuration change. Separate plain and formatted input, targets, and providers. Reject stale results in the popup when the selection or target changes. A cache hit must not increase the provider-usage estimate.
+The cache separates credentials, region or endpoint, plain and formatted input, targets, and providers. The popup ignores stale results as soon as a selection closes or its target changes. Closing hides a result without aborting the shared provider call, which may still serve another caller or populate the current cache. Future usage counters must count provider calls once and exclude cache hits.
 
 Keep source and translated text in memory. Persisting translations would retain potentially private page content, so disk caching and translation history need their own user-facing decision. If worker eviction makes cache misses frequent, evaluate bounded `chrome.storage.session` storage before using a persistent database. Chrome documents session storage as memory-backed, surviving worker lifetimes but clearing on browser restart, extension reload, update, or disable. [Chrome storage API](https://developer.chrome.com/docs/extensions/reference/api/storage)
 

@@ -347,6 +347,7 @@ export function mountTranslator(client: TranslationClient): () => void {
 
   async function chooseTarget(code: Language): Promise<void> {
     const choice = ++choiceGeneration
+
     generation++
     sessionTarget = code
     showLoading()

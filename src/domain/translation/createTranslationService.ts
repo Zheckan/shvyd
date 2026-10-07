@@ -96,14 +96,17 @@ async function assertResponseOk(
 
   if (provider === 'azure' && response.status === 403) {
     let payload: unknown
+
     try {
       payload = await response.json()
     } catch {
       // Unknown or malformed errors keep the ordinary authentication classification.
     }
+
     if (signal.aborted) {
       throw new TranslationError('timeout', TIMEOUT_MESSAGE)
     }
+
     if (
       isRecord(payload) &&
       isRecord(payload.error) &&
@@ -286,6 +289,7 @@ export function createTranslationService({
       const started = performance.now()
       const signal = AbortSignal.timeout(requestTimeoutMs)
       let response: Response
+
       try {
         response = await fetcher(url, {
           method: 'POST',
@@ -300,6 +304,7 @@ export function createTranslationService({
         ) {
           throw new TranslationError('timeout', TIMEOUT_MESSAGE)
         }
+
         throw new TranslationError(
           'network',
           'Translation could not connect. Check your connection and try again.'
@@ -309,12 +314,14 @@ export function createTranslationService({
       await assertResponseOk(response, provider, signal)
 
       let payload: unknown
+
       try {
         payload = await response.json()
       } catch {
         if (signal.aborted) {
           throw new TranslationError('timeout', TIMEOUT_MESSAGE)
         }
+
         throw new TranslationError(
           'provider',
           'The provider returned an unreadable response. Try again.'
@@ -337,22 +344,27 @@ export function createTranslationService({
         const bytes =
           encoder.encode(cacheKey).byteLength +
           encoder.encode(JSON.stringify(result)).byteLength
+
         if (bytes <= CACHE_BYTE_LIMIT) {
           cache.set(cacheKey, { translation: result, bytes })
           cacheBytes += bytes
         }
       }
+
       while (cache.size > CACHE_LIMIT || cacheBytes > CACHE_BYTE_LIMIT) {
         const oldest = cache.keys().next().value
+
         if (oldest === undefined) {
           break
         }
+
         cacheBytes -= cache.get(oldest)?.bytes ?? 0
         cache.delete(oldest)
       }
 
       return result
     })()
+
     if (generation === cacheGeneration) {
       inFlight.set(cacheKey, task)
     }
