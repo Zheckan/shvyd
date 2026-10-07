@@ -1,25 +1,25 @@
 # First stable release plan
 
-Updated 2026-10-05. This is a proposed plan for the first stable release, intended for personal use and one or two friends. It does not require a beta programme or promotion. The prototype is working; the remaining work is setup, reliability, diagnostics, documentation, and packaging. This PR records the plan without implementing these additions or publishing a release.
+Updated 2026-10-07. This is a proposed plan for the first stable release, intended for personal use and one or two friends. It does not require a beta programme or promotion. The prototype is working; the remaining work is setup, reliability, diagnostics, documentation, and packaging. This PR records the plan without implementing these additions or publishing a release.
 
 ## Decisions for this release
 
-| Area               | Decision                                                                                                                                 |
-| ------------------ | ---------------------------------------------------------------------------------------------------------------------------------------- |
-| Translation        | Azure standard translation remains the default. DeepL remains a selectable alternative with the user's own key.                          |
-| Azure account      | Keep the owner's existing resource on F0. Monitoring is already arranged by the owner. No pricing-tier change is planned.                |
-| Credentials        | Distribute a build with empty credentials. Users configure keys in settings. The owner's private build can continue using `build:local`. |
-| Application server | Direct requests from the extension worker to the chosen provider. No translation proxy or user accounts in this release.                 |
-| Cache              | Keep the bounded in-memory cache. Add protection against duplicate simultaneous requests.                                                |
-| Storage            | Use `chrome.storage.local` for settings and small local usage summaries. No application database is needed.                              |
-| Diagnostics        | Keep bounded, optional local error records and provide an export for support.                                                            |
-| Central reporting  | Optional follow-up, disabled by default if introduced. It is a separate decision from local diagnostics.                                 |
-| Distribution       | Begin with a versioned, credential-free ZIP for manual installation. A Chrome Web Store listing is a separate distribution task.         |
-| Offline            | Still speculative. See [future ideas](future.md).                                                                                        |
+| Area               | Decision                                                                                                                         |
+| ------------------ | -------------------------------------------------------------------------------------------------------------------------------- |
+| Translation        | Azure standard translation remains the default. DeepL remains a selectable alternative with the user's own key.                  |
+| Azure account      | Keep the owner's existing resource on F0. Monitoring is already arranged by the owner. No pricing-tier change is planned.        |
+| Credentials        | All builds contain empty credentials. Azure BYOK overrides included access. DeepL requires BYOK.                                 |
+| Application server | Included Azure uses a server relay holding the owner's key. BYOK requests go directly to the provider. No user accounts.         |
+| Cache              | Keep the bounded in-memory cache. Add protection against duplicate simultaneous requests.                                        |
+| Storage            | Use `chrome.storage.local` for settings and small local usage summaries. No application database is needed.                      |
+| Diagnostics        | Keep bounded, optional local error records and provide an export for support.                                                    |
+| Central reporting  | Optional follow-up, disabled by default if introduced. It is a separate decision from local diagnostics.                         |
+| Distribution       | Begin with a versioned, credential-free ZIP for manual installation. A Chrome Web Store listing is a separate distribution task. |
+| Offline            | Still speculative. See [future ideas](future.md).                                                                                |
 
 DeepL's provider picker, masked key input, and official endpoint choice already exist. They need a clearer first-use experience, rather than a new integration. The current free API Developer plan provides one million characters total without a reset. That allowance belongs to the user's provider account. Azure F0 provides two million characters per month. [DeepL plans](https://support.deepl.com/hc/en-us/articles/360021200939-DeepL-API-plans), [Azure pricing](https://azure.microsoft.com/en-us/pricing/details/translator/)
 
-Friends can configure their own Azure resource as well. A key manually shared with a trusted friend consumes the same resource's allowance and grants access to that resource. Never include the owner's key in a distributed ZIP, repository, screenshot, or settings export. A public service that works without users' keys would require a separate backend and quota design.
+Friends can configure their own Azure resource as well. Included access consumes the owner's allowance through a relay; its key stays on the server. Never include it in a distributed ZIP, repository, screenshot, or settings export. The relay implementation is prepared but not deployed. See [shared Azure setup](shared-azure.md) for deployment, limits, and the one-time removal of legacy credentials.
 
 ## What works now
 
@@ -36,7 +36,7 @@ The selection limit is currently 10,000 serialized input characters. Browser int
 
 ## Settings and first use
 
-Use the [settings design brief](settings-design-brief.md) for the next design pass. Keep the normal path short: choose a provider, add its key, save, and translate. Existing users should keep their preferences and keys when the settings page changes.
+Use the [settings design brief](settings-design-brief.md) for the next design pass. Keep the normal path short: choose a provider, add its key, save, and translate. Existing users keep preferences. This security upgrade clears legacy credentials once; old records cannot distinguish owner bootstrap keys from BYOK.
 
 Required states include an empty key, a saved but unverified key, successful validation, rejected credentials, temporary rate limiting, exhausted quota, and a network failure. The current "ready" label only means a key is present. Replace it with accurate status text.
 
@@ -79,7 +79,7 @@ Record usage when the provider call actually occurs, rather than every popup ren
 
 ## Can the owner see other people's usage?
 
-Direct provider requests do not pass through a Shvyd server. Local logs stay on each user's device, and an Azure account meter cannot identify which extension user made a request. Friends can export their diagnostics when reporting a problem.
+BYOK provider requests do not pass through a Shvyd server. Included Azure requests pass through the relay; its application does not record selected text or keys. Local logs stay on each user's device, and an Azure account meter cannot identify which extension user made a request. Friends can export their diagnostics when reporting a problem.
 
 If that becomes insufficient, add an optional "Share diagnostic counts" feature in a later PR. Before selecting a host, define the actual questions: Are requests failing? Which provider is slow? Does the cache help? How many opted-in installations use a version? Avoid collecting browsing activity to answer those questions.
 
@@ -113,11 +113,11 @@ Prepare concise usage terms covering user-owned provider credentials, provider l
 1. **Design settings.** Produce layouts from the brief, including first use, provider credentials, languages, appearance, usage, diagnostics, and error states. Keep planned controls visibly distinct from existing behavior in the design handoff.
 2. **Implement settings and reliability.** Preserve saved data; add explicit connection validation, usable key removal, request deduplication, bounded cache size, and accurate rate-limit/quota messages. Check keyboard navigation, focus, loading states, and stale responses.
 3. **Add local observability.** Implement counters, bounded diagnostics, clear/export controls, retention, and redaction. Keep central reporting a separate PR if it is approved later.
-4. **Prepare distribution.** Add icons, versioned packaging, a changelog, installation/update instructions, a privacy notice, usage terms, and a license decision. Produce the artifact from a clean build and an explicit file allowlist. Never package `build:local` output for others.
+4. **Prepare distribution.** Add icons, versioned packaging, a changelog, installation/update instructions, a privacy notice, usage terms, and a license decision. Produce the artifact from a clean build and an explicit file allowlist. Both build commands are credential-free; package only the explicit release file allowlist.
 5. **Verify the artifact.** Run `pnpm check` and relevant browser checks, then install the exact ZIP contents in fresh Chromium and Helium profiles. Verify empty credentials, both providers, update migration, unsupported pages, worker restart, language modes, safe formatted output, copying, dragging, keyboard use, errors, and clearing data. Inspect the ZIP for credentials and development files.
 6. **Review and release manually.** The owner reviews and merges the stack. Tag and publish only when explicitly requested. Keep the last working release and document how to reinstall it without losing settings.
 
-The clean verification build replaces the private credential bootstrap in `dist`. Schedule it deliberately when the owner is using a local build; documentation checks alone do not need to rebuild the extension.
+Every build removes the obsolete credential bootstrap. Verify that the release contains no provider credentials, including when rebuilding an existing `dist/`.
 
 Measure click-to-visible translation and popup responsiveness on representative short and long selections, with cold workers, warm workers, and cache hits recorded separately. Reuse the same input corpus for before/after comparisons and report slower responses as well as medians. Provider-call benchmarks alone are not proof of the finished UI's responsiveness.
 
@@ -128,4 +128,4 @@ Measure click-to-visible translation and popup responsiveness on representative 
 - Whether distribution should stay a manual ZIP or also use an unlisted/public store listing.
 - Whether central diagnostics answer a real need after local exports are available.
 
-Accounts, payment handling, a shared public translation proxy, more cloud models, translation history, persistent text caching, and offline models remain outside this release plan. A specific need can move an item into a later release.
+Accounts, payment handling, more cloud models, translation history, persistent text caching, and offline models remain outside this release plan. A specific need can move an item into a later release.

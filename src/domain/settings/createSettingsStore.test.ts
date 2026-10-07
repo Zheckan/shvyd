@@ -86,7 +86,10 @@ test('uses an available preferred language after changing to a provider that lac
   const store = createSettingsStore({
     read: async () => undefined,
     write: async () => {},
-    seed: async () => structuredClone(DEFAULT_SETTINGS),
+    seed: async () => ({
+      ...structuredClone(DEFAULT_SETTINGS),
+      deepl: { key: 'user-key', endpoint: 'https://api-free.deepl.com' },
+    }),
   })
 
   await store.updatePreferences({

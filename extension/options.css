@@ -848,3 +848,11 @@ hr {
     flex-direction: column;
   }
 }
+
+.provider-card:has(input:disabled) {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+.provider-card input:disabled {
+  cursor: not-allowed;
+}

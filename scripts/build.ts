@@ -1,11 +1,14 @@
-import { chmod, mkdir, copyFile } from 'node:fs/promises'
+import { mkdir, copyFile, rm } from 'node:fs/promises'
 import { resolve } from 'node:path'
-import { DEFAULT_SETTINGS, settingsFromEnv } from '@/domain/settings/settings'
+import { parseReleaseConfig } from '@/domain/settings/release-config'
 
 export async function build(local = false): Promise<void> {
   const root = resolve(import.meta.dir, '..')
   const output = resolve(root, 'dist')
   await mkdir(output, { recursive: true })
+  const config = parseReleaseConfig({
+    managedAzureUrl: Bun.env.SHVYD_AZURE_PROXY_URL ?? '',
+  })
 
   const result = await Bun.build({
     entrypoints: ['content.ts', 'background.ts', 'options.ts'].map((name) =>
@@ -26,12 +29,21 @@ export async function build(local = false): Promise<void> {
     await copyFile(resolve(root, 'extension', name), resolve(output, name))
   }
 
-  const settings = local
-    ? settingsFromEnv(Bun.env)
-    : structuredClone(DEFAULT_SETTINGS)
-  const path = resolve(output, 'local-settings.json')
-  await Bun.write(path, JSON.stringify(settings))
-  await chmod(path, 0o600)
+  // Remove the old credential-bearing bootstrap even when rebuilding an existing dist/.
+  await rm(resolve(output, 'local-settings.json'), { force: true })
+  await Bun.write(
+    resolve(output, 'release-config.json'),
+    JSON.stringify(config)
+  )
+
+  if (config.managedAzureUrl) {
+    const path = resolve(output, 'manifest.json')
+    const manifest = JSON.parse(await Bun.file(path).text())
+    manifest.host_permissions.push(
+      `${new URL(config.managedAzureUrl).origin}/*`
+    )
+    await Bun.write(path, JSON.stringify(manifest, null, 2))
+  }
 
   const sizes = await Promise.all(
     ['content.js', 'background.js', 'options.js'].map(async (name) => ({
@@ -41,7 +53,7 @@ export async function build(local = false): Promise<void> {
   )
 
   console.info(
-    `Built dist/ ${local ? 'with private local Azure/DeepL settings' : 'without credentials'}.`
+    `Built dist/ without provider credentials.${local ? ' build:local no longer embeds .env keys.' : ''}`
   )
 
   for (const item of sizes) {

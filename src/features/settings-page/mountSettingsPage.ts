@@ -1,6 +1,7 @@
 import {
   isProvider,
   parseSettings,
+  parseSettingsView,
   publicPreferences,
   settingsFromEnv,
   type Settings,
@@ -41,6 +42,7 @@ export function mountSettingsPage(
   let loaded = false
   let validationError = false
   let saveState: SaveState = { kind: 'saved' }
+  let managedAzureAvailable = false
 
   async function call(request: unknown): Promise<unknown> {
     return unwrapResponse(await send(request))
@@ -143,19 +145,44 @@ export function mountSettingsPage(
     for (const provider of ['azure', 'deepl'] as const) {
       const hasKey = !!input(`${provider}Key`).value.trim()
       const state = required(`[data-key-state="${provider}"]`, HTMLSpanElement)
-      state.textContent = hasKey ? 'Key added' : 'Needs a key'
-      state.dataset.ready = String(hasKey)
+      state.textContent = hasKey ? 'Using your key' : 'Requires your own key'
+
+      if (provider === 'azure' && !hasKey) {
+        state.textContent = managedAzureAvailable
+          ? 'Included Azure access'
+          : 'Shared access not configured'
+      }
+
+      state.dataset.ready = String(
+        hasKey || (provider === 'azure' && managedAzureAvailable)
+      )
+
+      if (provider === 'deepl') {
+        required('[name=provider][value=deepl]', HTMLInputElement).disabled =
+          !hasKey
+      }
       const result = required(`#${provider}-test-status`, HTMLOutputElement)
+      required(`[data-test-provider=${provider}]`, HTMLButtonElement).disabled =
+        result.dataset.state === 'testing' ||
+        (!hasKey && !(provider === 'azure' && managedAzureAvailable))
 
       if (!result.dataset.state) {
         const keyState = saveState.kind === 'saved' ? 'Key saved' : 'Key added'
         result.textContent = hasKey
           ? `${keyState} · not verified`
-          : 'No key yet'
+          : 'Add your own key to enable'
+
+        if (provider === 'azure' && !hasKey) {
+          result.textContent = managedAzureAvailable
+            ? 'Included access · not verified'
+            : 'Shared access not configured'
+        }
       }
 
       if (hasKey) {
-        labels.push(`${provider === 'azure' ? 'Azure' : 'DeepL'} key added`)
+        labels.push(`${provider === 'azure' ? 'Azure' : 'DeepL'} · your key`)
+      } else if (provider === 'azure' && managedAzureAvailable) {
+        labels.push('Azure included')
       }
     }
 
@@ -169,6 +196,11 @@ export function mountSettingsPage(
 
     try {
       const settings = read()
+      selectRadio('provider', settings.provider)
+
+      if (languageSettings.read().provider !== settings.provider) {
+        languageSettings.setProvider(settings.provider)
+      }
       validationError = false
       input('azureRegion').removeAttribute('aria-invalid')
       saver.schedule(settings)
@@ -270,7 +302,7 @@ export function mountSettingsPage(
             error instanceof Error ? error.message : 'Connection test failed.'
         }
       } finally {
-        button.disabled = false
+        updateKeyLabels()
       }
     })
   }
@@ -369,7 +401,9 @@ export function mountSettingsPage(
 
   void call({ kind: 'get-settings' })
     .then((value) => {
-      fill(parseSettings(value))
+      const settings = parseSettingsView(value)
+      managedAzureAvailable = settings.managedAzureAvailable
+      fill(settings)
       loaded = true
       fields.disabled = false
       statusContainer.dataset.state = 'saved'

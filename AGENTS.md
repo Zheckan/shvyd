@@ -4,7 +4,8 @@
 
 Shvyd is a Chromium extension (Manifest V3) that translates selected text in a
 small popup styled to match the page. Azure Translator is the default
-provider; DeepL is optional. Users bring their own API keys.
+provider through a server relay; users can override it with BYOK. DeepL is
+optional and requires BYOK. Builds contain no provider credentials.
 
 The extension has three runtimes, and the playground adds a fourth:
 
@@ -59,19 +60,21 @@ Conventions:
 bun install
 bun run verify        # lint, format check, typecheck, unit tests, build
 bun run fix           # lint fixes and formatting, then verify
-bun run build:local   # private dist/ with keys from .env; never share it
+bun run build        # credential-free dist/; build:local is a safe compatibility alias
 bun run dev           # playground on http://localhost:5173
 ```
 
 Load `dist/` with **Load unpacked** at `chrome://extensions` to try the
 extension.
 
-Live browser checks need provider keys in `.env` and the Helium browser:
+Live browser checks need provider keys in `.env` and the Helium browser. The
+extension harness explicitly configures BYOK in a temporary profile. For shared
+Azure routing or deployment, read `docs/shared-azure.md`.
 
 ```sh
 bun run dev                          # keep running in another terminal
 python3 scripts/check-demo.py
-bun run build:local && python3 scripts/check-extension.py
+bun run build && python3 scripts/check-extension.py
 ```
 
 Python benchmark tests: `python3 -m pytest scripts/test_benchmark_cloud.py

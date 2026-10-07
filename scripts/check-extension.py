@@ -1,12 +1,14 @@
 #!/usr/bin/env python3
 """Check the unpacked extension in an isolated Helium profile with live provider keys.
 
-Run `bun run build:local` and `bun run dev` first. Requires websocket-client,
+Run `bun run build` and `bun run dev` first. The harness explicitly configures
+BYOK in its temporary profile from `.env`; no keys are bundled in dist/. Requires websocket-client,
 already used by the local benchmark harness. Never uses the regular browser profile.
 Pass --settings-only for focused connection, import, appearance, and reflow checks.
 """
 import base64
 import json
+import importlib.util
 from pathlib import Path
 import subprocess
 import sys
@@ -173,8 +175,28 @@ def main():
             worker = CDP(worker_info['webSocketDebuggerUrl'])
             connections.append(worker)
             readiness = wait_for(lambda: worker.evaluate("chrome.storage.local.get('settings').then(({settings})=>settings?({azure:!!settings.azure.key,deepl:!!settings.deepl.key}):null)"), 'initialized provider settings')
-            assert readiness['azure'] and readiness['deepl'], 'Use build:local with both provider keys configured.'
-            results['providerKeysPresent'] = readiness
+            assert not readiness['azure'] and not readiness['deepl'], 'Fresh builds must never seed owner keys.'
+            options()
+            assert page.evaluate("!document.querySelector('[name=azureKey]').value && !document.querySelector('[name=deeplKey]').value && document.querySelector('[name=provider][value=deepl]').disabled")
+            record('fresh-install-owner-keys-absent-deepl-disabled', {'passed': True})
+
+            spec = importlib.util.spec_from_file_location('benchmark_cloud', ROOT / 'scripts/benchmark-cloud.py')
+            benchmark = importlib.util.module_from_spec(spec)
+            spec.loader.exec_module(benchmark)
+            env = benchmark.load_env(ROOT / '.env')
+            assert env.get('AZURE_TRANSLATOR_KEY') and env.get('DEEPL_API_KEY'), 'Live BYOK checks need both keys in .env.'
+            credentials = {
+                'azure': {'key': env['AZURE_TRANSLATOR_KEY'], 'region': env.get('AZURE_TRANSLATOR_REGION', '')},
+                'deepl': {'key': env['DEEPL_API_KEY'], 'endpoint': env.get('DEEPL_API_ENDPOINT', 'https://api-free.deepl.com').rstrip('/')},
+            }
+            configured = page.evaluate('''(async () => {
+              const current=await chrome.runtime.sendMessage({kind:'get-settings'});
+              const result=await chrome.runtime.sendMessage({kind:'save-settings',value:{...current.data,...CREDENTIALS}});
+              return result.ok;
+            })()'''.replace('CREDENTIALS', json.dumps(credentials)))
+            assert configured, 'Explicit temporary-profile BYOK setup failed.'
+            results['providerKeysPresent'] = {'azure': True, 'deepl': True}
+            options()
 
             if '--settings-only' in sys.argv:
                 options()
@@ -200,7 +222,7 @@ def main():
                   document.getElementById('settings').requestSubmit();
                 })()""")
                 wait_for(lambda: page.evaluate("document.getElementById('status').textContent==='All changes saved'"), 'credential removal saved')
-                assert page.evaluate("document.getElementById('key-summary').textContent==='No keys yet'")
+                assert page.evaluate("['No keys yet','Azure included'].includes(document.getElementById('key-summary').textContent) && document.querySelector('[name=provider][value=deepl]').disabled && document.querySelector('[name=provider]:checked').value==='azure'")
                 record('settings-first-use-without-keys', {'passed': True})
 
                 page.evaluate("""(() => {
@@ -208,7 +230,7 @@ def main():
                   transfer.items.add(new File(['AZURE_TRANSLATOR_KEY=fixture-key\\nAZURE_TRANSLATOR_REGION=global\\nDEEPL_API_KEY=fixture-deepl-key'],'.env',{type:'text/plain'}));
                   input.files=transfer.files;input.dispatchEvent(new Event('change'));
                 })()""")
-                wait_for(lambda: page.evaluate("document.getElementById('key-summary').textContent.includes('DeepL key added') && document.getElementById('status').textContent==='All changes saved'"), 'env import saved')
+                wait_for(lambda: page.evaluate("document.getElementById('key-summary').textContent.includes('your key') && document.getElementById('status').textContent==='All changes saved'"), 'env import saved')
                 assert page.evaluate("document.querySelector('[name=azureRegion]').value===''")
                 record('settings-env-import', {'passed': True})
 

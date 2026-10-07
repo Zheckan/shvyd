@@ -10,15 +10,18 @@ export async function testConnection({
   settings,
   provider,
   fetcher,
+  managedAzureUrl,
 }: {
   settings: Settings
   provider: Provider
   fetcher?: Fetcher
+  managedAzureUrl?: string
 }): Promise<{ durationMs: number }> {
   const parsed = parseSettings(settings)
   const service = createTranslationService({
     readSettings: async () => parsed,
     fetcher,
+    managedAzureUrl,
   })
   const result = await service.translate({
     text: 'Hello',

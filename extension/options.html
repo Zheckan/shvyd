@@ -61,7 +61,7 @@
                     />
                     <span
                       ><strong>Azure</strong
-                      ><small>Fastest complete results in our tests</small
+                      ><small>Included access or your own API key</small
                       ><span class="provider-ready" data-key-state="azure"
                         >Needs a key</span
                       ></span
@@ -75,7 +75,8 @@
                       aria-label="DeepL"
                     />
                     <span
-                      ><strong>DeepL</strong><small>Alternative wording</small
+                      ><strong>DeepL</strong
+                      ><small>Enabled with your own API key</small
                       ><span class="provider-ready" data-key-state="deepl"
                         >Needs a key</span
                       ></span
@@ -122,7 +123,7 @@
                     >No key yet</output
                   >
                 </div>
-                <label for="azure-key">API key</label>
+                <label for="azure-key">Your Azure API key, optional</label>
                 <div class="key-field">
                   <input
                     id="azure-key"
@@ -130,7 +131,7 @@
                     type="password"
                     autocomplete="off"
                     spellcheck="false"
-                    placeholder="Paste your Translator key"
+                    placeholder="Add your own key to replace included access"
                     aria-describedby="connection-note azure-test-status"
                   />
                   <button
@@ -172,7 +173,7 @@
                     >No key yet</output
                   >
                 </div>
-                <label for="deepl-key">API key</label>
+                <label for="deepl-key">Your DeepL API key</label>
                 <div class="key-field">
                   <input
                     id="deepl-key"
@@ -221,6 +222,11 @@
                   </button>
                 </div>
               </div>
+              <p class="hint">
+                Azure uses included access until you add your own key. Removing
+                your Azure key restores included access. DeepL is available only
+                with your own key.
+              </p>
               <p id="connection-note" class="hint">
                 Test connection sends “Hello” to that provider for translation
                 into Ukrainian. Each test uses 5 characters of your allowance.
@@ -229,9 +235,10 @@
           </fieldset>
         </form>
         <p class="privacy-note">
-          Keys stay in this browser. Selected text goes to your chosen provider
-          only when you click Translate. The preview uses sample text and makes
-          no translation requests.
+          Your keys are stored in this browser. Included Azure access uses
+          Shvyd’s server; your own keys connect directly to the provider.
+          Selected text is sent only when you click Translate. The preview uses
+          sample text and makes no translation requests.
         </p>
       </div>
       <aside

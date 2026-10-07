@@ -3,6 +3,41 @@ import { DEFAULT_SETTINGS } from '@/domain/settings/settings'
 import { createTranslationService } from './createTranslationService'
 
 describe('selected-text translation', () => {
+  test('uses shared Azure without receiving the owner key and switches to BYOK even for the same selection', async () => {
+    let settings = structuredClone(DEFAULT_SETTINGS)
+    const requests: Request[] = []
+    const service = createTranslationService({
+      readSettings: async () => settings,
+      managedAzureUrl: 'https://translation.example.com/translate',
+      fetcher: async (url, init) => {
+        requests.push(new Request(url, init))
+
+        return Response.json({
+          value: [{ translations: [{ text: 'Привіт' }] }],
+        })
+      },
+    })
+
+    await service.translate({ text: 'Hello', target: 'uk' })
+    expect(requests[0]?.url).toBe('https://translation.example.com/translate')
+    expect(requests[0]?.headers.has('Ocp-Apim-Subscription-Key')).toBe(false)
+    expect(await requests[0]?.json()).toEqual({
+      text: 'Hello',
+      format: 'plain',
+      target: 'uk',
+    })
+
+    settings = { ...settings, azure: { key: 'user-owned-key', region: '' } }
+    await service.translate({ text: 'Hello', target: 'uk' })
+    expect(requests).toHaveLength(2)
+    expect(requests[1]?.url).toStartWith(
+      'https://api.cognitive.microsofttranslator.com/'
+    )
+    expect(requests[1]?.headers.get('Ocp-Apim-Subscription-Key')).toBe(
+      'user-owned-key'
+    )
+  })
+
   test('rejects a target unavailable with the provider before sending selected text', async () => {
     let sent = false
     const service = createTranslationService({

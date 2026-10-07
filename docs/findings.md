@@ -31,3 +31,11 @@ confusion, and non-obvious constraints.
   connection tests. Each test translates `Hello`, using five source characters.
   Results go to `.preview/settings-extension-check/`; the full extension run
   keeps its separate `.preview/extension-check/` output.
+
+- Both extension build commands are credential-free and remove the legacy
+  `dist/local-settings.json` bootstrap. Included Azure requires a public relay
+  URL; owner credentials belong only on its server. DeepL requires BYOK.
+- Old extension settings have no credential provenance. The security migration
+  clears their keys once, preserving preferences; subsequent BYOK saves carry
+  a provenance marker. The live harness supplies keys explicitly in an isolated
+  profile instead of relying on an embedded bootstrap.
