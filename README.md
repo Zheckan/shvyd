@@ -28,7 +28,7 @@ On the first upgrade from the old bootstrap build, saved credentials are cleared
 
 The bundled catalog has 173 targets across the two providers. Choose your preferred languages in settings; the popup shows those first, with a searchable **More languages** menu for the rest. The language menu opens in a separate popover, so expanding or searching it keeps the translation window still. It follows its button when the browser is resized. You can hide the additional-language menu. Target choices follow provider support, and preferred languages stay saved across provider changes. See [language choices](docs/languages.md) for the default-language modes and catalog details.
 
-The background worker sends BYOK requests directly to Azure or DeepL. Included Azure access uses a server relay that holds the owner's key; the extension receives only the public endpoint URL. See [shared Azure setup](docs/shared-azure.md). User keys are stored in extension-local storage restricted to trusted extension contexts. The page popup receives only public preferences and translated text.
+The background worker sends BYOK requests directly to Azure or DeepL. Included Azure access uses a server relay that holds the owner's key; the extension receives only the public endpoint URL. See [shared Azure setup](docs/shared-azure.md); `bun run worker:deploy` deploys it and rebuilds the extension once the dedicated deployment token is configured. User keys are stored in extension-local storage restricted to trusted extension contexts. The page popup receives only public preferences and translated text.
 
 ## Run the playground
 

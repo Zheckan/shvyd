@@ -4,14 +4,20 @@
   "compatibility_date": "2026-10-07",
   "vars": {
     "AZURE_TRANSLATOR_REGION": "",
-    "ALLOWED_EXTENSION_ORIGINS": ""
+    "ALLOWED_EXTENSION_ORIGINS": "chrome-extension://dnofmicolgpeckcgpdkcipalkhebongp"
   },
   "ratelimits": [
     {
       "name": "REQUEST_LIMITER",
       "namespace_id": "2026100701",
-      "simple": { "limit": 20, "period": 60 }
+      "simple": {
+        "limit": 20,
+        "period": 60
+      }
     }
   ],
-  "observability": { "enabled": false }
+  "observability": {
+    "enabled": false
+  },
+  "workers_dev": true
 }

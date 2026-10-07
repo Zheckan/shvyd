@@ -25,14 +25,16 @@ Reload the extension at `chrome://extensions` after building. That starts the ne
 
 ## Cloudflare Worker deployment
 
-`wrangler.jsonc` and `src/entries/azure-relay.ts` prepare the Worker. Deployment remains a hosting decision; no live endpoint is configured by this change.
+`wrangler.jsonc` and `src/entries/azure-relay.ts` prepare the Worker. Cloudflare Worker hosting is selected. Deployment was attempted but Cloudflare rejected the existing token with HTTP 403 for Worker secrets and subdomain access. No Worker or Azure secret was uploaded. A dedicated deployment token is required.
 
-1. Sign in to Cloudflare with `bunx wrangler login`.
-2. Set `ALLOWED_EXTENSION_ORIGINS` in `wrangler.jsonc` to the actual `chrome-extension://<id>` origins of the builds being distributed, separated by commas. Unpacked extension IDs can differ by installation; configure the IDs your friends actually use. A stable store distribution needs its published ID.
-3. Set `AZURE_TRANSLATOR_REGION` to the resource's region, or leave it empty for Global.
-4. Deploy the Worker with `bunx wrangler deploy`, then set its `AZURE_TRANSLATOR_KEY` secret using `bunx wrangler secret put AZURE_TRANSLATOR_KEY`. Enter the key at the secret prompt. Requests cannot succeed until the secret is installed. [Cloudflare secrets](https://developers.cloudflare.com/workers/configuration/secrets/)
-5. Put the resulting public `https://<worker-host>/translate` URL in `SHVYD_AZURE_PROXY_URL` in local `.env`. Rebuild with `bun run build`. The build adds the relay origin to the extension's host permissions.
+1. Create a custom token at [Cloudflare API tokens](https://dash.cloudflare.com/profile/api-tokens), with **Account → Workers Scripts → Edit** and **Account → Account Settings → Read**, scoped to the existing account. Save it in `.env` as `CLOUDFLARE_WORKERS_API_TOKEN`. Keep the separate `CLOUDFLARE_API_TOKEN` for Workers AI benchmarks. Cloudflare's [Workers token template](https://developers.cloudflare.com/fundamentals/api/reference/template/) documents the deployment permissions.
+2. Keep `CLOUDFLARE_ACCOUNT_ID` and `AZURE_TRANSLATOR_KEY` configured in `.env`. The deployment command passes the Azure key to the secret command through stdin, never as an argument or public variable.
+3. Configure `ALLOWED_EXTENSION_ORIGINS` in `wrangler.jsonc` for the builds being distributed. The current local unpacked build uses `chrome-extension://dnofmicolgpeckcgpdkcipalkhebongp`. IDs can differ by installation path; add your friends' actual IDs. A stable store distribution needs its published ID.
+4. Set `AZURE_TRANSLATOR_REGION` in `wrangler.jsonc` to the Azure resource's region, or leave it empty for Global. The current resource is Global.
+5. Run `bun run worker:deploy`. It uses Wrangler 4.148.0, deploys the Worker, uploads `AZURE_TRANSLATOR_KEY` as a server secret, reads the public workers.dev hostname, saves `SHVYD_AZURE_PROXY_URL` in `.env`, and rebuilds the credential-free extension. The URL is saved only after deployment and secret upload succeed. [Cloudflare secrets](https://developers.cloudflare.com/workers/configuration/secrets/)
 6. Install/reload that exact build. Confirm blank key fields, included Azure access, a successful Azure connection test, Azure BYOK override, and disabled DeepL until BYOK is supplied.
+
+A failed setup can leave a deployed Worker without a working secret; rerun after correcting the reported error. The command never changes the public release endpoint on a deploy or secret-upload failure. It does not change the Cloudflare or Azure pricing plan.
 
 The handler accepts only Azure translation, validates target and format, enforces the existing 10,000-character selection limit, caps request bodies at 65,000 bytes, and returns only translation text. It does not forward arbitrary URLs or upstream headers. Errors expose no upstream response bodies or server credentials.
 
@@ -56,3 +58,5 @@ Verify the exact extension files contain no configured provider secrets, includi
 - The prepared relay was exercised with controlled upstream responses: server-key routing, formatted output, origin rejection, invalid target/provider/body rejection, oversized selections, and rate-limit denial before upstream calls passed.
 
 These are local checks. They do not establish production relay availability; deployment and a live shared-route check remain outstanding.
+
+The follow-up regression suite now has 27 passing tests, including the settings-store migration/BYOK boundary and both built artifacts. The store regression was observed failing before the migration policy moved into the store. A Wrangler dry run also passed. Live shared-route verification is blocked by deployment-token permissions, rather than by an Azure key or build failure.

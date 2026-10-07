@@ -39,3 +39,8 @@ confusion, and non-obvious constraints.
   clears their keys once, preserving preferences; subsequent BYOK saves carry
   a provenance marker. The live harness supplies keys explicitly in an isolated
   profile instead of relying on an embedded bootstrap.
+
+- An active Cloudflare token that can list Workers is not proof of deployment
+  access. The configured benchmark token returned HTTP 403 for Worker secrets
+  and subdomain access. Use a separate `CLOUDFLARE_WORKERS_API_TOKEN` with
+  Workers Scripts Edit and Account Settings Read for relay deployment.
