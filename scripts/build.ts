@@ -1,5 +1,6 @@
 import { mkdir, copyFile, rm } from 'node:fs/promises'
 import { resolve } from 'node:path'
+import { DEFAULT_MANAGED_AZURE_URL } from '@/config/release'
 import { parseReleaseConfig } from '@/domain/settings/release-config'
 
 export async function build(
@@ -10,7 +11,7 @@ export async function build(
   const output = outputDirectory ?? resolve(root, 'dist')
   await mkdir(output, { recursive: true })
   const config = parseReleaseConfig({
-    managedAzureUrl: Bun.env.SHVYD_AZURE_PROXY_URL ?? '',
+    managedAzureUrl: Bun.env.SHVYD_AZURE_PROXY_URL ?? DEFAULT_MANAGED_AZURE_URL,
   })
 
   const result = await Bun.build({

@@ -19,7 +19,7 @@ Updated 2026-10-07. This is a proposed plan for the first stable release, intend
 
 DeepL's provider picker, masked key input, and official endpoint choice already exist. They need a clearer first-use experience, rather than a new integration. The current free API Developer plan provides one million characters total without a reset. That allowance belongs to the user's provider account. Azure F0 provides two million characters per month. [DeepL plans](https://support.deepl.com/hc/en-us/articles/360021200939-DeepL-API-plans), [Azure pricing](https://azure.microsoft.com/en-us/pricing/details/translator/)
 
-Friends can configure their own Azure resource as well. Included access consumes the owner's allowance through a relay; its key stays on the server. Never include it in a distributed ZIP, repository, screenshot, or settings export. The relay implementation is prepared but not deployed. See [shared Azure setup](shared-azure.md) for deployment, limits, and the one-time removal of legacy credentials.
+Friends can configure their own Azure resource as well. Included access consumes the owner's allowance through a relay; its key stays on the server. Never include it in a distributed ZIP, repository, screenshot, or settings export. The relay is deployed and verified from the installed extension with empty key fields. See [shared Azure setup](shared-azure.md) for deployment, limits, and the one-time removal of legacy credentials.
 
 ## What works now
 

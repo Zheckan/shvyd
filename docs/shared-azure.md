@@ -2,7 +2,7 @@
 
 The owner's Azure key belongs on a server. An extension service worker is still part of the distributed client; embedding the key there lets recipients extract it. Masking a settings field does not protect a bundled key.
 
-Both extension build commands now omit provider credentials and remove the old `dist/local-settings.json`. The only release configuration is `SHVYD_AZURE_PROXY_URL`, a public HTTPS endpoint ending in `/translate`. With no endpoint, Azure requires BYOK. The relay below is prepared but has not been deployed.
+Both extension build commands now omit provider credentials and remove the old `dist/local-settings.json`. The only release configuration is `SHVYD_AZURE_PROXY_URL`, a public HTTPS endpoint ending in `/translate`. The release defaults to the live endpoint `https://shvyd-azure-relay.zheckan.workers.dev/translate`. Set the override explicitly empty to require Azure BYOK instead. Provider keys are never part of this configuration.
 
 ## Request routing
 
@@ -25,7 +25,7 @@ Reload the extension at `chrome://extensions` after building. That starts the ne
 
 ## Cloudflare Worker deployment
 
-`wrangler.jsonc` and `src/entries/azure-relay.ts` prepare the Worker. Cloudflare Worker hosting is selected. Deployment was attempted but Cloudflare rejected the existing token with HTTP 403 for Worker secrets and subdomain access. No Worker or Azure secret was uploaded. A dedicated deployment token is required.
+`wrangler.jsonc` and `src/entries/azure-relay.ts` prepare the Worker. The Worker was deployed on 2026-10-07 using the dedicated deployment token. The Azure key is stored as its server secret. The benchmark token remains separate; it does not have the required deployment permissions.
 
 1. Create a custom token at [Cloudflare API tokens](https://dash.cloudflare.com/profile/api-tokens), with **Account → Workers Scripts → Edit** and **Account → Account Settings → Read**, scoped to the existing account. Save it in `.env` as `CLOUDFLARE_WORKERS_API_TOKEN`. Keep the separate `CLOUDFLARE_API_TOKEN` for Workers AI benchmarks. Cloudflare's [Workers token template](https://developers.cloudflare.com/fundamentals/api/reference/template/) documents the deployment permissions.
 2. Keep `CLOUDFLARE_ACCOUNT_ID` and `AZURE_TRANSLATOR_KEY` configured in `.env`. The deployment command passes the Azure key to the secret command through stdin, never as an argument or public variable.
@@ -57,6 +57,6 @@ Verify the exact extension files contain no configured provider secrets, includi
 - A local diagnostic exercised actual background startup with sentinel legacy keys, confirming credential removal, preference preservation, subsequent BYOK saves, and refusal of settings requests from page scripts.
 - The prepared relay was exercised with controlled upstream responses: server-key routing, formatted output, origin rejection, invalid target/provider/body rejection, oversized selections, and rate-limit denial before upstream calls passed.
 
-These are local checks. They do not establish production relay availability; deployment and a live shared-route check remain outstanding.
+The initial checks above were local. After deployment, the live relay returned HTTP 200 and a valid translation with no configured credentials in its response. The installed Helium extension passed 13 focused checks, including shared Azure connection testing and a selection popup with both key fields empty.
 
-The follow-up regression suite now has 27 passing tests, including the settings-store migration/BYOK boundary and both built artifacts. The store regression was observed failing before the migration policy moved into the store. A Wrangler dry run also passed. Live shared-route verification is blocked by deployment-token permissions, rather than by an Azure key or build failure.
+The follow-up regression suite now has 27 passing tests, including the settings-store migration/BYOK boundary and both built artifacts. The store regression was observed failing before the migration policy moved into the store. A Wrangler dry run also passed. The dedicated deployment token resolved the earlier HTTP 403 permission failure. Live shared-route verification now passes.

@@ -180,6 +180,18 @@ def main():
             assert page.evaluate("!document.querySelector('[name=azureKey]').value && !document.querySelector('[name=deeplKey]').value && document.querySelector('[name=provider][value=deepl]').disabled")
             record('fresh-install-owner-keys-absent-deepl-disabled', {'passed': True})
 
+            results['extensionId'] = extension_id
+            shared_available = page.evaluate("chrome.runtime.sendMessage({kind:'get-settings'}).then(reply=>reply.ok && reply.data.managedAzureAvailable)")
+            if shared_available:
+                page.evaluate("document.querySelector('[data-test-provider=azure]').click()")
+                wait_for(lambda: page.evaluate("document.getElementById('azure-test-status').dataset.state==='success'"), 'shared Azure connection without BYOK')
+                record('shared-azure-connection-with-empty-keys', {'passed': True, 'liveProvider': True})
+                navigate('editorial')
+                value = translate_selection()
+                record('shared-azure-popup-with-empty-keys', {'passed': True, 'liveProvider': True, 'observedClickToCompleteMs': value['observedClickToCompleteMs']})
+                options()
+                assert page.evaluate("!document.querySelector('[name=azureKey]').value && !document.querySelector('[name=deeplKey]').value")
+
             spec = importlib.util.spec_from_file_location('benchmark_cloud', ROOT / 'scripts/benchmark-cloud.py')
             benchmark = importlib.util.module_from_spec(spec)
             spec.loader.exec_module(benchmark)

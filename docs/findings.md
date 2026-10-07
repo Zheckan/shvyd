@@ -44,3 +44,8 @@ confusion, and non-obvious constraints.
   access. The configured benchmark token returned HTTP 403 for Worker secrets
   and subdomain access. Use a separate `CLOUDFLARE_WORKERS_API_TOKEN` with
   Workers Scripts Edit and Account Settings Read for relay deployment.
+
+- The release defaults to the deployed public Azure relay URL in
+  `src/config/release.ts`. `SHVYD_AZURE_PROXY_URL` overrides it; explicitly
+  empty disables included access. Both key fields remained empty during the
+  installed extension's successful shared connection and selection tests.
