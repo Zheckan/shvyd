@@ -1,8 +1,248 @@
 import { describe, expect, test } from 'bun:test'
-import { DEFAULT_SETTINGS } from '@/domain/settings/settings'
+import { DEFAULT_SETTINGS, type Settings } from '@/domain/settings/settings'
 import { createTranslationService } from './createTranslationService'
 
 describe('selected-text translation', () => {
+  test('keeps the 32-entry cache limit and refreshes recently read entries', async () => {
+    const service = createTranslationService({
+      readSettings: async () => ({
+        ...DEFAULT_SETTINGS,
+        azure: { key: 'test-key', region: '' },
+      }),
+      fetcher: async () =>
+        Response.json({ value: [{ translations: [{ text: 'Translation' }] }] }),
+    })
+    for (let index = 0; index < 32; index++) {
+      await service.translate({ text: `Selection ${index}`, target: 'uk' })
+    }
+    await service.translate({ text: 'Selection 0', target: 'uk' })
+    await service.translate({ text: 'Selection 32', target: 'uk' })
+    expect(
+      (await service.translate({ text: 'Selection 0', target: 'uk' })).cached
+    ).toBe(true)
+    expect(
+      (await service.translate({ text: 'Selection 1', target: 'uk' })).cached
+    ).toBe(false)
+  })
+
+  test('a recreated service starts with an empty cache and still translates with saved settings', async () => {
+    const options = {
+      readSettings: async () => ({
+        ...DEFAULT_SETTINGS,
+        azure: { key: 'saved-key', region: '' },
+      }),
+      fetcher: async () =>
+        Response.json({ value: [{ translations: [{ text: 'Привіт' }] }] }),
+    }
+    const first = createTranslationService(options)
+    await first.translate({ text: 'Hello', target: 'uk' })
+    expect(
+      (await first.translate({ text: 'Hello', target: 'uk' })).cached
+    ).toBe(true)
+
+    const restarted = createTranslationService(options)
+    expect(
+      await restarted.translate({ text: 'Hello', target: 'uk' })
+    ).toMatchObject({ text: 'Привіт', cached: false })
+  })
+
+  test('a failed shared request reaches every caller and a later retry sends fresh work', async () => {
+    let calls = 0
+    const service = createTranslationService({
+      readSettings: async () => ({
+        ...DEFAULT_SETTINGS,
+        azure: { key: 'test-key', region: '' },
+      }),
+      fetcher: async () => {
+        calls++
+        if (calls === 1) {
+          await Bun.sleep(0)
+          throw new TypeError('Unreachable')
+        }
+        return Response.json({
+          value: [{ translations: [{ text: 'Recovered' }] }],
+        })
+      },
+    })
+    const outcomes = await Promise.allSettled([
+      service.translate({ text: 'Hello', target: 'uk' }),
+      service.translate({ text: 'Hello', target: 'uk' }),
+    ])
+    expect(outcomes).toMatchObject([
+      { status: 'rejected', reason: { code: 'network' } },
+      { status: 'rejected', reason: { code: 'network' } },
+    ])
+    expect(
+      await service.translate({ text: 'Hello', target: 'uk' })
+    ).toMatchObject({ text: 'Recovered', cached: false })
+    expect(calls).toBe(2)
+  })
+
+  test('changing a DeepL endpoint cannot reuse a translation from the previous endpoint', async () => {
+    let settings: Settings = {
+      ...DEFAULT_SETTINGS,
+      provider: 'deepl',
+      deepl: { key: 'test-key', endpoint: 'https://api-free.deepl.com' },
+    }
+    const urls: string[] = []
+    const service = createTranslationService({
+      readSettings: async () => settings,
+      fetcher: async (url) => {
+        urls.push(url)
+        return Response.json({ translations: [{ text: 'Translation' }] })
+      },
+    })
+
+    await service.translate({ text: 'Hello', target: 'uk' })
+    settings = {
+      ...settings,
+      deepl: { key: 'test-key', endpoint: 'https://api.deepl.com' },
+    }
+    expect(
+      (await service.translate({ text: 'Hello', target: 'uk' })).cached
+    ).toBe(false)
+    expect(urls).toEqual([
+      'https://api-free.deepl.com/v2/translate',
+      'https://api.deepl.com/v2/translate',
+    ])
+  })
+
+  test('returns oversized translations without caching them or evicting useful small entries', async () => {
+    const service = createTranslationService({
+      readSettings: async () => ({
+        ...DEFAULT_SETTINGS,
+        azure: { key: 'test-key', region: '' },
+      }),
+      fetcher: async (_url, init) => {
+        const body = JSON.parse(String(init.body))
+        return Response.json({
+          value: [
+            {
+              translations: [
+                {
+                  text:
+                    body.inputs[0].text === 'Huge'
+                      ? 'ї'.repeat(300_000)
+                      : 'Small',
+                },
+              ],
+            },
+          ],
+        })
+      },
+    })
+
+    await service.translate({ text: 'Small', target: 'uk' })
+    expect(
+      (await service.translate({ text: 'Huge', target: 'uk' })).text.length
+    ).toBe(300_000)
+    expect(
+      (await service.translate({ text: 'Huge', target: 'uk' })).cached
+    ).toBe(false)
+    expect(
+      (await service.translate({ text: 'Small', target: 'uk' })).cached
+    ).toBe(true)
+  })
+
+  test('evicts old translations when UTF-8 payloads exceed the 512 KiB cache budget', async () => {
+    let calls = 0
+    const service = createTranslationService({
+      readSettings: async () => ({
+        ...DEFAULT_SETTINGS,
+        azure: { key: 'test-key', region: '' },
+      }),
+      fetcher: async () => {
+        calls++
+        return Response.json({
+          value: [{ translations: [{ text: 'ї'.repeat(100_000) }] }],
+        })
+      },
+    })
+
+    for (const text of ['First', 'Second', 'Third']) {
+      await service.translate({ text, target: 'uk' })
+    }
+    expect(
+      await service.translate({ text: 'Third', target: 'uk' })
+    ).toMatchObject({ cached: true })
+    expect(
+      await service.translate({ text: 'Second', target: 'uk' })
+    ).toMatchObject({ cached: true })
+    expect(
+      await service.translate({ text: 'First', target: 'uk' })
+    ).toMatchObject({ cached: false })
+    expect(calls).toBe(4)
+  })
+
+  test('clearing settings while a request runs starts fresh work and keeps late results out of the cache', async () => {
+    let release: () => void = () => undefined
+    const ready = new Promise<void>((resolve) => {
+      release = resolve
+    })
+    let calls = 0
+    const service = createTranslationService({
+      readSettings: async () => ({
+        ...DEFAULT_SETTINGS,
+        azure: { key: 'test-key', region: '' },
+      }),
+      fetcher: async () => {
+        const call = ++calls
+        if (call === 1) {
+          await ready
+        }
+        return Response.json({
+          value: [{ translations: [{ text: call === 1 ? 'Old' : 'Fresh' }] }],
+        })
+      },
+    })
+
+    const old = service.translate({ text: 'Hello', target: 'uk' })
+    await Bun.sleep(0)
+    service.clearCache()
+    const fresh = service.translate({ text: 'Hello', target: 'uk' })
+    await Bun.sleep(0)
+    release()
+
+    expect(await old).toMatchObject({ text: 'Old' })
+    expect(await fresh).toMatchObject({ text: 'Fresh', cached: false })
+    expect(
+      await service.translate({ text: 'Hello', target: 'uk' })
+    ).toMatchObject({ text: 'Fresh', cached: true })
+    expect(calls).toBe(2)
+  })
+
+  test('simultaneous identical selections share one provider request', async () => {
+    let release: () => void = () => undefined
+    const ready = new Promise<void>((resolve) => {
+      release = resolve
+    })
+    let calls = 0
+    const service = createTranslationService({
+      readSettings: async () => ({
+        ...DEFAULT_SETTINGS,
+        azure: { key: 'test-key', region: '' },
+      }),
+      fetcher: async () => {
+        calls++
+        await ready
+        return Response.json({
+          value: [{ translations: [{ text: 'Привіт' }] }],
+        })
+      },
+    })
+
+    const first = service.translate({ text: 'Hello', target: 'uk' })
+    const second = service.translate({ text: 'Hello', target: 'uk' })
+    await Bun.sleep(0)
+    release()
+
+    expect(await Promise.all([first, second])).toMatchObject([
+      { text: 'Привіт', cached: false },
+      { text: 'Привіт', cached: false },
+    ])
+    expect(calls).toBe(1)
+  })
+
   test('uses shared Azure without receiving the owner key and switches to BYOK even for the same selection', async () => {
     let settings = structuredClone(DEFAULT_SETTINGS)
     const requests: Request[] = []
