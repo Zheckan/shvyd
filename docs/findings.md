@@ -78,3 +78,11 @@ confusion, and non-obvious constraints.
   there). Releases come only from `bun run package`, which builds into a fresh
   directory and copies the `RELEASE_FILES` allowlist. Chrome stable ignores
   `--load-extension`; automated extension checks use Helium.
+- Bun loads `.env` into `Bun.env` for every script, including `bun run package`.
+  The packager therefore passes the release relay URL to `build()` explicitly
+  (default, or `--relay=`); `SHVYD_AZURE_PROXY_URL` affects only `build`.
+- Settings styles are split across `options.css`, `language-settings.css`,
+  `usage.css`, and `preview.css`, loaded in that order. Moving a rule into a later
+  file can change the cascade, so each file carries its own media-query
+  overrides. The split was checked by comparing every computed style and box
+  on the settings page at five widths and both themes.

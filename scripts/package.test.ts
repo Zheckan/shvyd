@@ -2,6 +2,7 @@ import { expect, test } from 'bun:test'
 import { mkdtemp, readdir, rm } from 'node:fs/promises'
 import { tmpdir } from 'node:os'
 import { resolve } from 'node:path'
+import { DEFAULT_MANAGED_AZURE_URL } from '@/config/release'
 import {
   assertVersionsMatch,
   packageExtension,
@@ -74,3 +75,34 @@ test('mismatched or invalid versions stop packaging', () => {
     'not a valid'
   )
 })
+
+test('the release uses the default relay even when the environment overrides it', async () => {
+  const output = await mkdtemp(resolve(tmpdir(), 'shvyd-package-test-'))
+  const previous = Bun.env.SHVYD_AZURE_PROXY_URL
+  Bun.env.SHVYD_AZURE_PROXY_URL = 'https://dev-relay.example.com/translate'
+
+  try {
+    const result = await packageExtension({
+      outputDirectory: output,
+      secrets: [],
+    })
+    const config = Bun.spawnSync([
+      'unzip',
+      '-p',
+      result.zipPath,
+      'release-config.json',
+    ]).stdout.toString()
+
+    expect(JSON.parse(config)).toEqual({
+      managedAzureUrl: DEFAULT_MANAGED_AZURE_URL,
+    })
+  } finally {
+    if (previous === undefined) {
+      delete Bun.env.SHVYD_AZURE_PROXY_URL
+    } else {
+      Bun.env.SHVYD_AZURE_PROXY_URL = previous
+    }
+
+    await rm(output, { recursive: true, force: true })
+  }
+}, 30_000)

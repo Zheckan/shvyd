@@ -1,6 +1,7 @@
 import { mkdir, mkdtemp, readdir, rm } from 'node:fs/promises'
 import { tmpdir } from 'node:os'
 import { relative, resolve } from 'node:path'
+import { DEFAULT_MANAGED_AZURE_URL } from '@/config/release'
 import { createZip } from '@/utils/createZip'
 import { parseEnvFile } from '@/utils/parseEnvFile'
 import { build } from './build'
@@ -15,6 +16,9 @@ export const RELEASE_FILES = [
   'options.js',
   'options.html',
   'options.css',
+  'language-settings.css',
+  'usage.css',
+  'preview.css',
   'release-config.json',
   'icons/icon16.png',
   'icons/icon32.png',
@@ -76,13 +80,17 @@ function sha256(data: Uint8Array): string {
 export async function packageExtension({
   outputDirectory = resolve(root, 'release'),
   secrets,
+  managedAzureUrl = DEFAULT_MANAGED_AZURE_URL,
 }: {
   outputDirectory?: string
   secrets: string[]
+  /** Passed explicitly so a local `.env` override can never reach a release. */
+  managedAzureUrl?: string
 }): Promise<{
   zipPath: string
   sha256: string
   version: string
+  managedAzureUrl: string
   omitted: string[]
 }> {
   const packageJson = await Bun.file(resolve(root, 'package.json')).json()
@@ -95,7 +103,7 @@ export async function packageExtension({
   const staging = await mkdtemp(resolve(tmpdir(), 'shvyd-package-'))
 
   try {
-    await build(false, staging)
+    await build(false, staging, managedAzureUrl)
     const built = await listFiles(staging)
     const missing = RELEASE_FILES.filter((path) => !built.includes(path))
 
@@ -145,6 +153,7 @@ export async function packageExtension({
       zipPath,
       sha256: hash,
       version,
+      managedAzureUrl,
       omitted: built.filter(
         (path) => !RELEASE_FILES.some((file) => file === path)
       ),
@@ -159,14 +168,17 @@ if (import.meta.main) {
   const fileValues = (await envFile.exists())
     ? parseEnvFile(await envFile.text())
     : {}
+  const relayFlag = Bun.argv.find((value) => value.startsWith('--relay='))
   const result = await packageExtension({
     secrets: secretValues({ ...fileValues, ...Bun.env }),
+    managedAzureUrl: relayFlag?.slice('--relay='.length),
   })
 
   console.info(
     `Packaged ${relative(root, result.zipPath)} (version ${result.version})`
   )
   console.info(`SHA-256 ${result.sha256}`)
+  console.info(`Included Azure relay: ${result.managedAzureUrl || 'disabled'}`)
 
   if (result.omitted.length > 0) {
     console.info(`Left out of the release: ${result.omitted.join(', ')}`)
