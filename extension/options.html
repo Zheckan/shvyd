@@ -240,6 +240,146 @@
             </section>
           </fieldset>
         </form>
+        <section id="usage" class="card" aria-labelledby="usage-heading">
+          <div class="section-heading">
+            <h2 id="usage-heading">Usage</h2>
+            <span id="usage-since" class="hint">Loading…</span>
+          </div>
+          <div
+            class="segments usage-period"
+            role="group"
+            aria-label="Usage period"
+          >
+            <button type="button" data-usage-period="1" aria-pressed="true">
+              Today
+            </button>
+            <button type="button" data-usage-period="7" aria-pressed="false">
+              7 days
+            </button>
+            <button type="button" data-usage-period="30" aria-pressed="false">
+              30 days
+            </button>
+            <button type="button" data-usage-period="90" aria-pressed="false">
+              90 days
+            </button>
+          </div>
+          <div class="usage-table-wrap">
+            <table class="usage-table">
+              <thead>
+                <tr>
+                  <th scope="col">Route</th>
+                  <th scope="col">Requests</th>
+                  <th scope="col">Characters</th>
+                  <th scope="col">Reused</th>
+                  <th scope="col">Failed</th>
+                  <th scope="col">Uncertain</th>
+                </tr>
+              </thead>
+              <tbody id="usage-rows"></tbody>
+            </table>
+            <p id="usage-empty" class="hint usage-empty">
+              No translations in this period.
+            </p>
+          </div>
+          <p class="hint">
+            Estimates for this browser only, counting provider requests when
+            they happen. Characters are the source text of successful requests;
+            providers may count formatting differently. Reused results came from
+            memory and used no allowance. Uncertain requests timed out and may
+            still have been charged. Periods use this computer’s calendar days,
+            not the provider’s billing cycle. Counts include no text or page
+            details and are removed after 90 days.
+          </p>
+          <div class="usage-actions">
+            <output
+              id="usage-status"
+              class="connection-status"
+              role="status"
+              aria-live="polite"
+            ></output>
+            <button id="clear-usage" class="button" type="button">
+              Clear usage
+            </button>
+          </div>
+          <hr />
+          <div class="section-heading">
+            <h3>DeepL allowance</h3>
+            <output
+              id="deepl-usage"
+              class="connection-status"
+              role="status"
+              aria-live="polite"
+              >Not checked</output
+            >
+          </div>
+          <div class="usage-actions">
+            <p class="hint">
+              Asks DeepL for your saved key’s allowance. Uses no characters and
+              may include other apps using the same key.
+            </p>
+            <button id="check-deepl-usage" class="button" type="button">
+              Check allowance
+            </button>
+          </div>
+        </section>
+        <section
+          id="diagnostics"
+          class="card"
+          aria-labelledby="diagnostics-heading"
+        >
+          <h2 id="diagnostics-heading">Error records</h2>
+          <label class="toggle">
+            <span
+              ><strong>Keep error records</strong
+              ><small
+                >Off by default. Keeps up to 100 failed requests for 7 days:
+                time, extension version, provider, error type, HTTP status,
+                duration and a random reference. Never keys, selected text,
+                translations, page addresses or titles. Turning this off deletes
+                kept records.</small
+              ></span
+            >
+            <input id="diagnostics-enabled" class="switch" type="checkbox" />
+          </label>
+          <div class="usage-actions">
+            <output
+              id="diagnostics-count"
+              class="connection-status"
+              role="status"
+              aria-live="polite"
+              >Not keeping error records</output
+            >
+            <button
+              id="preview-diagnostics"
+              class="button"
+              type="button"
+              disabled
+            >
+              Preview
+            </button>
+            <button
+              id="download-diagnostics"
+              class="button"
+              type="button"
+              disabled
+            >
+              Download
+            </button>
+            <button
+              id="clear-diagnostics"
+              class="button"
+              type="button"
+              disabled
+            >
+              Clear
+            </button>
+          </div>
+          <pre
+            id="diagnostics-preview"
+            class="diagnostics-preview"
+            hidden
+          ></pre>
+        </section>
         <p class="privacy-note">
           Your keys are stored in this browser. Included Azure access uses
           Shvyd’s server; your own keys connect directly to the provider.
