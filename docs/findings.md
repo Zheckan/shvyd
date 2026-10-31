@@ -74,3 +74,7 @@ confusion, and non-obvious constraints.
   call. `src/test/browser/reliability-storage.js` holds only writes containing
   `settings`; holding every `set` call would also trap usage writes and break the
   save counts the reliability harness waits for.
+- `dist/` can hold stale development files (an old `playground.html` was found
+  there). Releases come only from `bun run package`, which builds into a fresh
+  directory and copies the `RELEASE_FILES` allowlist. Chrome stable ignores
+  `--load-extension`; automated extension checks use Helium.
