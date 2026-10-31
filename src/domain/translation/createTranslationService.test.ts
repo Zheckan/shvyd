@@ -705,7 +705,6 @@ describe('usage events', () => {
     await service.translate({ text: 'Hello', target: 'uk' })
 
     expect(events).toEqual([
-      { kind: 'reused', provider: 'azure', access: 'own-key' },
       {
         kind: 'provider-call',
         provider: 'azure',
@@ -715,7 +714,36 @@ describe('usage events', () => {
         outcome: 'success',
       },
       { kind: 'reused', provider: 'azure', access: 'own-key' },
+      { kind: 'reused', provider: 'azure', access: 'own-key' },
     ])
+  })
+
+  test('a caller joining a shared call that fails is not counted as reused', async () => {
+    const events: string[] = []
+    let fail = () => {}
+    const service = createTranslationService({
+      readSettings: azureSettings,
+      onEvent: (event) =>
+        events.push(
+          event.kind === 'reused' ? 'reused' : `call:${event.outcome}`
+        ),
+      fetcher: () =>
+        new Promise((_resolve, reject) => {
+          fail = () => reject(new TypeError('offline'))
+        }),
+    })
+
+    const first = service.translate({ text: 'Hello', target: 'uk' })
+    const second = service.translate({ text: 'Hello', target: 'uk' })
+    await Bun.sleep(0)
+    fail()
+
+    const results = await Promise.allSettled([first, second])
+    expect(results.map((result) => result.status)).toEqual([
+      'rejected',
+      'rejected',
+    ])
+    expect(events).toEqual(['call:failure'])
   })
 
   test('a failed provider call reports its category and HTTP status, never the response body', async () => {

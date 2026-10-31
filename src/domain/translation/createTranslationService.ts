@@ -5,6 +5,13 @@ import {
 } from '@/domain/languages/languages'
 import { isProvider, type Settings } from '@/domain/settings/settings'
 import { isRecord } from '@/utils/isRecord'
+import { createRequestCache } from './createRequestCache'
+import {
+  errorForStatus,
+  isAzureQuotaPayload,
+  QUOTA_MESSAGE,
+  TIMEOUT_MESSAGE,
+} from './provider-errors'
 import {
   isTranslationFormat,
   MAX_SELECTION_LENGTH,
@@ -23,36 +30,42 @@ const AZURE_TRANSLATE_URL =
 const REQUEST_TIMEOUT_MS = 15_000
 const CACHE_LIMIT = 32
 const CACHE_BYTE_LIMIT = 512 * 1024
-const QUOTA_MESSAGE =
-  "The provider's character allowance is exhausted. Check your quota or choose another provider in settings."
 
-const TIMEOUT_MESSAGE = 'Translation took too long. Try again.'
+/** Everything needed to send one translation to one provider. */
+type ProviderCall = {
+  provider: Provider
+  access: TranslationAccess
+  settings: Settings
+  managedAzureUrl?: string
+  text: string
+  format: TranslationFormat
+  target: string
+  providerTarget: string
+}
 
-type ProviderRequest = {
+type HttpRequest = {
   url: string
   headers: Record<string, string>
   body: unknown
 }
 
-function providerRequest({
-  provider,
-  settings,
-  text,
-  format,
-  providerTarget,
-}: {
-  provider: Provider
-  settings: Settings
-  text: string
-  format: TranslationFormat
-  providerTarget: string
-}): ProviderRequest {
-  const headers: Record<string, string> = {
-    'Content-Type': 'application/json',
+function httpRequest(call: ProviderCall): HttpRequest {
+  const { provider, settings, text, format, providerTarget } = call
+
+  if (call.access === 'included' && call.managedAzureUrl) {
+    return {
+      url: call.managedAzureUrl,
+      headers: { 'Content-Type': 'application/json' },
+      body: { text, format, target: call.target },
+    }
   }
 
   if (provider === 'azure') {
-    headers['Ocp-Apim-Subscription-Key'] = settings.azure.key
+    const headers: Record<string, string> = {
+      'Content-Type': 'application/json',
+      'Ocp-Apim-Subscription-Key': settings.azure.key,
+    }
+
     if (settings.azure.region) {
       headers['Ocp-Apim-Subscription-Region'] = settings.azure.region
     }
@@ -72,10 +85,12 @@ function providerRequest({
     }
   }
 
-  headers.Authorization = `DeepL-Auth-Key ${settings.deepl.key}`
   return {
     url: `${settings.deepl.endpoint}/v2/translate`,
-    headers,
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `DeepL-Auth-Key ${settings.deepl.key}`,
+    },
     body: {
       text: [text],
       target_lang: providerTarget.toUpperCase(),
@@ -92,10 +107,6 @@ async function assertResponseOk(
   provider: Provider,
   signal: AbortSignal
 ): Promise<void> {
-  if (response.status === 504) {
-    throw new TranslationError('timeout', TIMEOUT_MESSAGE)
-  }
-
   if (provider === 'azure' && response.status === 403) {
     let payload: unknown
 
@@ -109,39 +120,23 @@ async function assertResponseOk(
       throw new TranslationError('timeout', TIMEOUT_MESSAGE)
     }
 
-    if (
-      isRecord(payload) &&
-      isRecord(payload.error) &&
-      (payload.error.code === 403001 || payload.error.code === '403001')
-    ) {
-      throw new TranslationError('quota', QUOTA_MESSAGE)
+    if (isAzureQuotaPayload(payload)) {
+      throw new TranslationError('quota', QUOTA_MESSAGE, response.status)
     }
   }
 
-  if (response.status === 401 || response.status === 403) {
-    throw new TranslationError(
-      'authentication',
-      'The API key was rejected. Check Shvyd settings.'
-    )
-  }
+  const error = errorForStatus(
+    response.status,
+    'The provider could not translate this selection. Try again.'
+  )
 
-  if (response.status === 429) {
-    throw new TranslationError(
-      'rate-limit',
-      'Too many translation requests. Wait a moment and try again.'
-    )
+  if (error) {
+    throw error
   }
+}
 
-  if (response.status === 456) {
-    throw new TranslationError('quota', QUOTA_MESSAGE)
-  }
-
-  if (!response.ok) {
-    throw new TranslationError(
-      'provider',
-      'The provider could not translate this selection. Try again.'
-    )
-  }
+function unreadable(message: string): TranslationError {
+  return new TranslationError('provider', message)
 }
 
 function readAzureText(payload: unknown): string {
@@ -149,23 +144,19 @@ function readAzureText(payload: unknown): string {
     isRecord(payload) && Array.isArray(payload.value)
       ? payload.value[0]
       : undefined
+
   if (!isRecord(first) || !Array.isArray(first.translations)) {
-    throw new TranslationError(
-      'provider',
-      'Azure returned an unreadable translation.'
-    )
+    throw unreadable('Azure returned an unreadable translation.')
   }
 
   const translation: unknown = first.translations[0]
+
   if (
     !isRecord(translation) ||
     typeof translation.text !== 'string' ||
     !translation.text.trim()
   ) {
-    throw new TranslationError(
-      'provider',
-      'Azure returned an empty translation.'
-    )
+    throw unreadable('Azure returned an empty translation.')
   }
 
   return translation.text
@@ -176,18 +167,137 @@ function readDeepLText(payload: unknown): string {
     isRecord(payload) && Array.isArray(payload.translations)
       ? payload.translations[0]
       : undefined
+
   if (
     !isRecord(first) ||
     typeof first.text !== 'string' ||
     !first.text.trim()
   ) {
-    throw new TranslationError(
-      'provider',
-      'DeepL returned an empty or unreadable translation.'
-    )
+    throw unreadable('DeepL returned an empty or unreadable translation.')
   }
 
   return first.text
+}
+
+/** Sends one request and returns the provider's text, or throws a classified error. */
+async function requestText(
+  call: ProviderCall,
+  fetcher: Fetcher,
+  timeoutMs: number
+): Promise<string> {
+  const { url, headers, body } = httpRequest(call)
+  const signal = AbortSignal.timeout(timeoutMs)
+  let response: Response
+
+  try {
+    response = await fetcher(url, {
+      method: 'POST',
+      headers,
+      body: JSON.stringify(body),
+      signal,
+    })
+  } catch (error) {
+    if (
+      signal.aborted ||
+      (error instanceof Error && error.name === 'TimeoutError')
+    ) {
+      throw new TranslationError('timeout', TIMEOUT_MESSAGE)
+    }
+
+    throw new TranslationError(
+      'network',
+      'Translation could not connect. Check your connection and try again.'
+    )
+  }
+
+  await assertResponseOk(response, call.provider, signal)
+  let payload: unknown
+
+  try {
+    payload = await response.json()
+  } catch {
+    if (signal.aborted) {
+      throw new TranslationError('timeout', TIMEOUT_MESSAGE)
+    }
+
+    throw unreadable('The provider returned an unreadable response. Try again.')
+  }
+
+  return call.provider === 'azure'
+    ? readAzureText(payload)
+    : readDeepLText(payload)
+}
+
+/** Validates a request against current settings and decides where it goes. */
+function planCall(
+  request: TranslationRequest,
+  settings: Settings,
+  managedAzureUrl: string | undefined
+): ProviderCall {
+  const format = request.format ?? 'plain'
+
+  if (
+    !isLanguage(request.target) ||
+    typeof request.text !== 'string' ||
+    !isTranslationFormat(format) ||
+    !request.text.trim() ||
+    request.text.length > MAX_SELECTION_LENGTH
+  ) {
+    throw new TranslationError(
+      'selection',
+      'Select between 1 and 10,000 characters to translate.'
+    )
+  }
+
+  const provider = request.provider ?? settings.provider
+
+  if (!isProvider(provider)) {
+    throw new TranslationError(
+      'configuration',
+      'Choose a translation provider.'
+    )
+  }
+
+  const providerTarget = getLanguage(request.target)?.[provider]
+
+  if (!providerTarget) {
+    throw new TranslationError(
+      'configuration',
+      'This language is unavailable with the selected provider. Choose another language or provider.'
+    )
+  }
+
+  const included =
+    provider === 'azure' && !settings.azure.key && !!managedAzureUrl
+
+  if (!settings[provider].key && !included) {
+    throw new TranslationError(
+      'configuration',
+      'Add your provider API key in Shvyd settings.'
+    )
+  }
+
+  return {
+    provider,
+    access: included ? 'included' : 'own-key',
+    settings,
+    managedAzureUrl,
+    text: request.text.trim(),
+    format,
+    target: request.target,
+    providerTarget,
+  }
+}
+
+function cacheKey(call: ProviderCall): string {
+  return JSON.stringify([
+    call.provider,
+    call.settings[call.provider],
+    call.access === 'included',
+    call.target,
+    call.format,
+    call.text,
+  ])
 }
 
 export function createTranslationService({
@@ -203,11 +313,14 @@ export function createTranslationService({
   requestTimeoutMs?: number
   onEvent?: (event: TranslationEvent) => void
 }) {
-  const cache = new Map<string, { translation: Translation; bytes: number }>()
   const encoder = new TextEncoder()
-  let cacheBytes = 0
-  const inFlight = new Map<string, Promise<Translation>>()
-  let cacheGeneration = 0
+  const cache = createRequestCache<Translation>({
+    maxEntries: CACHE_LIMIT,
+    maxBytes: CACHE_BYTE_LIMIT,
+    sizeOf: (key, value) =>
+      encoder.encode(key).byteLength +
+      encoder.encode(JSON.stringify(value)).byteLength,
+  })
 
   function report(event: TranslationEvent): void {
     try {
@@ -217,220 +330,66 @@ export function createTranslationService({
     }
   }
 
-  async function translate(request: TranslationRequest): Promise<Translation> {
-    const generation = cacheGeneration
-    const format = request.format ?? 'plain'
-    if (
-      !isLanguage(request.target) ||
-      typeof request.text !== 'string' ||
-      !isTranslationFormat(format) ||
-      !request.text.trim() ||
-      request.text.length > MAX_SELECTION_LENGTH
-    ) {
-      throw new TranslationError(
-        'selection',
-        'Select between 1 and 10,000 characters to translate.'
-      )
-    }
-
-    const settings = await readSettings()
-    const provider = request.provider ?? settings.provider
-    if (!isProvider(provider)) {
-      throw new TranslationError(
-        'configuration',
-        'Choose a translation provider.'
-      )
-    }
-
-    const providerTarget = getLanguage(request.target)?.[provider]
-    if (!providerTarget) {
-      throw new TranslationError(
-        'configuration',
-        'This language is unavailable with the selected provider. Choose another language or provider.'
-      )
-    }
-
-    const sharedAzure =
-      provider === 'azure' && !settings.azure.key && !!managedAzureUrl
-
-    if (!settings[provider].key && !sharedAzure) {
-      throw new TranslationError(
-        'configuration',
-        'Add your provider API key in Shvyd settings.'
-      )
-    }
-
-    const text = request.text.trim()
-    const access: TranslationAccess = sharedAzure ? 'included' : 'own-key'
-    const cacheKey = JSON.stringify([
-      provider,
-      settings[provider],
-      sharedAzure,
-      request.target,
-      format,
-      text,
-    ])
-    const cached = cache.get(cacheKey)
-    if (cached && generation === cacheGeneration) {
-      cache.delete(cacheKey)
-      cache.set(cacheKey, cached)
-      report({ kind: 'reused', provider, access })
-      return { ...cached.translation, cached: true, durationMs: 0 }
-    }
-
-    const pending = inFlight.get(cacheKey)
-    if (pending && generation === cacheGeneration) {
-      report({ kind: 'reused', provider, access })
-      return pending
-    }
-
+  /** One provider call, reported exactly once however many callers share it. */
+  async function callProvider(call: ProviderCall): Promise<Translation> {
+    const { provider, access } = call
     const started = performance.now()
-    let status: number | undefined
-
-    const call = (async () => {
-      const directRequest = providerRequest({
-        provider,
-        settings,
-        text,
-        format,
-        providerTarget,
-      })
-      const { url, headers, body } =
-        sharedAzure && managedAzureUrl
-          ? {
-              url: managedAzureUrl,
-              headers: { 'Content-Type': 'application/json' },
-              body: { text, format, target: request.target },
-            }
-          : directRequest
-
-      const signal = AbortSignal.timeout(requestTimeoutMs)
-      let response: Response
-
-      try {
-        response = await fetcher(url, {
-          method: 'POST',
-          headers,
-          body: JSON.stringify(body),
-          signal,
-        })
-      } catch (error) {
-        if (
-          signal.aborted ||
-          (error instanceof Error && error.name === 'TimeoutError')
-        ) {
-          throw new TranslationError('timeout', TIMEOUT_MESSAGE)
-        }
-
-        throw new TranslationError(
-          'network',
-          'Translation could not connect. Check your connection and try again.'
-        )
-      }
-
-      status = response.status
-      await assertResponseOk(response, provider, signal)
-
-      let payload: unknown
-
-      try {
-        payload = await response.json()
-      } catch {
-        if (signal.aborted) {
-          throw new TranslationError('timeout', TIMEOUT_MESSAGE)
-        }
-
-        throw new TranslationError(
-          'provider',
-          'The provider returned an unreadable response. Try again.'
-        )
-      }
-
-      const result: Translation = {
-        text:
-          provider === 'azure'
-            ? readAzureText(payload)
-            : readDeepLText(payload),
-        format,
-        provider,
-        target: request.target,
-        cached: false,
-        durationMs: Math.round(performance.now() - started),
-      }
-
-      if (generation === cacheGeneration) {
-        const bytes =
-          encoder.encode(cacheKey).byteLength +
-          encoder.encode(JSON.stringify(result)).byteLength
-
-        if (bytes <= CACHE_BYTE_LIMIT) {
-          cache.set(cacheKey, { translation: result, bytes })
-          cacheBytes += bytes
-        }
-      }
-
-      while (cache.size > CACHE_LIMIT || cacheBytes > CACHE_BYTE_LIMIT) {
-        const oldest = cache.keys().next().value
-
-        if (oldest === undefined) {
-          break
-        }
-
-        cacheBytes -= cache.get(oldest)?.bytes ?? 0
-        cache.delete(oldest)
-      }
-
-      return result
-    })()
-
-    const task = call.then(
-      (result) => {
-        report({
-          kind: 'provider-call',
-          provider,
-          access,
-          characters: text.length,
-          durationMs: result.durationMs,
-          outcome: 'success',
-        })
-        return result
-      },
-      (error: unknown) => {
-        report({
-          kind: 'provider-call',
-          provider,
-          access,
-          characters: text.length,
-          durationMs: Math.round(performance.now() - started),
-          outcome: 'failure',
-          code: error instanceof TranslationError ? error.code : 'provider',
-          ...(status === undefined || (status >= 200 && status < 300)
-            ? {}
-            : { status }),
-        })
-        throw error
-      }
-    )
-
-    if (generation === cacheGeneration) {
-      inFlight.set(cacheKey, task)
-    }
+    const characters = call.text.length
 
     try {
-      return await task
-    } finally {
-      if (inFlight.get(cacheKey) === task) {
-        inFlight.delete(cacheKey)
+      const text = await requestText(call, fetcher, requestTimeoutMs)
+      const durationMs = Math.round(performance.now() - started)
+      report({
+        kind: 'provider-call',
+        provider,
+        access,
+        characters,
+        durationMs,
+        outcome: 'success',
+      })
+
+      return {
+        text,
+        format: call.format,
+        provider,
+        target: call.target,
+        cached: false,
+        durationMs,
       }
+    } catch (error) {
+      report({
+        kind: 'provider-call',
+        provider,
+        access,
+        characters,
+        durationMs: Math.round(performance.now() - started),
+        outcome: 'failure',
+        code: error instanceof TranslationError ? error.code : 'provider',
+        ...(error instanceof TranslationError && error.status !== undefined
+          ? { status: error.status }
+          : {}),
+      })
+      throw error
     }
   }
 
-  function clearCache(): void {
-    cacheGeneration++
-    cache.clear()
-    cacheBytes = 0
-    inFlight.clear()
+  async function translate(request: TranslationRequest): Promise<Translation> {
+    const token = cache.token()
+    const call = planCall(request, await readSettings(), managedAzureUrl)
+    const { value, source } = await cache.load(
+      cacheKey(call),
+      () => callProvider(call),
+      token
+    )
+
+    if (source !== 'fresh') {
+      report({ kind: 'reused', provider: call.provider, access: call.access })
+    }
+
+    return source === 'cache'
+      ? { ...value, cached: true, durationMs: 0 }
+      : value
   }
 
-  return { translate, clearCache }
+  return { translate, clearCache: cache.clear }
 }

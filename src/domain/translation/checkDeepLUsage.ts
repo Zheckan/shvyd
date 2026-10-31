@@ -1,6 +1,7 @@
 import { parseSettings, type Settings } from '@/domain/settings/settings'
 import { isRecord } from '@/utils/isRecord'
 import type { Fetcher } from './createTranslationService'
+import { errorForStatus } from './provider-errors'
 import { TranslationError } from './translation'
 
 const REQUEST_TIMEOUT_MS = 15_000
@@ -13,31 +14,6 @@ export type DeepLUsage = {
 
 function isCount(value: unknown): value is number {
   return typeof value === 'number' && Number.isSafeInteger(value) && value >= 0
-}
-
-function statusError(status: number): TranslationError | undefined {
-  if (status === 401 || status === 403) {
-    return new TranslationError(
-      'authentication',
-      'DeepL rejected the API key. Check it in Shvyd settings.'
-    )
-  }
-
-  if (status === 429) {
-    return new TranslationError(
-      'rate-limit',
-      'DeepL is limiting requests. Wait a moment and check again.'
-    )
-  }
-
-  if (status >= 300) {
-    return new TranslationError(
-      'provider',
-      'DeepL could not report the allowance. Try again.'
-    )
-  }
-
-  return undefined
 }
 
 /** Reads the account allowance. This request translates nothing and uses no characters. */
@@ -74,7 +50,10 @@ export async function checkDeepLUsage({
     )
   }
 
-  const error = statusError(response.status)
+  const error = errorForStatus(
+    response.status,
+    'DeepL could not report the allowance. Try again.'
+  )
 
   if (error) {
     throw error

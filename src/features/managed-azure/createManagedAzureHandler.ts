@@ -6,10 +6,20 @@ import {
 import {
   parseTranslationRequest,
   TranslationError,
+  type ErrorCode,
+  type TranslationRequest,
 } from '@/domain/translation/translation'
 import { isRecord } from '@/utils/isRecord'
 
 const MAX_REQUEST_BYTES = 65_000
+
+/** Status the extension maps back to the same error category. Others become 502. */
+const RELAY_STATUS: Partial<Record<ErrorCode, number>> = {
+  'rate-limit': 429,
+  timeout: 504,
+  selection: 400,
+  configuration: 400,
+}
 
 async function readRequest(request: Request): Promise<unknown> {
   const reader = request.body?.getReader()
@@ -106,10 +116,10 @@ export function createManagedAzureHandler({
       })
     }
 
-    let value: unknown
+    let translationRequest: TranslationRequest
 
     try {
-      value = await readRequest(request)
+      const value = await readRequest(request)
 
       if (
         !isRecord(value) ||
@@ -118,7 +128,10 @@ export function createManagedAzureHandler({
         throw new Error('Use Azure translation.')
       }
 
-      value = parseTranslationRequest({ ...value, provider: 'azure' })
+      translationRequest = parseTranslationRequest({
+        ...value,
+        provider: 'azure',
+      })
     } catch {
       return new Response('Invalid translation request.', {
         status: 400,
@@ -127,9 +140,7 @@ export function createManagedAzureHandler({
     }
 
     try {
-      const translation = await service.translate(
-        parseTranslationRequest(value)
-      )
+      const translation = await service.translate(translationRequest)
 
       // Return only the translation, never upstream headers or server configuration.
       return Response.json(
@@ -137,29 +148,18 @@ export function createManagedAzureHandler({
         { headers }
       )
     } catch (error) {
-      let status = 502
+      const code = error instanceof TranslationError ? error.code : undefined
 
-      if (error instanceof TranslationError) {
-        if (error.code === 'quota') {
-          // Preserve Azure's documented quota signal without forwarding its body.
-          return Response.json(
-            { error: { code: 403001 } },
-            { status: 403, headers }
-          )
-        } else if (error.code === 'rate-limit') {
-          status = 429
-        } else if (error.code === 'timeout') {
-          status = 504
-        } else if (
-          error.code === 'selection' ||
-          error.code === 'configuration'
-        ) {
-          status = 400
-        }
+      if (code === 'quota') {
+        // Preserve Azure's documented quota signal without forwarding its body.
+        return Response.json(
+          { error: { code: 403001 } },
+          { status: 403, headers }
+        )
       }
 
       return new Response('Shared Azure could not finish this request.', {
-        status,
+        status: (code && RELAY_STATUS[code]) ?? 502,
         headers,
       })
     }
