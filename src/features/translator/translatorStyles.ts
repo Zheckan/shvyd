@@ -37,6 +37,10 @@ export const TRANSLATOR_STYLES = `
       -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display",
       system-ui, sans-serif;
     letter-spacing: normal;
+    color-scheme: var(--shvyd-scheme, normal);
+    scrollbar-width: thin;
+    scrollbar-color: color-mix(in srgb, var(--shvyd-foreground) 28%, transparent)
+      transparent;
   }
   .bubble {
     display: flex;
@@ -276,23 +280,26 @@ export const TRANSLATOR_STYLES = `
     color: var(--shvyd-accent);
     font-size: 13px;
   }
+  /* Same box as .translation: each placeholder line takes one 24 px text line. */
   .loading {
-    padding: 18px 17px;
+    padding: 13px 17px 18px;
   }
   .line {
     height: 10px;
-    margin: 7px 0 12px;
+    margin: 7px 0;
     border-radius: 3px;
     background: color-mix(in srgb, var(--shvyd-foreground) 10%, transparent);
   }
-  .line:last-child {
-    width: 64%;
-  }
+  /* Padding from .status would otherwise make the panel scroll while loading. */
   .sr-only {
     position: absolute;
     width: 1px;
     height: 1px;
+    padding: 0;
+    margin: -1px;
+    border: 0;
     overflow: hidden;
+    white-space: nowrap;
     clip-path: inset(50%);
   }
 `

@@ -96,3 +96,13 @@ confusion, and non-obvious constraints.
   digits of SHA-256 of the absolute folder path, mapped `0-f` to `a-p`, so the
   same ZIP extracted elsewhere gets HTTP 403 from the relay. The extension now
   reports that as included access being unavailable, not as a rejected key.
+- Text selected inside an `input` or `textarea` is not part of the document's
+  ranges: Chrome reports a range at the field's parent whose box is empty, so
+  positioning from it puts the button at the viewport corner. The popup reads
+  field selections from `selectionStart`/`selectionEnd` and anchors to the last
+  pointer release. Only `text` and `search` inputs and text areas are read.
+- Selections inside the popup's shadow root reach the page's `selectionchange`
+  handler; the popup ignores selections while the latest press was inside it.
+- The popup's height animation can be paused in a headless page that renders no
+  frames. The live checks finish running animations before measuring instead of
+  waiting for them. Positioning uses the final height while an animation runs.

@@ -8,6 +8,8 @@ export type PageStyle = {
   border: string
   radius: string
   shadow: string
+  /** Native controls and scroll bars follow the popup's light or dark surface. */
+  scheme: 'light' | 'dark'
 }
 
 const RGB_PATTERN =
@@ -172,6 +174,7 @@ export function samplePageStyle(element: Element, adapt: boolean): PageStyle {
     border: css(border),
     radius: cornerRadius(ancestors, adapt),
     shadow: shadow ?? `0 8px 30px rgba(0, 0, 0, ${dark ? 0.32 : 0.12})`,
+    scheme: dark ? 'dark' : 'light',
   }
 }
 

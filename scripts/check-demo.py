@@ -48,7 +48,7 @@ with tempfile.TemporaryDirectory(prefix='shvyd-demo-') as profile:
             page.call('Input.dispatchMouseEvent',{'type':'mouseReleased','button':'left','clickCount':1,**coords})
 
         def complete(target):
-            wait_for(lambda:page.evaluate("(() => {const r=document.getElementById('shvyd-root').shadowRoot,p=r.querySelector('.panel'),o=r.querySelector('.translation');return !p.hidden && p.getAttribute('aria-busy')==='false' && o.lang===TARGET && o.textContent.length>0;})()".replace('TARGET',json.dumps(target))), 'demo translation to '+target)
+            wait_for(lambda:page.evaluate("(() => {const r=document.getElementById('shvyd-root').shadowRoot,p=r.querySelector('.panel'),o=r.querySelector('.translation');return !p.hidden && p.getAttribute('aria-busy')==='false' && (p.getAnimations().forEach(a=>a.finish()), true) && o.lang===TARGET && o.textContent.length>0;})()".replace('TARGET',json.dumps(target))), 'demo translation to '+target)
             value=page.evaluate("(() => {const r=document.getElementById('shvyd-root').shadowRoot,o=r.querySelector('.translation');return {target:o.lang,direction:o.dir,text:o.textContent,error:!r.querySelector('.actions').hidden};})()")
             assert not value['error']
             return value

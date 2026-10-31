@@ -82,7 +82,6 @@ export function createTranslatorView(
 
   const loading = make('div', 'loading')
   loading.setAttribute('aria-hidden', 'true')
-  loading.append(make('div', 'line'), make('div', 'line'), make('div', 'line'))
 
   const output = make('div', 'translation')
   output.setAttribute('aria-live', 'polite')
