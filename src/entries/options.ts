@@ -3,5 +3,5 @@ import { mountUsageSettings } from '@/features/usage-settings/mountUsageSettings
 
 const send = (request: unknown) => chrome.runtime.sendMessage(request)
 
-mountSettingsPage(send)
+mountSettingsPage(send, { version: chrome.runtime.getManifest().version })
 mountUsageSettings(send)

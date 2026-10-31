@@ -14,7 +14,8 @@ import { createSettingsSaver, type SaveState } from './createSettingsSaver'
 import { mountSettingsPreview } from './mountSettingsPreview'
 
 export function mountSettingsPage(
-  send: (request: unknown) => Promise<unknown>
+  send: (request: unknown) => Promise<unknown>,
+  { version }: { version: string }
 ): void {
   function required<T extends HTMLElement>(
     selector: string,
@@ -36,6 +37,7 @@ export function mountSettingsPage(
   const retry = required('#retry-save', HTMLButtonElement)
   const summary = required('#key-summary', HTMLSpanElement)
   const envFile = required('#import-env', HTMLInputElement)
+  required('#version', HTMLSpanElement).textContent = `v${version}`
   const preview = mountSettingsPreview(
     required('#settings-preview', HTMLElement)
   )

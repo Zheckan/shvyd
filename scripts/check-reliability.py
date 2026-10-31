@@ -5,6 +5,7 @@ No provider keys or playground server are required. Observations use the popup
 UI and extension messages; only external fetch and storage timing are controlled.
 """
 import importlib.util
+import os
 import json
 import base64
 import queue
@@ -22,6 +23,8 @@ spec = importlib.util.spec_from_file_location('extension_checks', ROOT / 'script
 module = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(module)
 OUTPUT = ROOT / '.preview/reliability-check'
+# Set SHVYD_EXTENSION_DIR to an extracted release ZIP to check the exact shipped files.
+EXTENSION = Path(os.environ.get('SHVYD_EXTENSION_DIR') or ROOT / 'dist').resolve()
 
 
 class WorkerProbe:
@@ -120,15 +123,15 @@ def main():
     OUTPUT.mkdir(parents=True, exist_ok=True)
     server = ThreadingHTTPServer(('127.0.0.1', 0), Fixture)
     threading.Thread(target=server.serve_forever, daemon=True).start()
-    results = {'browser': 'Helium', 'isolatedProfile': True, 'controlledProviders': True, 'passed': False, 'checks': []}
+    results = {'browser': 'Helium', 'extension': str(EXTENSION), 'isolatedProfile': True, 'controlledProviders': True, 'passed': False, 'checks': []}
     connections = []
     with tempfile.TemporaryDirectory(prefix='shvyd-reliability-') as profile:
         process = subprocess.Popen([
             module.BROWSER, '--headless=new', '--no-first-run', '--no-default-browser-check',
             '--disable-background-timer-throttling', '--disable-renderer-backgrounding',
             '--user-data-dir=' + profile, '--remote-debugging-port=0',
-            '--disable-extensions-except=' + str(ROOT / 'dist'),
-            '--load-extension=' + str(ROOT / 'dist'), 'about:blank',
+            '--disable-extensions-except=' + str(EXTENSION),
+            '--load-extension=' + str(EXTENSION), 'about:blank',
         ], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
         try:
             port_file = Path(profile) / 'DevToolsActivePort'
