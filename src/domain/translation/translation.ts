@@ -36,6 +36,44 @@ export type ErrorCode =
   | 'network'
   | 'provider'
 
+export type TranslationAccess = 'included' | 'own-key'
+
+export type TranslationEvent =
+  | { kind: 'reused'; provider: Provider; access: TranslationAccess }
+  | {
+      kind: 'provider-call'
+      provider: Provider
+      access: TranslationAccess
+      characters: number
+      durationMs: number
+      outcome: 'success'
+    }
+  | {
+      kind: 'provider-call'
+      provider: Provider
+      access: TranslationAccess
+      characters: number
+      durationMs: number
+      outcome: 'failure'
+      code: ErrorCode
+      status?: number
+    }
+
+export const ERROR_CODES: readonly ErrorCode[] = [
+  'selection',
+  'configuration',
+  'authentication',
+  'quota',
+  'rate-limit',
+  'timeout',
+  'network',
+  'provider',
+]
+
+export function isErrorCode(value: unknown): value is ErrorCode {
+  return ERROR_CODES.some((code) => code === value)
+}
+
 export class TranslationError extends Error {
   constructor(
     readonly code: ErrorCode,

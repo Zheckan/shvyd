@@ -10,6 +10,8 @@ import {
   MAX_SELECTION_LENGTH,
   TranslationError,
   type Translation,
+  type TranslationAccess,
+  type TranslationEvent,
   type TranslationFormat,
   type TranslationRequest,
 } from './translation'
@@ -193,17 +195,27 @@ export function createTranslationService({
   fetcher = fetch,
   managedAzureUrl,
   requestTimeoutMs = REQUEST_TIMEOUT_MS,
+  onEvent,
 }: {
   readSettings: () => Promise<Settings>
   fetcher?: Fetcher
   managedAzureUrl?: string
   requestTimeoutMs?: number
+  onEvent?: (event: TranslationEvent) => void
 }) {
   const cache = new Map<string, { translation: Translation; bytes: number }>()
   const encoder = new TextEncoder()
   let cacheBytes = 0
   const inFlight = new Map<string, Promise<Translation>>()
   let cacheGeneration = 0
+
+  function report(event: TranslationEvent): void {
+    try {
+      onEvent?.(event)
+    } catch {
+      // Usage tracking must never prevent a translation from appearing.
+    }
+  }
 
   async function translate(request: TranslationRequest): Promise<Translation> {
     const generation = cacheGeneration
@@ -249,6 +261,7 @@ export function createTranslationService({
     }
 
     const text = request.text.trim()
+    const access: TranslationAccess = sharedAzure ? 'included' : 'own-key'
     const cacheKey = JSON.stringify([
       provider,
       settings[provider],
@@ -261,15 +274,20 @@ export function createTranslationService({
     if (cached && generation === cacheGeneration) {
       cache.delete(cacheKey)
       cache.set(cacheKey, cached)
+      report({ kind: 'reused', provider, access })
       return { ...cached.translation, cached: true, durationMs: 0 }
     }
 
     const pending = inFlight.get(cacheKey)
     if (pending && generation === cacheGeneration) {
+      report({ kind: 'reused', provider, access })
       return pending
     }
 
-    const task = (async () => {
+    const started = performance.now()
+    let status: number | undefined
+
+    const call = (async () => {
       const directRequest = providerRequest({
         provider,
         settings,
@@ -286,7 +304,6 @@ export function createTranslationService({
             }
           : directRequest
 
-      const started = performance.now()
       const signal = AbortSignal.timeout(requestTimeoutMs)
       let response: Response
 
@@ -311,6 +328,7 @@ export function createTranslationService({
         )
       }
 
+      status = response.status
       await assertResponseOk(response, provider, signal)
 
       let payload: unknown
@@ -364,6 +382,35 @@ export function createTranslationService({
 
       return result
     })()
+
+    const task = call.then(
+      (result) => {
+        report({
+          kind: 'provider-call',
+          provider,
+          access,
+          characters: text.length,
+          durationMs: result.durationMs,
+          outcome: 'success',
+        })
+        return result
+      },
+      (error: unknown) => {
+        report({
+          kind: 'provider-call',
+          provider,
+          access,
+          characters: text.length,
+          durationMs: Math.round(performance.now() - started),
+          outcome: 'failure',
+          code: error instanceof TranslationError ? error.code : 'provider',
+          ...(status === undefined || (status >= 200 && status < 300)
+            ? {}
+            : { status }),
+        })
+        throw error
+      }
+    )
 
     if (generation === cacheGeneration) {
       inFlight.set(cacheKey, task)

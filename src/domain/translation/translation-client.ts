@@ -1,6 +1,7 @@
 import { parsePreferences, type Preferences } from '@/domain/settings/settings'
 import { isRecord } from '@/utils/isRecord'
 import {
+  isErrorCode,
   parseTranslation,
   TranslationError,
   type Translation,
@@ -25,16 +26,7 @@ export async function unwrapResponse(value: unknown): Promise<unknown> {
         ? value.message
         : 'Translation could not finish. Try again.'
 
-    if (
-      value.code === 'selection' ||
-      value.code === 'configuration' ||
-      value.code === 'authentication' ||
-      value.code === 'quota' ||
-      value.code === 'rate-limit' ||
-      value.code === 'timeout' ||
-      value.code === 'network' ||
-      value.code === 'provider'
-    ) {
+    if (isErrorCode(value.code)) {
       throw new TranslationError(value.code, message)
     }
 
