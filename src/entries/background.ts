@@ -1,4 +1,5 @@
 import { createSettingsStore } from '@/domain/settings/createSettingsStore'
+import { createSiteStore } from '@/domain/sites/createSiteStore'
 import { parseReleaseConfig } from '@/domain/settings/release-config'
 import { createTranslationService } from '@/domain/translation/createTranslationService'
 import type { TranslationEvent } from '@/domain/translation/translation'
@@ -27,6 +28,22 @@ const usage = createUsageStore({
   version: chrome.runtime.getManifest().version,
 })
 
+const sites = createSiteStore({
+  read: () => readKey('hiddenSites'),
+  write: (value) => chrome.storage.local.set({ hiddenSites: value }),
+})
+
+async function notifySiteHidden(site: string): Promise<void> {
+  // Every frame checks the site itself; tabs without Shvyd simply do not answer.
+  for (const tab of await chrome.tabs.query({})) {
+    if (tab.id !== undefined) {
+      chrome.tabs
+        .sendMessage(tab.id, { kind: 'site-hidden', site })
+        .catch(() => undefined)
+    }
+  }
+}
+
 function recordUsage(event: TranslationEvent): void {
   // Counters are best effort; a storage failure must not affect the translation.
   usage.record(event).catch(() => undefined)
@@ -39,6 +56,10 @@ const managedAzureUrl = fetch(chrome.runtime.getURL('release-config.json'))
 const handle = createExtensionRouter({
   settings,
   usage,
+  sites,
+  notifySiteHidden: (site) => {
+    void notifySiteHidden(site).catch(() => undefined)
+  },
   recordUsage,
   managedAzureUrl,
   translator: managedAzureUrl.then((url) =>

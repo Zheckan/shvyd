@@ -43,12 +43,59 @@ function clamp(value: number, min: number, max: number): number {
   return Math.max(min, Math.min(value, max))
 }
 
-/** Show the translation popup for text selections on this page. */
-export function mountTranslator(client: TranslationClient): () => void {
+/**
+ * Show the translation popup for text selections on this page, unless Shvyd is
+ * turned off for `site`. Without a site (the playground), it always shows.
+ */
+export function mountTranslator(
+  client: TranslationClient,
+  { site }: { site?: string } = {}
+): () => void {
   if (document.getElementById('shvyd-root')) {
     return () => undefined
   }
 
+  let stop: (() => void) | undefined
+  let unmounted = false
+
+  function start(): void {
+    if (!unmounted && !stop) {
+      stop = startTranslator(client, site)
+    }
+  }
+
+  function remove(): void {
+    stop?.()
+    stop = undefined
+  }
+
+  if (!site) {
+    start()
+  } else {
+    client.onSiteHidden((hidden) => {
+      if (hidden === site) {
+        unmounted = true
+        remove()
+      }
+    })
+    // If the status cannot be read, keep the previous behavior and show Shvyd.
+    client.siteHidden(site).then((hidden) => {
+      if (!hidden) {
+        start()
+      }
+    }, start)
+  }
+
+  return () => {
+    unmounted = true
+    remove()
+  }
+}
+
+function startTranslator(
+  client: TranslationClient,
+  site: string | undefined
+): () => void {
   const picker = createLanguagePicker({
     onSelect: (code) => {
       void chooseTarget(code)
@@ -68,7 +115,13 @@ export function mountTranslator(client: TranslationClient): () => void {
     actions,
     retry,
     settings,
+    hideSite,
+    confirmHide,
+    cancelHide,
   } = createTranslatorView(picker)
+
+  hideSite.hidden = !site
+  hideSite.title = site ? `Don't show Shvyd on ${site}` : ''
 
   let preferences = publicPreferences(DEFAULT_SETTINGS)
   let selected: Selected | undefined
@@ -184,6 +237,15 @@ export function mountTranslator(client: TranslationClient): () => void {
     status.hidden = false
   }
 
+  /** Shows the action row with only these buttons, or hides it when empty. */
+  function showActions(...visible: HTMLButtonElement[]): void {
+    for (const button of [retry, settings, confirmHide, cancelHide]) {
+      button.hidden = !visible.includes(button)
+    }
+
+    actions.hidden = visible.length === 0
+  }
+
   // Selection
 
   function readSelection(): void {
@@ -265,7 +327,7 @@ export function mountTranslator(client: TranslationClient): () => void {
     status.hidden = false
     status.className = 'status sr-only'
     status.textContent = 'Translating…'
-    actions.hidden = true
+    showActions()
   }
 
   async function translate(): Promise<void> {
@@ -333,10 +395,15 @@ export function mountTranslator(client: TranslationClient): () => void {
           ? error.message
           : 'Translation could not finish. Try again.'
       )
-      actions.hidden = false
-      retry.hidden =
+      const needsSettings =
         error instanceof TranslationError &&
         (error.code === 'configuration' || error.code === 'authentication')
+
+      if (needsSettings) {
+        showActions(settings)
+      } else {
+        showActions(retry, settings)
+      }
     } finally {
       if (!isStale()) {
         panel.setAttribute('aria-busy', 'false')
@@ -445,6 +512,48 @@ export function mountTranslator(client: TranslationClient): () => void {
   })
 
   closeButton.addEventListener('click', dismiss)
+
+  hideSite.addEventListener('click', () => {
+    if (!site) {
+      return
+    }
+
+    // Ask first: one stray click should not turn Shvyd off for a whole site.
+    generation++
+    picker.close()
+    loading.hidden = true
+    output.hidden = true
+    copy.disabled = true
+    panel.setAttribute('aria-busy', 'false')
+    showMessage(
+      `Stop showing Shvyd on ${site}? You can turn it back on in settings.`
+    )
+    showActions(confirmHide, cancelHide)
+    position(panel)
+    confirmHide.focus()
+  })
+
+  cancelHide.addEventListener('click', () => {
+    void translate()
+  })
+
+  confirmHide.addEventListener('click', async () => {
+    if (!site) {
+      return
+    }
+
+    confirmHide.disabled = true
+
+    try {
+      // The background then tells every frame on this site, including this one.
+      await client.hideSite(site)
+    } catch {
+      showMessage('Shvyd could not turn itself off here. Try again.')
+      position(panel)
+    } finally {
+      confirmHide.disabled = false
+    }
+  })
 
   copy.addEventListener('click', async () => {
     const result = await copyTranslation({

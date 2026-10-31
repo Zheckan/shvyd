@@ -4,6 +4,8 @@ A small Chromium extension for translating selected text without leaving the pag
 
 The popup uses consistent SF Pro / system typography with 15 px translation text. On macOS it uses the native system font; other platforms use their system sans-serif fallback. It takes background, text and accent colors, border, corner radius, and shadow from the area around the selection. Text contrast is checked before using the sampled colors. You can switch page adaptation off in settings.
 
+To turn Shvyd off on a site, click the crossed-out eye in the popup and confirm. It stays off on that site, including in embedded frames, until you choose **Show again** under **Hidden on these sites** in settings.
+
 Drag the empty space in the popup's top bar to move it. The window stays inside the viewport, keeps its position when you change languages, and moves its language menu with it. Each new popup starts beside the selected text again. Selected underlined text, including underlined links, keeps its underline in the translation.
 
 Selected paragraphs, headings, emphasis, lists, and table cells keep their structure in the translation. Code stays unchanged. The Copy button keeps paragraph breaks, list markers, and table columns as plain text. This uses one provider request; see [selection formatting](docs/formatting.md).

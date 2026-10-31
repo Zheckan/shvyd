@@ -86,3 +86,8 @@ confusion, and non-obvious constraints.
   file can change the cascade, so each file carries its own media-query
   overrides. The split was checked by comparing every computed style and box
   on the settings page at five widths and both themes.
+- Hidden sites live in `chrome.storage.local` key `hiddenSites` and are matched by
+  the top-level page's host (`location.ancestorOrigins`, last entry), so embedded
+  frames follow their page. A hidden site gets no Shvyd DOM or listeners at all;
+  the content script asks `site-status` before mounting. Hiding broadcasts
+  `site-hidden` to every tab; showing again needs a reload of that site's tabs.

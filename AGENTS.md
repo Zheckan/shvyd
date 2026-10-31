@@ -25,14 +25,14 @@ before adding or moving files.
 - `src/entries/`: bundler entry points (`content.ts`, `background.ts`,
   `options.ts`, and the playground's `demo.ts`). Keep them to wiring only.
 - `src/features/`: `translator` (selection popup), `language-settings`,
-  `settings-page`, `usage-settings`, `extension-router` (background message
-  routes and who may send each), `managed-azure` (relay handler), and
-  `playground`. Each feature's `mount*.ts` or `create*.ts` file is its public
-  interface.
+  `settings-page`, `usage-settings`, `site-settings` (hidden sites),
+  `extension-router` (background message routes and who may send each),
+  `managed-azure` (relay handler), and `playground`. Each feature's
+  `mount*.ts` or `create*.ts` file is its public interface.
 - `src/domain/`: `languages` (provider language catalog), `settings` (types,
   parsing, persistent store), `translation` (provider requests, request cache,
-  status classification, message client), and `usage` (local counts and error
-  records).
+  status classification, message client), `usage` (local counts and error
+  records), and `sites` (site identity and hidden-site store).
 - `src/utils/`: product-agnostic helpers.
 - `src/test/browser/`: scripts that `scripts/check-demo.py` runs in a page.
 - `extension/`: manifest, options HTML, and CSS copied into `dist/` as-is.

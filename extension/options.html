@@ -383,6 +383,26 @@
             hidden
           ></pre>
         </section>
+        <section
+          id="hidden-sites"
+          class="card"
+          aria-labelledby="hidden-sites-heading"
+        >
+          <div class="section-heading">
+            <h2 id="hidden-sites-heading">Hidden on these sites</h2>
+            <output
+              id="hidden-sites-status"
+              class="connection-status"
+              role="status"
+              aria-live="polite"
+            ></output>
+          </div>
+          <ul id="hidden-site-list" class="site-list" hidden></ul>
+          <p id="hidden-sites-empty" class="hint">
+            Shvyd shows on every site. To turn it off on one, open a translation
+            there and choose the crossed-out eye.
+          </p>
+        </section>
         <p class="privacy-note">
           Your keys are stored in this browser. Included Azure access uses
           Shvyd’s server; your own keys connect directly to the provider.

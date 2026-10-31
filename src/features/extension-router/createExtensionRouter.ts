@@ -1,5 +1,7 @@
 import type { createSettingsStore } from '@/domain/settings/createSettingsStore'
 import { isProvider, parseSettings } from '@/domain/settings/settings'
+import type { createSiteStore } from '@/domain/sites/createSiteStore'
+import { parseSite } from '@/domain/sites/sites'
 import { checkDeepLUsage } from '@/domain/translation/checkDeepLUsage'
 import type { createTranslationService } from '@/domain/translation/createTranslationService'
 import { testConnection } from '@/domain/translation/testConnection'
@@ -33,6 +35,8 @@ type Route = {
 export function createExtensionRouter({
   settings,
   usage,
+  sites,
+  notifySiteHidden,
   translator,
   managedAzureUrl,
   recordUsage,
@@ -40,6 +44,9 @@ export function createExtensionRouter({
 }: {
   settings: ReturnType<typeof createSettingsStore>
   usage: ReturnType<typeof createUsageStore>
+  sites: ReturnType<typeof createSiteStore>
+  /** Tells other pages on the site to remove Shvyd now, without a reload. */
+  notifySiteHidden: (site: string) => void
   translator: Promise<ReturnType<typeof createTranslationService>>
   managedAzureUrl: Promise<string | undefined>
   recordUsage: (event: TranslationEvent) => void
@@ -69,6 +76,29 @@ export function createExtensionRouter({
       run: async () => {
         await openSettings()
         return null
+      },
+    },
+    'site-status': {
+      access: 'extension',
+      run: async (message) => ({
+        hidden: await sites.isHidden(parseSite(message.site)),
+      }),
+    },
+    'hide-site': {
+      access: 'extension',
+      run: async (message) => {
+        const site = parseSite(message.site)
+        await sites.hide(site)
+        notifySiteHidden(site)
+        return { hidden: true }
+      },
+    },
+    'hidden-sites': { access: 'settings-page', run: () => sites.list() },
+    'show-site': {
+      access: 'settings-page',
+      run: async (message) => {
+        await sites.show(parseSite(message.site))
+        return sites.list()
       },
     },
     'get-settings': {

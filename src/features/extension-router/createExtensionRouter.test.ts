@@ -1,11 +1,13 @@
 import { describe, expect, test } from 'bun:test'
 import { createSettingsStore } from '@/domain/settings/createSettingsStore'
+import { createSiteStore } from '@/domain/sites/createSiteStore'
 import { createTranslationService } from '@/domain/translation/createTranslationService'
 import { createUsageStore } from '@/domain/usage/createUsageStore'
 import { createExtensionRouter } from './createExtensionRouter'
 
-function router() {
+function router(notified: string[] = []) {
   let stored: unknown
+  let sitesStored: unknown
   const settings = createSettingsStore({
     read: async () => stored,
     write: async (value) => {
@@ -18,9 +20,18 @@ function router() {
     version: 'test',
   })
 
+  const sites = createSiteStore({
+    read: async () => sitesStored,
+    write: async (value) => {
+      sitesStored = value
+    },
+  })
+
   return createExtensionRouter({
     settings,
     usage,
+    sites,
+    notifySiteHidden: (site) => notified.push(site),
     recordUsage: () => undefined,
     managedAzureUrl: Promise.resolve(undefined),
     translator: Promise.resolve(
@@ -38,6 +49,8 @@ describe('extension messages', () => {
     const handle = router()
 
     for (const kind of [
+      'hidden-sites',
+      'show-site',
       'get-settings',
       'save-settings',
       'test-connection',
@@ -89,5 +102,50 @@ describe('extension messages', () => {
         contentScript
       )
     ).toMatchObject({ ok: false, code: 'configuration' })
+  })
+})
+
+describe('hidden sites', () => {
+  test('a content script can check its site and hide it, and other tabs are told', async () => {
+    const notified: string[] = []
+    const handle = router(notified)
+
+    expect(
+      await handle(
+        { kind: 'site-status', site: 'www.Example.com' },
+        contentScript
+      )
+    ).toEqual({ ok: true, data: { hidden: false } })
+    expect(
+      await handle({ kind: 'hide-site', site: 'example.com' }, contentScript)
+    ).toEqual({ ok: true, data: { hidden: true } })
+    expect(notified).toEqual(['example.com'])
+    expect(
+      await handle({ kind: 'site-status', site: 'example.com' }, contentScript)
+    ).toEqual({ ok: true, data: { hidden: true } })
+  })
+
+  test('the settings page lists hidden sites and shows one again', async () => {
+    const handle = router()
+    await handle({ kind: 'hide-site', site: 'b.example' }, contentScript)
+    await handle({ kind: 'hide-site', site: 'a.example' }, contentScript)
+
+    expect(await handle({ kind: 'hidden-sites' }, settingsPage)).toEqual({
+      ok: true,
+      data: ['a.example', 'b.example'],
+    })
+    expect(
+      await handle({ kind: 'show-site', site: 'a.example' }, settingsPage)
+    ).toEqual({ ok: true, data: ['b.example'] })
+  })
+
+  test('an invalid site is rejected and nothing is hidden', async () => {
+    const notified: string[] = []
+    const handle = router(notified)
+
+    expect(
+      await handle({ kind: 'hide-site', site: 'not a host' }, contentScript)
+    ).toMatchObject({ ok: false })
+    expect(notified).toEqual([])
   })
 })
