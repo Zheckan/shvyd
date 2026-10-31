@@ -40,6 +40,7 @@ export async function build(
     await copyFile(resolve(root, 'extension', name), resolve(output, name))
   }
 
+  await copyFile(resolve(root, 'LICENSE'), resolve(output, 'LICENSE'))
   await cp(resolve(root, 'extension/icons'), resolve(output, 'icons'), {
     recursive: true,
   })

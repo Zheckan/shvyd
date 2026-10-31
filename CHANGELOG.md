@@ -3,7 +3,7 @@
 Shvyd follows [semantic versioning](https://semver.org/). Each release is a
 credential-free ZIP built with `bun run package`.
 
-## Unreleased
+## 0.0.1 – trial build (unpublished)
 
 ### Added
 
@@ -25,6 +25,8 @@ credential-free ZIP built with `bun run package`.
 - Builds contain no provider credentials. Included Azure access goes through a server relay; your own keys go directly to the provider.
 - The first upgrade from the old bootstrap build clears saved keys once and keeps preferences.
 
-## 0.1.0 – prototype
+## Prototype (before 0.0.1)
+
+Development builds were labelled 0.1.0; numbering restarted at 0.0.1 for the first build shared for testing.
 
 - Selected-text translation with Azure and DeepL, preferred languages, page-matched styling, formatting preservation, copying, and dragging.
