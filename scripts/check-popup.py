@@ -97,7 +97,7 @@ def main():
             options = browser.CDP(browser.wait_for(lambda: next((item for item in targets() if item['id'] == options_id), None), 'settings')['webSocketDebuggerUrl'])
             connections.append(options)
             options.call('Runtime.enable')
-            browser.wait_for(lambda: options.evaluate("!document.getElementById('settings-fields').disabled"), 'settings load')
+            browser.wait_for(lambda: options.evaluate("document.getElementById('settings-fields')?.disabled === false"), 'settings load')
             assert options.evaluate("(async()=>{const c=await chrome.runtime.sendMessage({kind:'get-settings'});return (await chrome.runtime.sendMessage({kind:'save-settings',value:{...c.data,azure:{key:'controlled-test-key',region:''}}})).ok})()")
             page.call('Page.bringToFront')
 
