@@ -13,6 +13,7 @@ import {
   publicPreferences,
   type Preferences,
 } from '@/domain/settings/settings'
+import { requireIn } from '@/utils/requireIn'
 
 const TEMPLATE = `
   <div class="row language-mode-row">
@@ -96,17 +97,7 @@ export function mountLanguageSettings(
 ) {
   container.innerHTML = options.compact ? COMPACT_TEMPLATE : TEMPLATE
 
-  function required<T extends Element>(
-    selector: string,
-    constructor: { new (...args: never[]): T }
-  ): T {
-    const element = container.querySelector(selector)
-    if (!(element instanceof constructor)) {
-      throw new Error('Language settings could not load.')
-    }
-
-    return element
-  }
+  const required = requireIn(container)
 
   const mode = required('[name=targetMode]', HTMLSelectElement)
   const target = required('[name=target]', HTMLSelectElement)

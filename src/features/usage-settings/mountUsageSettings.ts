@@ -10,6 +10,7 @@ import {
   formatTrackingSince,
   usageTable,
 } from './logic/formatUsage'
+import { requireIn } from '@/utils/requireIn'
 
 const TABLE_COLUMNS = [
   'route',
@@ -23,18 +24,7 @@ const TABLE_COLUMNS = [
 export function mountUsageSettings(
   send: (request: unknown) => Promise<unknown>
 ): void {
-  function required<T extends HTMLElement>(
-    selector: string,
-    constructor: { new (...args: never[]): T }
-  ): T {
-    const element = document.querySelector(selector)
-
-    if (!(element instanceof constructor)) {
-      throw new Error('Usage settings could not load.')
-    }
-
-    return element
-  }
+  const required = requireIn(document)
 
   const since = required('#usage-since', HTMLElement)
   const rows = required('#usage-rows', HTMLTableSectionElement)
