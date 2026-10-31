@@ -11,24 +11,19 @@ import { unwrapResponse } from '@/domain/translation/translation-client'
 import { mountLanguageSettings } from '@/features/language-settings/mountLanguageSettings'
 import { parseEnvFile } from '@/utils/parseEnvFile'
 import { createSettingsSaver, type SaveState } from './createSettingsSaver'
+import {
+  accessText,
+  canTranslate,
+  credentialAccess,
+} from './logic/credentialAccess'
 import { mountSettingsPreview } from './mountSettingsPreview'
+import { requireIn } from '@/utils/requireIn'
 
 export function mountSettingsPage(
   send: (request: unknown) => Promise<unknown>,
   { version }: { version: string }
 ): void {
-  function required<T extends HTMLElement>(
-    selector: string,
-    constructor: { new (...args: never[]): T }
-  ): T {
-    const element = document.querySelector(selector)
-
-    if (!(element instanceof constructor)) {
-      throw new Error('Settings could not load.')
-    }
-
-    return element
-  }
+  const required = requireIn(document)
 
   const form = required('#settings', HTMLFormElement)
   const fields = required('#settings-fields', HTMLFieldSetElement)
@@ -146,45 +141,27 @@ export function mountSettingsPage(
 
     for (const provider of ['azure', 'deepl'] as const) {
       const hasKey = !!input(`${provider}Key`).value.trim()
-      const state = required(`[data-key-state="${provider}"]`, HTMLSpanElement)
-      state.textContent = hasKey ? 'Using your key' : 'Requires your own key'
+      const access = credentialAccess(provider, hasKey, managedAzureAvailable)
+      const text = accessText(provider, access, saveState.kind === 'saved')
+      const card = required(`[data-key-state="${provider}"]`, HTMLSpanElement)
+      const result = required(`#${provider}-test-status`, HTMLOutputElement)
 
-      if (provider === 'azure' && !hasKey) {
-        state.textContent = managedAzureAvailable
-          ? 'Included Azure access'
-          : 'Shared access not configured'
-      }
-
-      state.dataset.ready = String(
-        hasKey || (provider === 'azure' && managedAzureAvailable)
-      )
+      card.textContent = text.card
+      card.dataset.ready = String(canTranslate(access))
+      required(`[data-test-provider=${provider}]`, HTMLButtonElement).disabled =
+        result.dataset.state === 'testing' || !canTranslate(access)
 
       if (provider === 'deepl') {
         required('[name=provider][value=deepl]', HTMLInputElement).disabled =
           !hasKey
       }
-      const result = required(`#${provider}-test-status`, HTMLOutputElement)
-      required(`[data-test-provider=${provider}]`, HTMLButtonElement).disabled =
-        result.dataset.state === 'testing' ||
-        (!hasKey && !(provider === 'azure' && managedAzureAvailable))
 
       if (!result.dataset.state) {
-        const keyState = saveState.kind === 'saved' ? 'Key saved' : 'Key added'
-        result.textContent = hasKey
-          ? `${keyState} · not verified`
-          : 'Add your own key to enable'
-
-        if (provider === 'azure' && !hasKey) {
-          result.textContent = managedAzureAvailable
-            ? 'Included access · not verified'
-            : 'Shared access not configured'
-        }
+        result.textContent = text.status
       }
 
-      if (hasKey) {
-        labels.push(`${provider === 'azure' ? 'Azure' : 'DeepL'} · your key`)
-      } else if (provider === 'azure' && managedAzureAvailable) {
-        labels.push('Azure included')
+      if (text.summary) {
+        labels.push(text.summary)
       }
     }
 
