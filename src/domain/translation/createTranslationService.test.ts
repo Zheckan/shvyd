@@ -804,3 +804,37 @@ describe('usage events', () => {
     ).toMatchObject({ cached: true })
   })
 })
+
+describe('included Azure access', () => {
+  test('a relay that refuses this installation explains that included access is unavailable, not that a key was rejected', async () => {
+    const service = createTranslationService({
+      readSettings: async () => ({ ...DEFAULT_SETTINGS }),
+      managedAzureUrl: 'https://relay.example/translate',
+      fetcher: async () => new Response('Forbidden', { status: 403 }),
+    })
+
+    await expect(
+      service.translate({ text: 'Hello', target: 'uk' })
+    ).rejects.toMatchObject({
+      code: 'configuration',
+      message:
+        'Included Azure access is not available for this installation. Add your own Azure key in Shvyd settings.',
+      status: 403,
+    })
+  })
+
+  test('your own rejected key keeps the key message', async () => {
+    const service = createTranslationService({
+      readSettings: async () => ({
+        ...DEFAULT_SETTINGS,
+        azure: { key: 'wrong', region: '' },
+      }),
+      managedAzureUrl: 'https://relay.example/translate',
+      fetcher: async () => new Response('', { status: 401 }),
+    })
+
+    await expect(
+      service.translate({ text: 'Hello', target: 'uk' })
+    ).rejects.toMatchObject({ code: 'authentication' })
+  })
+})
