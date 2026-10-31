@@ -1,6 +1,6 @@
 # First stable release plan
 
-Updated 2026-10-07. This plan is for the first stable release, intended for personal use and one or two friends. It does not require a beta programme or promotion. Settings and request reliability are implemented on the stacked implementation branches. The remaining release work includes local usage and diagnostics, documentation, and packaging. No release has been published.
+Updated 2026-10-31. This plan is for the first stable release, intended for personal use and one or two friends. It does not require a beta programme or promotion. Settings, request reliability, and local usage and diagnostics are implemented on the stacked implementation branches. The remaining release work is documentation and packaging. No release has been published.
 
 ## Decisions for this release
 
@@ -35,6 +35,7 @@ Friends can configure their own Azure resource as well. Included access consumes
 - Local settings persistence with credentials restricted to trusted extension contexts.
 - An in-memory cache capped at 32 entries and 512 KiB of UTF-8 payloads, keyed by provider configuration, target, format, and source. Identical in-flight requests share one call. Saving full settings and worker restarts clear it.
 - Distinct messages for rate limiting, exhausted quota, connection failures, and timeouts. Popup results are guarded against closing and rapid target changes, including delayed preference saves.
+- A local Usage section with per-route request, character, reuse, failure, and uncertain counts; a DeepL allowance check; and optional, exportable error records. See [local usage](local-usage.md).
 - A playground and repeatable browser checks. See [README](../README.md) for commands; generated screenshots and results stay in `.preview/`.
 
 The selection limit is currently 10,000 serialized input characters. Browser internal pages, protected store pages, browser PDF viewers, and text inputs are documented prototype exclusions. Decide whether to retain these exclusions for 1.0; they do not need to become new features to release.
@@ -62,6 +63,8 @@ Keep source and translated text in memory. Persisting translations would retain 
 Use `chrome.storage.local` for preferences, keys, and bounded metadata. Keep `TRUSTED_CONTEXTS` access and avoid key synchronization. Local extension storage is not a password vault; describe its actual protections without claiming encryption that we do not implement. IndexedDB becomes worth considering only if a later feature needs substantial queryable history or a larger persistent dataset.
 
 ## Local usage and diagnostics
+
+Implemented; see [local usage](local-usage.md) for the shipped behavior. The original requirements follow.
 
 Add a local Usage section with provider requests, cache hits, successful source-character estimates, and failed or uncertain attempts. Track by provider and date. It helps the owner understand testing and day-to-day consumption without introducing an account system.
 

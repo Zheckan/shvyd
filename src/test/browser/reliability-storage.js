@@ -7,7 +7,8 @@
   globalThis.shvydProbe = state
 
   chrome.storage.local.set = (value) => {
-    if (!state.holdSaves) {
+    // Only settings writes are controlled; usage counters keep saving normally.
+    if (!state.holdSaves || !('settings' in value)) {
       return originalSet(value)
     }
     return new Promise((resolve, reject) => {

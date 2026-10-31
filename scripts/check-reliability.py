@@ -291,6 +291,8 @@ def main():
             second = message(checkpoint)
             assert first['ok'] and not first['data']['cached']
             assert second['ok'] and second['data']['cached']
+            usage_before = message({'kind': 'get-usage'})
+            assert usage_before['ok'], 'Usage could not be read before restart'
             before = options.evaluate("chrome.runtime.sendMessage({kind:'preferences'})")
             old_id = worker_info['id']
             worker.close()
@@ -310,6 +312,47 @@ def main():
             assert cached_again['ok'] and cached_again['data']['cached']
             assert len(worker.requests) == 1, 'Restarted worker did not cache its new result'
             record('actual-worker-restart-retains-settings-and-rebuilds-memory-cache')
+
+            def own_key_totals(reply):
+                rows = [day for day in reply['data']['days'] if day['provider'] == 'azure' and day['access'] == 'own-key']
+                return {key: sum(day[key] for day in rows) for key in ['requests', 'succeeded', 'failed', 'uncertain', 'reused', 'characters']}
+
+            usage_after = message({'kind': 'get-usage'})
+            old_totals = own_key_totals(usage_before)
+            new_totals = own_key_totals(usage_after)
+            assert old_totals['requests'] >= 1 and old_totals['failed'] >= 2 and old_totals['uncertain'] >= 1, 'Provider failures were not counted: ' + json.dumps(old_totals)
+            assert new_totals['requests'] == old_totals['requests'] + 1, 'Usage did not survive the worker restart: ' + json.dumps([old_totals, new_totals])
+            assert new_totals['reused'] == old_totals['reused'] + 1, 'Cache hit was not counted as reused'
+            assert new_totals['characters'] == old_totals['characters'] + len(checkpoint['text'])
+            record('usage-counts-survive-worker-restart-and-count-provider-calls-once')
+
+            secret_text = 'Private diagnostic sentence.'
+            enabled = message({'kind': 'set-diagnostics', 'enabled': True})
+            assert enabled['ok'] and enabled['data']['diagnostics']['enabled']
+            worker.status = 429
+            failed = message({'kind': 'translate', 'text': secret_text, 'target': 'uk'})
+            worker.status = 200
+            assert not failed['ok'] and failed['code'] == 'rate-limit'
+            exported = message({'kind': 'export-diagnostics'})
+            assert exported['ok'] and len(exported['data']['records']) == 1
+            assert sorted(exported['data']['records'][0]) == ['code', 'durationMs', 'provider', 'reference', 'status', 'time', 'version']
+            serialized = json.dumps(exported['data'])
+            for forbidden in [secret_text, 'controlled-test-key', '127.0.0.1', 'reliability fixture']:
+                assert forbidden not in serialized, 'Diagnostics export leaked ' + forbidden
+            disabled = message({'kind': 'set-diagnostics', 'enabled': False})
+            assert disabled['data']['diagnostics'] == {'enabled': False, 'count': 0}
+            record('diagnostics-opt-in-export-is-redacted-and-disable-deletes-records')
+
+            options.call('Page.reload')
+            module.wait_for(lambda: options.evaluate("[...document.querySelectorAll('#usage-rows th')].some(cell=>cell.textContent==='Azure · your key')"), 'usage table on settings page')
+            options.call('Emulation.setDeviceMetricsOverride', {'width': 1280, 'height': 900, 'deviceScaleFactor': 1, 'mobile': False})
+            options.evaluate("document.querySelector('[data-usage-period=\"7\"]').click(),document.getElementById('usage').scrollIntoView(),true")
+            box = options.evaluate("(()=>{const a=document.getElementById('usage').getBoundingClientRect();const b=document.getElementById('diagnostics').getBoundingClientRect();return {x:a.x-8,y:a.y+scrollY-8,width:a.width+16,height:b.bottom-a.top+16}})()")
+            shot = options.call('Page.captureScreenshot', {'format': 'png', 'captureBeyondViewport': True, 'clip': {**box, 'scale': 1}})
+            (OUTPUT / 'usage-settings.png').write_bytes(base64.b64decode(shot['data']))
+            options.evaluate("document.querySelector('#clear-usage') && (window.confirm=()=>true, document.querySelector('#clear-usage').click(), true)")
+            module.wait_for(lambda: options.evaluate("!document.querySelector('#usage-empty').hidden && document.querySelectorAll('#usage-rows tr').length===0"), 'usage cleared from settings page')
+            record('settings-page-shows-and-clears-usage')
             results['passed'] = True
         finally:
             for connection in connections:
