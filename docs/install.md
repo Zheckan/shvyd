@@ -15,7 +15,12 @@ Shvyd is shared as a ZIP for manual installation in Chromium-based browsers
    unpacked**, and choose that folder.
 5. Reload any open tabs, select text, and click **Translate**.
 
-Azure works immediately through included access. To use DeepL or your own Azure
+Azure works through included access only for extension IDs the relay allows.
+An unpacked extension's ID comes from its folder path, so today included access
+works only when loaded from the maintainer's `dist/` folder. Anywhere else the
+popup says included access is unavailable; add your own Azure key in settings.
+Pinning one ID for every install needs a relay update first; see
+[releasing](releasing.md). To use DeepL or your own Azure
 key, click the Shvyd toolbar icon to open settings.
 
 ## Update
