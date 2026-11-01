@@ -10,8 +10,10 @@ Nothing here publishes automatically.
 2. Move the `Unreleased` entries in `CHANGELOG.md` under that version with the
    date.
 3. Make sure the relay allows the extension ID that will run the release:
-   `ALLOWED_EXTENSION_ORIGINS` in `wrangler.jsonc`. Unpacked IDs depend on the
-   folder path; store installs use the store's ID.
+   `ALLOWED_EXTENSION_ORIGINS` in `wrangler.jsonc`. The `key` in
+   `extension/manifest.json` fixes the ID of every unpacked install at
+   `fccglnmggflkkamnjjkibkbbakdkhgil`; a unit test fails if the relay list
+   drops it. Store installs use the ID the store assigns.
 4. If the relay handler or its allowed origins changed, deploy it first with `bun run worker:deploy`
    (see [shared Azure](shared-azure.md)).
 
@@ -20,6 +22,7 @@ Nothing here publishes automatically.
 ```sh
 bun run verify
 bun run package                     # writes release/shvyd-<version>.zip and .sha256
+bun run package --store             # writes release/shvyd-<version>-store.zip without the manifest key
 rm -rf /tmp/shvyd-release && mkdir /tmp/shvyd-release
 unzip -q release/shvyd-<version>.zip -d /tmp/shvyd-release
 SHVYD_EXTENSION_DIR=/tmp/shvyd-release python3 scripts/check-reliability.py
@@ -31,6 +34,11 @@ environment value whose name ends in `KEY`, `TOKEN`, `SECRET`, or `PASSWORD`,
 and produces the same bytes for the same source. It prints any built files it
 left out.
 
+The matching private key is kept outside the repository, at
+`~/.config/shvyd/extension-key.pem` on the maintainer's machine. Unpacked
+installs and store uploads do not need it; it only matters for packing a
+`.crx` with the same ID.
+
 The reliability check runs the exact extracted files in an isolated Helium
 profile with controlled provider replies.
 
@@ -41,7 +49,7 @@ does not accept `--load-extension`, so use **Load unpacked** by hand. Then check
 
 - [ ] Both key fields start empty; included Azure translates.
 - [ ] DeepL with your own key translates; **Check allowance** shows a result.
-- [ ] Updating over the previous release in the same folder keeps settings.
+- [ ] Updating over the previous release keeps settings.
 - [ ] Browser pages and PDFs show no popup, and nothing breaks there.
 - [ ] Remembered and fixed languages; formatted text; copy; drag; Escape; Tab focus.
 - [ ] Error messages for a wrong key; **Clear usage**; error-record export.

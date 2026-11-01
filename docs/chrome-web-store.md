@@ -4,21 +4,23 @@ Status: preparation only. Nothing has been submitted.
 
 ## Still needed from the owner
 
-- [ ] Operator name and a contact email (dashboard requirement; also goes in
-      [PRIVACY.md](../PRIVACY.md)).
-- [ ] A public URL for the privacy policy. The repository is private, so use a
-      public page (for example a public GitHub Gist, a GitHub Pages site from a
-      public repository, or a page on your own domain).
+- [x] Operator name and a contact email: Yevhenii Zhaivoronok,
+      Zheckan1120@gmail.com (also in [PRIVACY.md](../PRIVACY.md)).
+- [ ] Make the repository public, so the privacy policy URL below works.
 - [ ] A Chrome Web Store developer account (one-time registration fee).
 - [ ] Store screenshots (1280×800 or 640×400) and a 440×280 promo tile.
 
 ## Before the first upload
 
-1. Upload the ZIP once as a draft to get the store's extension ID.
-2. Add `chrome-extension://<store id>` to `ALLOWED_EXTENSION_ORIGINS` in
-   `wrangler.jsonc` and run `bun run worker:deploy`. Without this, included
-   Azure answers 403 for store installs (see [install](install.md)).
-3. Do not put a `key` field in the uploaded manifest; the store manages the ID.
+1. Build the upload with `bun run package --store`. It is the trial ZIP without
+   the manifest `key`, which the store rejects; the store assigns its own ID.
+2. Upload it once as a draft to get the store's extension ID.
+3. Add `chrome-extension://<store id>` to `ALLOWED_EXTENSION_ORIGINS` in
+   `wrangler.jsonc`, next to the trial ID, and run `bun run worker:deploy`.
+   Without this, included Azure answers 403 for store installs.
+4. Optional: to give trial installs the store's ID, replace the manifest `key`
+   with the store's public key (dashboard → Package → View public key). Trial
+   installs then reset their settings once.
 
 ## Listing answers
 
@@ -48,4 +50,5 @@ popup next to the selection.
 - Certify: not sold, not used for unrelated purposes, not used for credit
   decisions.
 
-**Privacy policy URL:** the public copy of [PRIVACY.md](../PRIVACY.md).
+**Privacy policy URL:** https://github.com/Zheckan/shvyd/blob/main/PRIVACY.md
+(works once the repository is public and the stack is merged).

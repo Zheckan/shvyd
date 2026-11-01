@@ -4,7 +4,7 @@
   "compatibility_date": "2026-10-07",
   "vars": {
     "AZURE_TRANSLATOR_REGION": "",
-    "ALLOWED_EXTENSION_ORIGINS": "chrome-extension://dnofmicolgpeckcgpdkcipalkhebongp"
+    "ALLOWED_EXTENSION_ORIGINS": "chrome-extension://fccglnmggflkkamnjjkibkbbakdkhgil"
   },
   "ratelimits": [
     {

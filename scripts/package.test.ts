@@ -106,3 +106,32 @@ test('the release uses the default relay even when the environment overrides it'
     await rm(output, { recursive: true, force: true })
   }
 }, 30_000)
+
+test('the store ZIP leaves out the manifest key and keeps everything else', async () => {
+  const output = await mkdtemp(resolve(tmpdir(), 'shvyd-package-test-'))
+  const manifestIn = (zipPath: string) =>
+    JSON.parse(
+      Bun.spawnSync(['unzip', '-p', zipPath, 'manifest.json']).stdout.toString()
+    )
+
+  try {
+    const trial = await packageExtension({
+      outputDirectory: output,
+      secrets: [],
+    })
+    const store = await packageExtension({
+      outputDirectory: output,
+      secrets: [],
+      store: true,
+    })
+    const { key, ...rest } = manifestIn(trial.zipPath)
+
+    expect(store.zipPath.endsWith(`shvyd-${store.version}-store.zip`)).toBe(
+      true
+    )
+    expect(key).toBeString()
+    expect(manifestIn(store.zipPath)).toEqual(rest)
+  } finally {
+    await rm(output, { recursive: true, force: true })
+  }
+}, 30_000)
