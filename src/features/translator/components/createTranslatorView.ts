@@ -6,6 +6,7 @@ const TRANSLATE_ICON =
   'M4 5h11M10 3v2M6 5c0 6 5 9 9 11M14 5c0 6-5 9-10 11M14 21l4-10 4 10M15.5 17h5'
 const COPY_ICON = 'M8 8h12v13H8zM16 8V3H3v13h5'
 const CLOSE_ICON = 'M6 6l12 12M18 6 6 18'
+const RESIZE_ICON = 'M20 11 11 20M20 17l-3 3'
 
 // Keep page styles from resizing or hiding the zero-size host element.
 const HOST_STYLES = {
@@ -87,10 +88,15 @@ export function createTranslatorView(
   const actions = make('div', 'actions')
   actions.append(retry, settings)
 
+  // Pointer-only, like moving the window by its toolbar.
+  const resizeGrip = make('div', 'resize-grip')
+  resizeGrip.title = 'Drag to resize. Double-click for the default size.'
+  resizeGrip.append(icon(RESIZE_ICON))
+
   const panel = make('section', 'panel')
   panel.setAttribute('role', 'dialog')
   panel.setAttribute('aria-label', 'Selected text translation')
-  panel.append(toolbar, loading, output, status, actions)
+  panel.append(toolbar, loading, output, status, actions, resizeGrip)
 
   bubble.hidden = true
   panel.hidden = true
@@ -111,5 +117,6 @@ export function createTranslatorView(
     actions,
     retry,
     settings,
+    resizeGrip,
   }
 }

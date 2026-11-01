@@ -1,5 +1,6 @@
 /** Average glyph width of 15 px system text, Latin and Cyrillic alike. */
 const CHARACTER_WIDTH_PX = 7.4
+const DEFAULT_FONT_SIZE_PX = 15
 /** Translations into Ukrainian, Polish, or German usually run a little longer. */
 const EXPANSION = 1.15
 /** Beyond this the popup scrolls anyway, so more placeholder lines add nothing. */
@@ -8,9 +9,17 @@ const MIN_LAST_LINE = 0.3
 
 export type LineEstimate = { lines: number; lastLineWidth: number }
 
-/** Predicts how many text lines a translation of `source` fills at `width` px. */
-export function estimateLines(source: string, width: number): LineEstimate {
-  const perLine = Math.max(1, Math.floor(width / CHARACTER_WIDTH_PX))
+/**
+ * Predicts how many text lines a translation of `source` fills at `width` px
+ * in `fontSize` px text.
+ */
+export function estimateLines(
+  source: string,
+  width: number,
+  fontSize = DEFAULT_FONT_SIZE_PX
+): LineEstimate {
+  const characterWidth = (CHARACTER_WIDTH_PX * fontSize) / DEFAULT_FONT_SIZE_PX
+  const perLine = Math.max(1, Math.floor(width / characterWidth))
   let lines = 0
   let lastLength = 0
 

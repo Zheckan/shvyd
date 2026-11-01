@@ -23,6 +23,7 @@ import {
   type PageSelection,
 } from './logic/readPageSelection'
 import { applyPageStyle, samplePageStyle } from './logic/page-style'
+import { resizePanel, type Size } from './logic/resizePanel'
 import { scrollEdges } from './logic/scrollEdges'
 
 /** Minimum distance between the popup and the viewport edge. */
@@ -31,8 +32,8 @@ const VIEWPORT_MARGIN = 12
 const SELECTION_GAP = 9
 /** Distance from the cursor to the button or popup corner, clear of the pointer. */
 const CURSOR_GAP = 12
-/** Horizontal padding inside the translation text block. */
-const TEXT_PADDING_PX = 34
+/** Smallest window the resize grip allows: the toolbar and two lines of text. */
+const MIN_PANEL_SIZE: Size = { width: 220, height: 100 }
 const RESIZE_MS = 200
 const OPEN_MS = 140
 
@@ -43,6 +44,8 @@ type DragOrigin = {
   left: number
   top: number
 }
+
+type ResizeOrigin = DragOrigin & Size
 
 function clamp(value: number, min: number, max: number): number {
   return Math.max(min, Math.min(value, max))
@@ -127,6 +130,7 @@ function startTranslator(client: TranslationClient): Translator {
     actions,
     retry,
     settings,
+    resizeGrip,
   } = createTranslatorView(picker)
 
   let preferences = publicPreferences(DEFAULT_SETTINGS)
@@ -150,17 +154,35 @@ function startTranslator(client: TranslationClient): Translator {
   let resizeFrame = 0
   let panelPosition: { x: number; y: number } | undefined
   let dragOrigin: DragOrigin | undefined
+  /** Size chosen with the resize grip; the popup's content decides otherwise. */
+  let panelSize: Size | undefined
+  let resizeOrigin: ResizeOrigin | undefined
 
   picker.update({ preferences, target: initialTarget(preferences) })
   void client
     .preferences()
     .then((value) => {
       if (panel.hidden) {
-        preferences = value
+        setPreferences(value)
         picker.update({ preferences, target: initialTarget(preferences) })
       }
     })
     .catch(() => undefined)
+
+  /** Saves `value` and restyles an open popup if its density changed. */
+  function setPreferences(value: Preferences): void {
+    const densityChanged = value.compactPopup !== preferences.compactPopup
+    preferences = value
+
+    for (const element of [bubble, panel]) {
+      element.classList.toggle('compact', preferences.compactPopup)
+    }
+
+    if (densityChanged) {
+      positionVisible()
+      markScrollEdges()
+    }
+  }
 
   // Visibility and layout
 
@@ -187,6 +209,8 @@ function startTranslator(client: TranslationClient): Translator {
     }
 
     endDrag()
+    endResize()
+    applySize(undefined)
     panelPosition = undefined
     generation++
     bubble.hidden = true
@@ -326,8 +350,17 @@ function startTranslator(client: TranslationClient): Translator {
 
   /** Placeholder lines sized to the expected translation, not a fixed block. */
   function renderSkeleton(): void {
-    const width = panel.clientWidth - TEXT_PADDING_PX
-    const estimate = estimateLines(selected?.text ?? '', width)
+    // Computed styles resolve while the text block is hidden.
+    const text = getComputedStyle(output)
+    const width =
+      panel.clientWidth -
+      parseFloat(text.paddingLeft) -
+      parseFloat(text.paddingRight)
+    const estimate = estimateLines(
+      selected?.text ?? '',
+      width,
+      parseFloat(text.fontSize)
+    )
     const lines = Array.from({ length: estimate.lines }, () =>
       document.createElement('div')
     )
@@ -429,7 +462,7 @@ function startTranslator(client: TranslationClient): Translator {
     position(panel)
 
     try {
-      preferences = await client.preferences()
+      setPreferences(await client.preferences())
       if (isStale()) {
         return
       }
@@ -510,7 +543,7 @@ function startTranslator(client: TranslationClient): Translator {
 
     try {
       if (preferences.targetMode === 'last') {
-        preferences = await client.updatePreferences({ target: code })
+        setPreferences(await client.updatePreferences({ target: code }))
       }
 
       if (choice !== choiceGeneration || !selected) {
@@ -582,6 +615,91 @@ function startTranslator(client: TranslationClient): Translator {
     }
   }
 
+  // Resizing
+
+  function applySize(size: Size | undefined): void {
+    panelSize = size
+    panel.toggleAttribute('data-sized', size !== undefined)
+
+    if (size) {
+      panel.style.width = `${size.width}px`
+      panel.style.height = `${size.height}px`
+    } else {
+      panel.style.removeProperty('width')
+      panel.style.removeProperty('height')
+    }
+  }
+
+  function startResize(event: PointerEvent): void {
+    if (event.button !== 0 || !event.isPrimary || panel.hidden) {
+      return
+    }
+
+    event.preventDefault()
+
+    // A running height animation would fight the size the pointer sets.
+    for (const animation of panel.getAnimations()) {
+      animation.cancel()
+    }
+
+    const bounds = panel.getBoundingClientRect()
+    panelPosition = { x: bounds.left, y: bounds.top }
+    resizeOrigin = {
+      pointerId: event.pointerId,
+      pointerX: event.clientX,
+      pointerY: event.clientY,
+      left: bounds.left,
+      top: bounds.top,
+      width: panelSize?.width ?? bounds.width,
+      height: panelSize?.height ?? bounds.height,
+    }
+
+    panel.toggleAttribute('data-resizing', true)
+    resizeGrip.setPointerCapture(event.pointerId)
+  }
+
+  function moveResize(event: PointerEvent): void {
+    if (!resizeOrigin || event.pointerId !== resizeOrigin.pointerId) {
+      return
+    }
+
+    applySize(
+      resizePanel({
+        start: { width: resizeOrigin.width, height: resizeOrigin.height },
+        delta: {
+          x: event.clientX - resizeOrigin.pointerX,
+          y: event.clientY - resizeOrigin.pointerY,
+        },
+        position: { x: resizeOrigin.left, y: resizeOrigin.top },
+        viewport: { width: window.innerWidth, height: window.innerHeight },
+        minimum: MIN_PANEL_SIZE,
+        margin: VIEWPORT_MARGIN,
+      })
+    )
+    position(panel)
+    markScrollEdges()
+  }
+
+  function endResize(): void {
+    if (!resizeOrigin) {
+      return
+    }
+
+    const { pointerId } = resizeOrigin
+    resizeOrigin = undefined
+    panel.removeAttribute('data-resizing')
+    if (resizeGrip.hasPointerCapture(pointerId)) {
+      resizeGrip.releasePointerCapture(pointerId)
+    }
+  }
+
+  function resetSize(): void {
+    endResize()
+    applySize(undefined)
+    position(panel)
+    markScrollEdges()
+  }
+
   // Popup controls
 
   bubble.addEventListener('pointerdown', (event) => event.preventDefault())
@@ -625,7 +743,16 @@ function startTranslator(client: TranslationClient): Translator {
     toolbar.addEventListener(name, endDrag, listen)
   }
 
+  resizeGrip.addEventListener('pointerdown', startResize, listen)
+  resizeGrip.addEventListener('pointermove', moveResize, listen)
+  for (const name of ['pointerup', 'pointercancel', 'lostpointercapture']) {
+    resizeGrip.addEventListener(name, endResize, listen)
+  }
+
+  resizeGrip.addEventListener('dblclick', resetSize, listen)
+
   window.addEventListener('blur', endDrag, listen)
+  window.addEventListener('blur', endResize, listen)
   output.addEventListener('scroll', markScrollEdges, {
     passive: true,
     signal: events.signal,
@@ -640,6 +767,7 @@ function startTranslator(client: TranslationClient): Translator {
         const path = event.composedPath()
         if (
           !dragOrigin &&
+          !resizeOrigin &&
           !path.includes(picker.menu) &&
           !path.includes(picker.button)
         ) {
@@ -744,7 +872,7 @@ function startTranslator(client: TranslationClient): Translator {
   return {
     stop,
     applyPreferences: (value) => {
-      preferences = value
+      setPreferences(value)
 
       if (panel.hidden) {
         picker.update({ preferences, target: initialTarget(preferences) })

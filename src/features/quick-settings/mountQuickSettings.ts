@@ -58,6 +58,7 @@ export function mountQuickSettings({
   const siteEnabled = required('#site-enabled', HTMLInputElement)
   const target = required('#quick-target', HTMLSelectElement)
   const adapt = required('#quick-adapt', HTMLInputElement)
+  const compact = required('#quick-compact', HTMLInputElement)
   const status = required('#quick-status', HTMLOutputElement)
   const providerButtons =
     document.querySelectorAll<HTMLButtonElement>('[data-provider]')
@@ -111,6 +112,7 @@ export function mountQuickSettings({
       })
     )
     adapt.checked = preferences.adaptToPage
+    compact.checked = preferences.compactPopup
   }
 
   async function update(change: Partial<Preferences>): Promise<void> {
@@ -203,6 +205,10 @@ export function mountQuickSettings({
 
   adapt.addEventListener('change', () => {
     void update({ adaptToPage: adapt.checked })
+  })
+
+  compact.addEventListener('change', () => {
+    void update({ compactPopup: compact.checked })
   })
 
   required('#open-settings', HTMLButtonElement).addEventListener(

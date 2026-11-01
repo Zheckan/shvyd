@@ -243,3 +243,25 @@ test('saving some fields keeps newer changes to the others', async () => {
   })
   await expect(store.save(['adaptToPage'])).rejects.toThrow()
 })
+
+test('the popup is full size by default, and the compact choice is saved', async () => {
+  const { compactPopup: _removed, ...older } = DEFAULT_SETTINGS
+  let persisted: unknown = structuredClone(older)
+  const storage = {
+    read: async () => persisted,
+    write: async (value: unknown) => {
+      persisted = structuredClone(value)
+    },
+  }
+
+  const store = createSettingsStore(storage)
+  expect((await store.preferences()).compactPopup).toBe(false)
+
+  await store.updatePreferences({ compactPopup: true })
+  expect((await createSettingsStore(storage).preferences()).compactPopup).toBe(
+    true
+  )
+  await expect(
+    store.updatePreferences({ compactPopup: 'yes' })
+  ).rejects.toThrow()
+})

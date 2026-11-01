@@ -129,6 +129,11 @@ confusion, and non-obvious constraints.
   `extension-page` (toolbar menu and settings), and `settings-page` (keys,
   usage, diagnostics). Preference changes and site changes are broadcast to every
   tab as `TabMessage`s, so open pages follow without a reload.
+- A manual resize sets the panel's inline `width` and `height` and marks it
+  `data-sized`, which switches it to a flex column so the translation fills the
+  height. The resize keeps the top-left corner, so the size is clamped to the
+  space right of and below the panel. `resizeSmoothly` sees no height change for
+  a sized panel and skips its animation; dismissing clears both size and position.
 - A tab opened in the background renders no frames, so CSS transitions freeze in
   screenshots of it. Browser checks open the toolbar menu as a background tab
   (keeping the fixture active) and turn transitions off before capturing it.

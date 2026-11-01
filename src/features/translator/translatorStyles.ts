@@ -57,10 +57,54 @@ export const TRANSLATOR_STYLES = `
   }
   .panel {
     width: min(410px, calc(100vw - 24px));
+    max-width: calc(100vw - 24px);
     max-height: calc(100dvh - 24px);
     border-radius: var(--shvyd-radius);
     overflow: auto;
     overscroll-behavior: contain;
+  }
+  /* After a manual resize the text fills the chosen height and scrolls inside. */
+  .panel[data-sized] {
+    display: flex;
+    flex-direction: column;
+  }
+  .panel[data-sized] > * {
+    flex-shrink: 0;
+  }
+  .panel[data-sized] .translation,
+  .panel[data-sized] .loading {
+    flex: 1 1 auto;
+    min-height: 0;
+    max-height: none;
+  }
+  .panel[data-sized] .loading {
+    overflow: hidden;
+  }
+  .resize-grip {
+    position: absolute;
+    right: 1px;
+    bottom: 1px;
+    width: 16px;
+    height: 16px;
+    display: grid;
+    place-items: center;
+    cursor: nwse-resize;
+    touch-action: none;
+    user-select: none;
+    opacity: 0.35;
+    transition: opacity 150ms ease-out;
+  }
+  .resize-grip svg {
+    width: 14px;
+    height: 14px;
+  }
+  .resize-grip:hover,
+  .panel[data-resizing] .resize-grip {
+    opacity: 0.8;
+  }
+  .panel[data-resizing] {
+    cursor: nwse-resize;
+    user-select: none;
   }
   .toolbar {
     display: flex;
@@ -232,7 +276,8 @@ export const TRANSLATOR_STYLES = `
   }
   @media (prefers-reduced-motion: reduce) {
     .toolbar,
-    .translation {
+    .translation,
+    .resize-grip {
       transition: none;
     }
   }
@@ -357,5 +402,55 @@ export const TRANSLATOR_STYLES = `
     overflow: hidden;
     white-space: nowrap;
     clip-path: inset(50%);
+  }
+  /* Compact view: smaller text and spacing, and a narrower window. */
+  .bubble.compact {
+    gap: 5px;
+    padding: 5px 8px;
+    font-size: 12px;
+    line-height: 16px;
+  }
+  .bubble.compact svg {
+    width: 14px;
+    height: 14px;
+  }
+  .panel.compact {
+    width: min(320px, calc(100vw - 24px));
+  }
+  .compact .toolbar {
+    gap: 4px;
+    padding: 6px 8px 3px 11px;
+  }
+  .compact .target {
+    font-size: 11px;
+  }
+  .compact .icon {
+    width: 24px;
+    height: 24px;
+  }
+  .compact .icon svg {
+    width: 14px;
+    height: 14px;
+  }
+  .compact .translation {
+    padding: 3px 12px 12px;
+    font-size: 13px;
+    line-height: 1.5;
+    max-height: min(40dvh, 320px);
+  }
+  .compact .loading {
+    padding: 3px 12px 12px;
+  }
+  .compact .line {
+    height: 8px;
+    margin: 6px 0;
+  }
+  .compact .status,
+  .compact .actions {
+    padding: 0 12px 11px;
+    font-size: 12px;
+  }
+  .compact .text-button {
+    font-size: 12px;
   }
 `

@@ -94,6 +94,7 @@ export function mountSettingsPreview(container: HTMLElement) {
             </span>
           </div>
           <div class="preview-translation"></div>
+          <svg class="preview-grip" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><path d="M20 11 11 20M20 17l-3 3"></path></svg>
           <div class="preview-menu" id="preview-language-menu" role="menu" aria-label="Preview languages" hidden></div>
         </section>
       </div>
@@ -106,6 +107,7 @@ export function mountSettingsPreview(container: HTMLElement) {
   const pages = required('.preview-pages', HTMLDivElement)
   const stage = required('.preview-stage', HTMLDivElement)
   const targetButton = required('.preview-target', HTMLButtonElement)
+  const popupView = required('.preview-popup', HTMLElement)
   const translation = required('.preview-translation', HTMLDivElement)
   const menu = required('.preview-menu', HTMLDivElement)
   const caption = required('.preview-caption', HTMLParagraphElement)
@@ -239,6 +241,7 @@ export function mountSettingsPreview(container: HTMLElement) {
       button.setAttribute('aria-pressed', String(button.dataset.page === page))
     }
 
+    popupView.classList.toggle('compact', preferences.compactPopup)
     targetButton.textContent = `${languageLabel(target)} ▾`
     targetButton.setAttribute(
       'aria-label',
@@ -250,7 +253,7 @@ export function mountSettingsPreview(container: HTMLElement) {
     translation.dir = SAMPLES[target]
       ? (getLanguage(target)?.direction ?? 'ltr')
       : 'ltr'
-    caption.textContent = `${preferences.provider === 'azure' ? 'Azure' : 'DeepL'} · ${preferences.targetMode === 'fixed' ? 'fixed default' : 'remembers last'} · ${preferences.adaptToPage ? 'matches the page' : 'neutral style'}. Sample only. Click the language to try the menu.`
+    caption.textContent = `${preferences.provider === 'azure' ? 'Azure' : 'DeepL'} · ${preferences.targetMode === 'fixed' ? 'fixed default' : 'remembers last'} · ${preferences.adaptToPage ? 'matches the page' : 'neutral style'}${preferences.compactPopup ? ' · compact' : ''}. Sample only. Click the language to try the menu.`
     renderMenu()
   }
 
