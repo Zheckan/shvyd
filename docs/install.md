@@ -37,11 +37,16 @@ changed.
 
 - **Usage counts:** Settings → Usage → **Clear usage**.
 - **Error records:** Settings → Error records → **Clear**, or turn the option off.
+- **Hidden sites:** Settings → Hidden on these sites → **Show again**.
 - **Everything:** remove the extension at `chrome://extensions`. This deletes
   settings, keys, usage counts, and error records from this browser.
 
 Choosing **Remove** and then loading the folder again starts with default
 settings.
+
+## Turn Shvyd off on a site
+
+In the popup, click the crossed-out eye, then **Don't show here**. Open tabs on that site drop Shvyd immediately. To bring it back, open settings → **Hidden on these sites** → **Show again**, then reload that site's tabs.
 
 ## Pages Shvyd cannot run on
 

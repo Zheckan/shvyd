@@ -356,6 +356,41 @@ def main():
             options.evaluate("document.querySelector('#clear-usage') && (window.confirm=()=>true, document.querySelector('#clear-usage').click(), true)")
             module.wait_for(lambda: options.evaluate("!document.querySelector('#usage-empty').hidden && document.querySelectorAll('#usage-rows tr').length===0"), 'usage cleared from settings page')
             record('settings-page-shows-and-clears-usage')
+
+            # Hide Shvyd on the fixture site from the popup; a second tab on that site loses it too.
+            second_id = page.call('Target.createTarget', {'url': fixture})['targetId']
+            second_info = module.wait_for(lambda: next((item for item in targets() if item['id'] == second_id), None), 'second fixture tab')
+            second = module.CDP(second_info['webSocketDebuggerUrl'])
+            connections.append(second)
+            second.call('Runtime.enable')
+            module.wait_for(lambda: second.evaluate("!!document.getElementById('shvyd-root')"), 'second tab content script')
+            page.call('Page.bringToFront')
+            fresh_selection('Hide Shvyd on this site.')
+            module.wait_for(lambda: worker.drain() == 0 and popup("return !root.querySelector('.translation').hidden"), 'translation before hiding')
+            click('[aria-label="Don\'t show on this site"]')
+            module.wait_for(lambda: popup("return root.querySelector('.status').textContent.startsWith('Stop showing Shvyd on 127.0.0.1')"), 'hide confirmation')
+            assert popup("return [...root.querySelectorAll('.actions button')].filter(b=>!b.hidden).map(b=>b.textContent).join('|')") == "Don't show here|Cancel"
+            box = page.evaluate("(()=>{const b=document.getElementById('shvyd-root').shadowRoot.querySelector('.panel').getBoundingClientRect();return {x:b.x-8,y:b.y-8,width:b.width+16,height:b.height+16}})()")
+            shot = page.call('Page.captureScreenshot', {'format': 'png', 'clip': {**box, 'scale': 2}})
+            (OUTPUT / 'hide-site-confirm.png').write_bytes(base64.b64decode(shot['data']))
+            click('.actions button:not([hidden])')
+            module.wait_for(lambda: page.evaluate("!document.getElementById('shvyd-root')"), 'popup removed after hiding')
+            module.wait_for(lambda: second.evaluate("!document.getElementById('shvyd-root')"), 'other tab on the site told to remove Shvyd')
+            page.call('Page.reload')
+            module.wait_for(lambda: page.evaluate("document.readyState === 'complete'"), 'fixture reload')
+            settle()
+            hidden_reply = message({'kind': 'hidden-sites'})
+            assert hidden_reply == {'ok': True, 'data': ['127.0.0.1']}, hidden_reply
+            assert page.evaluate("new Promise(resolve => setTimeout(() => resolve(!document.getElementById('shvyd-root')), 1500))"), 'Shvyd came back after reloading a hidden site'
+            record('hide-on-site-confirms-removes-everywhere-and-survives-reload')
+
+            options.call('Page.reload')
+            module.wait_for(lambda: options.evaluate("[...document.querySelectorAll('#hidden-site-list li span')].map(s=>s.textContent).join()==='127.0.0.1'"), 'hidden site listed in settings')
+            options.evaluate("document.querySelector('#hidden-site-list button').click(), true")
+            module.wait_for(lambda: options.evaluate("!document.querySelector('#hidden-sites-empty').hidden"), 'site shown again')
+            page.call('Page.reload')
+            module.wait_for(lambda: page.evaluate("!!document.getElementById('shvyd-root')"), 'Shvyd back after showing the site again')
+            record('settings-page-shows-hidden-site-again')
             results['passed'] = True
         finally:
             for connection in connections:

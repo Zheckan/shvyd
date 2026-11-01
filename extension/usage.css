@@ -1,4 +1,4 @@
-/* Usage and error-record cards. Loaded after options.css. */
+/* Usage, error-record, and hidden-site cards. Loaded after options.css. */
 .settings-column > .card {
   margin-top: 16px;
 }
@@ -59,4 +59,25 @@
   background: var(--pane);
   font-size: 12px;
   line-height: 1.5;
+}
+.site-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.site-list li {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--line);
+  font-size: 14px;
+  overflow-wrap: anywhere;
+}
+.site-list li:last-child {
+  border-bottom: 0;
+}
+.site-list .button {
+  height: 30px;
 }
