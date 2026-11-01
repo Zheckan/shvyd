@@ -16,6 +16,9 @@ credential-free ZIP built with `bun run package`.
 
 ### Changed
 
+- The Translate button appears next to the selection in text fields and on pages that re-render selected text, instead of the top-left corner. Plain text fields, search fields, and text areas can be translated; password and other input types never offer translation.
+- While loading, the placeholder matches the expected length of the translation, the popup opens with a short fade, and its height eases to the final size. No scroll bar appears while loading, and scroll bars follow the popup's light or dark surface.
+- You can select and copy part of a translation without the popup closing.
 - Identical simultaneous translations share one provider call. The memory cache is capped at 32 entries and 512 KiB.
 - Rate limits, exhausted allowance, connection failures, and timeouts have separate messages.
 - Late replies can no longer show an old language or reopen a closed popup.

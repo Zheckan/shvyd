@@ -4,7 +4,7 @@ import {
   type TranslationFormat,
 } from '@/domain/translation/translation'
 
-type SelectedContent = { text: string; format: TranslationFormat }
+export type SelectedContent = { text: string; format: TranslationFormat }
 
 const TAGS = new Set([
   'div',

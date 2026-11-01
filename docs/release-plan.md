@@ -38,7 +38,7 @@ Friends can configure their own Azure resource as well. Included access consumes
 - A local Usage section with per-route request, character, reuse, failure, and uncertain counts; a DeepL allowance check; and optional, exportable error records. See [local usage](local-usage.md).
 - A playground and repeatable browser checks. See [README](../README.md) for commands; generated screenshots and results stay in `.preview/`.
 
-The selection limit is currently 10,000 serialized input characters. Browser internal pages, protected store pages, browser PDF viewers, and text inputs are documented prototype exclusions. Decide whether to retain these exclusions for 1.0; they do not need to become new features to release.
+The selection limit is currently 10,000 serialized input characters. Browser internal pages, protected store pages, and browser PDF viewers are documented exclusions; password and other non-text inputs never offer translation, while text fields and text areas do. Decide whether to retain these exclusions for 1.0; they do not need to become new features to release.
 
 ## Settings and first use
 

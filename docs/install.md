@@ -55,5 +55,6 @@ In the popup, click the crossed-out eye, then **Don't show here**. Open tabs on 
 
 ## Pages Shvyd cannot run on
 
-Browser pages (`chrome://`), extension store pages, the built-in PDF viewer, and
-text inside input fields and text areas.
+Browser pages (`chrome://`), extension store pages, and the built-in PDF viewer.
+Password fields and other non-text inputs never offer translation; plain text
+fields, search fields, and text areas do.

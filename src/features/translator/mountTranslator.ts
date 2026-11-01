@@ -8,28 +8,29 @@ import {
   initialTarget,
   publicPreferences,
 } from '@/domain/settings/settings'
-import {
-  MAX_SELECTION_LENGTH,
-  TranslationError,
-} from '@/domain/translation/translation'
+import { TranslationError } from '@/domain/translation/translation'
 import type { TranslationClient } from '@/domain/translation/translation-client'
 import { createLanguagePicker } from './components/createLanguagePicker'
 import { createTranslatorView } from './components/createTranslatorView'
 import { copyTranslation } from './logic/copyTranslation'
-import { captureSelection, renderTranslation } from './logic/formatted-text'
+import { estimateLines } from './logic/estimateLines'
+import { renderTranslation } from './logic/formatted-text'
+import {
+  isSameSelection,
+  readPageSelection,
+  type PagePoint,
+  type PageSelection,
+} from './logic/readPageSelection'
 import { applyPageStyle, samplePageStyle } from './logic/page-style'
 
 /** Minimum distance between the popup and the viewport edge. */
 const VIEWPORT_MARGIN = 12
 /** Distance between the selected text and the popup. */
 const SELECTION_GAP = 9
-
-type Selected = {
-  text: string
-  content: ReturnType<typeof captureSelection>
-  range: Range
-  element: Element
-}
+/** Horizontal padding inside the translation text block. */
+const TEXT_PADDING_PX = 34
+const RESIZE_MS = 200
+const OPEN_MS = 140
 
 type DragOrigin = {
   pointerId: number
@@ -124,10 +125,15 @@ function startTranslator(
   hideSite.title = site ? `Don't show Shvyd on ${site}` : ''
 
   let preferences = publicPreferences(DEFAULT_SETTINGS)
-  let selected: Selected | undefined
+  let selected: PageSelection | undefined
   let sessionTarget: Language | undefined
   let copiedText = ''
   let pointerDown = false
+  /** The latest pointer press was inside the popup, so its selection is ours. */
+  let pointerInside = false
+  let lastPointer: PagePoint | undefined
+  /** Final panel height while a resize animation runs. */
+  let panelTargetHeight: number | undefined
   let destroyed = false
 
   // Each translation and language choice takes a ticket. Results that arrive
@@ -168,6 +174,13 @@ function startTranslator(
   }
 
   function dismiss(): void {
+    // Once the popup closes, a selection can no longer belong to it.
+    pointerInside = false
+
+    for (const animation of panel.getAnimations()) {
+      animation.cancel()
+    }
+
     endDrag()
     panelPosition = undefined
     generation++
@@ -192,11 +205,13 @@ function startTranslator(
       return
     }
 
-    const rects = selected.range.getClientRects()
-    const anchor =
-      rects[rects.length - 1] ?? selected.range.getBoundingClientRect()
+    const anchor = selected.anchor()
     const width = element.offsetWidth
-    const height = element.offsetHeight
+    // Mid-animation the panel is shorter than it will be; place it for its final size.
+    const height =
+      element === panel && panelTargetHeight !== undefined
+        ? panelTargetHeight
+        : element.offsetHeight
 
     let x = anchor.right - width
     let y = anchor.bottom + SELECTION_GAP
@@ -250,21 +265,20 @@ function startTranslator(
 
   function readSelection(): void {
     frame = 0
-    if (destroyed || pointerDown) {
-      return
-    }
 
-    const selection = window.getSelection()
+    // Selecting text inside the popup, for example to copy part of a translation.
     if (
-      !selection ||
-      !selection.rangeCount ||
-      selection.anchorNode?.getRootNode() === root
+      destroyed ||
+      pointerDown ||
+      pointerInside ||
+      window.getSelection()?.anchorNode?.getRootNode() === root
     ) {
       return
     }
 
-    const text = selection.toString().trim()
-    if (!text) {
+    const result = readPageSelection(lastPointer)
+
+    if (result.kind === 'none') {
       if (panel.hidden) {
         dismiss()
       }
@@ -272,35 +286,20 @@ function startTranslator(
       return
     }
 
-    if (text.length > MAX_SELECTION_LENGTH) {
+    if (result.kind !== 'selected') {
       dismiss()
       return
     }
 
-    const range = selection.getRangeAt(0).cloneRange()
-    const ancestor = range.commonAncestorContainer
-    const element =
-      ancestor instanceof Element ? ancestor : ancestor.parentElement
-    if (
-      !element ||
-      element.closest('input, textarea') ||
-      element.getRootNode() === root
-    ) {
-      return
-    }
+    const next = result.selection
 
-    const isSameSelection =
-      selected?.text === text &&
-      !panel.hidden &&
-      selected.range.compareBoundaryPoints(Range.START_TO_START, range) === 0 &&
-      selected.range.compareBoundaryPoints(Range.END_TO_END, range) === 0
-    if (isSameSelection) {
+    if (selected && !panel.hidden && isSameSelection(selected, next)) {
       return
     }
 
     dismiss()
-    selected = { text, content: captureSelection(range, text), range, element }
-    applyPageStyle(host, samplePageStyle(element, preferences.adaptToPage))
+    selected = next
+    applyPageStyle(host, samplePageStyle(next.element, preferences.adaptToPage))
     bubble.hidden = false
     reveal()
     position(bubble)
@@ -314,15 +313,76 @@ function startTranslator(
 
   // Translation
 
+  const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)')
+
+  /** Placeholder lines sized to the expected translation, not a fixed block. */
+  function renderSkeleton(): void {
+    const width = panel.clientWidth - TEXT_PADDING_PX
+    const estimate = estimateLines(selected?.text ?? '', width)
+    const lines = Array.from({ length: estimate.lines }, () =>
+      document.createElement('div')
+    )
+
+    for (const line of lines) {
+      line.className = 'line'
+    }
+
+    lines
+      .at(-1)
+      ?.style.setProperty(
+        'width',
+        `${Math.round(estimate.lastLineWidth * 100)}%`
+      )
+    loading.replaceChildren(...lines)
+  }
+
+  /** Applies `update`, then eases the panel from its old height to the new one. */
+  function resizeSmoothly(update: () => void): void {
+    const before = panel.getBoundingClientRect().height
+    update()
+    position(panel)
+    const after = panel.getBoundingClientRect().height
+
+    if (reducedMotion.matches || panel.hidden || Math.abs(after - before) < 2) {
+      return
+    }
+
+    panel.style.overflow = 'hidden'
+    panelTargetHeight = after
+    const animation = panel.animate(
+      [{ height: `${before}px` }, { height: `${after}px` }],
+      { duration: RESIZE_MS, easing: 'cubic-bezier(0.2, 0.8, 0.2, 1)' }
+    )
+    const restore = () => {
+      panelTargetHeight = undefined
+      panel.style.removeProperty('overflow')
+    }
+    animation.onfinish = restore
+    animation.oncancel = restore
+  }
+
   function showLoading(): void {
+    const opening = panel.hidden
     bubble.hidden = true
     panel.hidden = false
+
+    if (opening && !reducedMotion.matches) {
+      panel.animate(
+        [
+          { opacity: 0, transform: 'translateY(-4px) scale(0.98)' },
+          { opacity: 1, transform: 'none' },
+        ],
+        { duration: OPEN_MS, easing: 'ease-out' }
+      )
+    }
+
     output.hidden = true
     output.textContent = ''
     copiedText = ''
     copy.disabled = true
     copy.setAttribute('aria-label', 'Copy translation')
     copy.title = 'Copy translation'
+    renderSkeleton()
     loading.hidden = false
     status.hidden = false
     status.className = 'status sr-only'
@@ -377,24 +437,28 @@ function startTranslator(
         return
       }
 
-      copiedText = renderTranslation(output, translation)
-      output.lang = translation.target
-      output.dir = getLanguage(translation.target)?.direction ?? 'auto'
-      output.hidden = false
-      loading.hidden = true
-      status.hidden = true
+      resizeSmoothly(() => {
+        copiedText = renderTranslation(output, translation)
+        output.lang = translation.target
+        output.dir = getLanguage(translation.target)?.direction ?? 'auto'
+        output.hidden = false
+        loading.hidden = true
+        status.hidden = true
+      })
       copy.disabled = false
     } catch (error) {
       if (isStale()) {
         return
       }
 
-      loading.hidden = true
-      showMessage(
-        error instanceof Error
-          ? error.message
-          : 'Translation could not finish. Try again.'
-      )
+      resizeSmoothly(() => {
+        loading.hidden = true
+        showMessage(
+          error instanceof Error
+            ? error.message
+            : 'Translation could not finish. Try again.'
+        )
+      })
       const needsSettings =
         error instanceof TranslationError &&
         (error.code === 'configuration' || error.code === 'authentication')
@@ -586,7 +650,9 @@ function startTranslator(
   document.addEventListener(
     'pointerdown',
     (event) => {
-      if (isInside(event)) {
+      pointerInside = isInside(event)
+
+      if (pointerInside) {
         const path = event.composedPath()
         if (
           !dragOrigin &&
@@ -607,8 +673,13 @@ function startTranslator(
 
   document.addEventListener(
     'pointerup',
-    () => {
+    (event) => {
       pointerDown = false
+
+      if (!isInside(event)) {
+        lastPointer = { x: event.clientX, y: event.clientY }
+      }
+
       scheduleSelection()
     },
     listen
@@ -628,6 +699,11 @@ function startTranslator(
     'keydown',
     (event) => {
       if (event.key !== 'Escape') {
+        // A keyboard selection no longer ends where the pointer was released.
+        if (!isInside(event)) {
+          lastPointer = undefined
+        }
+
         return
       }
 

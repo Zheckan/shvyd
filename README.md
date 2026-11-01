@@ -74,7 +74,9 @@ Run the reliability checks without provider keys or a playground server:
 bun run test:reliability
 ```
 
-This builds the extension and checks delayed replies, language-save failures, rapid target changes, closing, network retry, error classifications, an actual background-worker restart, persistent usage counts, and redacted error-record export in an isolated Helium profile. It requires Helium and Python's `websocket-client`. Results stay in `.preview/reliability-check/`. These browser checks run locally; CI runs the unit tests. See [request reliability](docs/translation-reliability.md) for cache behavior and verification details.
+`bun run test:popup` checks the button's position in text fields, that password fields never offer translation, loading size and scroll bars, a popup that grows near the bottom edge, and selecting part of a translation. Results stay in `.preview/popup-check/`.
+
+The reliability check builds the extension and checks delayed replies, language-save failures, rapid target changes, closing, network retry, error classifications, an actual background-worker restart, persistent usage counts, and redacted error-record export in an isolated Helium profile. It requires Helium and Python's `websocket-client`. Results stay in `.preview/reliability-check/`. These browser checks run locally; CI runs the unit tests. See [request reliability](docs/translation-reliability.md) for cache behavior and verification details.
 
 To run live checks, configure provider keys in `.env` and leave the demo server running in another terminal. The extension harness explicitly adds BYOK credentials to an isolated profile; it does not embed them in the build:
 

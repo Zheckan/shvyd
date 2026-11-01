@@ -12,6 +12,7 @@
     "playground": "bun scripts/dev.ts",
     "test": "bun test src scripts/build.test.ts scripts/package.test.ts",
     "test:reliability": "bun run build && python3 scripts/check-reliability.py",
+    "test:popup": "bun run build && python3 scripts/check-popup.py",
     "typecheck": "tsc --noEmit",
     "lint": "oxlint --deny-warnings src scripts demo",
     "lint:fix": "oxlint --fix --deny-warnings src scripts demo",
