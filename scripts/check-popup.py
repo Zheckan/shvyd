@@ -34,11 +34,13 @@ SHORT = 'Add team key validation'
 LONG = ' '.join(['The release keeps settings in this browser and sends only the selected text to the provider you chose.'] * 6)
 PAGE = f'''<!doctype html><html><head><title>Shvyd popup fixture</title>
 <style>
+  :root {{ color-scheme: dark; }}
   body {{ margin: 0; padding: 60px 80px; background: #111; color: #eee; font: 15px/1.6 system-ui; }}
   textarea, input {{ display: block; width: 520px; margin: 24px 0; padding: 10px; font: 22px/1.4 system-ui;
     background: #111; color: #eee; border: 1px solid #333; }}
   p {{ max-width: 620px; }}
 </style></head><body>
+<div id="post"><a href="/cytrus"><span style="color: #1d9bf0">@cytrus</span></a><p id="post-text">Every ex driver is backing Haas</p></div>
 <p id="short">{SHORT}</p>
 <p id="long">{LONG}</p>
 <textarea id="field" rows="2">{SHORT}</textarea>
@@ -282,10 +284,32 @@ def main():
             popup("const t=root.querySelector('.translation');t.scrollTop=t.scrollHeight; return true")
             bottom = edges('bottom')
             check('translation-scrolled-to-the-end-has-no-bottom-fade', bottom['above'] and not bottom['below'], bottom)
+            close_popup()
+
+            # 7. Links colored on an inner span (as on X) set the accent, not the browser's default link color.
+            select_text('post-text')
+            accent = page.evaluate("getComputedStyle(document.getElementById('shvyd-root')).getPropertyValue('--shvyd-accent').trim()")
+            check('accent-follows-visible-link-text-color', accent == 'rgb(29, 155, 240)', {'accent': accent})
+            close_popup()
+
+            # 8. After the extension reloads, the copy left in this tab removes itself on the next selection.
+            try:
+                # The settings page closes with the reload, so its reply may never come.
+                options.evaluate('setTimeout(()=>chrome.runtime.reload(),50), true')
+            except Exception:
+                pass
+            page.evaluate('new Promise(r=>setTimeout(r,1500))')
+            page.evaluate("(() => {const range=document.createRange();range.selectNodeContents(document.getElementById('short'));getSelection().removeAllRanges();getSelection().addRange(range);return true})()")
+            page.evaluate('new Promise(r=>setTimeout(r,300))')
+            left = page.evaluate("!!document.getElementById('shvyd-root')")
+            check('orphaned-script-leaves-the-page-after-extension-reload', not left, {'rootStillThere': left})
             results['passed'] = not failures
         finally:
             for connection in connections:
-                connection.close()
+                try:
+                    connection.close()
+                except Exception:
+                    pass
             process.terminate()
             process.wait(timeout=10)
             server.shutdown()
