@@ -1,4 +1,5 @@
 import { isLanguage, type Language } from '@/domain/languages/languages'
+import { createSerialQueue } from '@/utils/createSerialQueue'
 import { isRecord } from '@/utils/isRecord'
 import {
   DEFAULT_SETTINGS,
@@ -34,7 +35,7 @@ export function createSettingsStore(storage: {
   credentialMode?: 'byok'
 }) {
   let current = structuredClone(DEFAULT_SETTINGS)
-  let queue = Promise.resolve()
+  const enqueue = createSerialQueue()
 
   async function persist(settings: Settings): Promise<void> {
     await storage.write(
@@ -62,25 +63,17 @@ export function createSettingsStore(storage: {
 
   async function settings(): Promise<Settings> {
     await ready
-    await queue
-    return structuredClone(current)
+    return enqueue(async () => structuredClone(current))
   }
 
   function update(change: (current: Settings) => Settings): Promise<Settings> {
-    const operation = queue.then(async () => {
+    return enqueue(async () => {
       await ready
       const next = change(structuredClone(current))
       await persist(next)
       current = next
       return structuredClone(current)
     })
-
-    queue = operation.then(
-      () => undefined,
-      () => undefined
-    )
-
-    return operation
   }
 
   return {

@@ -22,7 +22,6 @@ const ROUTE_LABELS: Record<string, string> = {
   'azure:included': 'Azure · included',
   'azure:own-key': 'Azure · your key',
   'deepl:own-key': 'DeepL · your key',
-  'deepl:included': 'DeepL · included',
 }
 
 function routeLabel(row: UsageRow): string {

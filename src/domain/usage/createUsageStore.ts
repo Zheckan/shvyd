@@ -1,4 +1,5 @@
 import type { TranslationEvent } from '@/domain/translation/translation'
+import { createSerialQueue } from '@/utils/createSerialQueue'
 import {
   createUsageState,
   exportDiagnostics,
@@ -24,7 +25,7 @@ export function createUsageStore({
   randomId?: () => string
   version: string
 }) {
-  let queue: Promise<unknown> = Promise.resolve()
+  const enqueue = createSerialQueue()
 
   async function load(): Promise<UsageState> {
     const stored = await read()
@@ -42,12 +43,6 @@ export function createUsageStore({
   }
 
   // Storage is the source of truth, so a restarted worker continues from saved counts.
-  function enqueue<T>(operation: () => Promise<T>): Promise<T> {
-    const result = queue.then(operation)
-    queue = result.catch(() => undefined)
-    return result
-  }
-
   function update(change: (state: UsageState) => UsageState): Promise<void> {
     return enqueue(async () => {
       await write(change(await load()))

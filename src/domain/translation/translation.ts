@@ -77,7 +77,9 @@ export function isErrorCode(value: unknown): value is ErrorCode {
 export class TranslationError extends Error {
   constructor(
     readonly code: ErrorCode,
-    message: string
+    message: string,
+    /** HTTP status of the response that caused the error, when there was one. */
+    readonly status?: number
   ) {
     super(message)
     this.name = 'TranslationError'

@@ -12,6 +12,7 @@ import {
   publicPreferences,
   type Preferences,
 } from '@/domain/settings/settings'
+import { requireIn } from '@/utils/requireIn'
 
 const PAGES = {
   editorial: {
@@ -100,18 +101,7 @@ export function mountSettingsPreview(container: HTMLElement) {
     </section>
   `
 
-  function required<T extends HTMLElement>(
-    selector: string,
-    constructor: { new (...args: never[]): T }
-  ): T {
-    const element = container.querySelector(selector)
-
-    if (!(element instanceof constructor)) {
-      throw new Error('Settings preview could not load.')
-    }
-
-    return element
-  }
+  const required = requireIn(container)
 
   const pages = required('.preview-pages', HTMLDivElement)
   const stage = required('.preview-stage', HTMLDivElement)

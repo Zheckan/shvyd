@@ -5,14 +5,14 @@ import { parseReleaseConfig } from '@/domain/settings/release-config'
 
 export async function build(
   local = false,
-  outputDirectory?: string
+  outputDirectory?: string,
+  managedAzureUrl: string = Bun.env.SHVYD_AZURE_PROXY_URL ??
+    DEFAULT_MANAGED_AZURE_URL
 ): Promise<void> {
   const root = resolve(import.meta.dir, '..')
   const output = outputDirectory ?? resolve(root, 'dist')
   await mkdir(output, { recursive: true })
-  const config = parseReleaseConfig({
-    managedAzureUrl: Bun.env.SHVYD_AZURE_PROXY_URL ?? DEFAULT_MANAGED_AZURE_URL,
-  })
+  const config = parseReleaseConfig({ managedAzureUrl })
 
   const result = await Bun.build({
     entrypoints: ['content.ts', 'background.ts', 'options.ts'].map((name) =>
@@ -29,7 +29,14 @@ export async function build(
     throw new Error(result.logs.map((log) => log.message).join('\n'))
   }
 
-  for (const name of ['manifest.json', 'options.html', 'options.css']) {
+  for (const name of [
+    'manifest.json',
+    'options.html',
+    'options.css',
+    'language-settings.css',
+    'usage.css',
+    'preview.css',
+  ]) {
     await copyFile(resolve(root, 'extension', name), resolve(output, name))
   }
 
