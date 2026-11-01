@@ -12,20 +12,24 @@ export function mountPlayground(): void {
   const adaptation = document.querySelector(
     '#demo-preferences [name="adaptToPage"]'
   )
+  const compact = document.querySelector(
+    '#demo-preferences [name="compactButton"]'
+  )
 
   if (
     !(dialog instanceof HTMLDialogElement) ||
     !languageContainer ||
     !(form instanceof HTMLFormElement) ||
     !status ||
-    !(adaptation instanceof HTMLInputElement)
+    !(adaptation instanceof HTMLInputElement) ||
+    !(compact instanceof HTMLInputElement)
   ) {
     throw new Error('Demo settings could not load.')
   }
 
   const languageSettings = mountLanguageSettings(languageContainer)
   // Hoisted function declarations below do not keep the checks above.
-  const controls = { dialog, status, adaptation }
+  const controls = { dialog, status, adaptation, compact }
 
   const client = createClient(async (request) => {
     if (isRecord(request) && request.kind === 'open-settings') {
@@ -68,6 +72,7 @@ export function mountPlayground(): void {
 
     languageSettings.fill(preferences)
     controls.adaptation.checked = preferences.adaptToPage
+    controls.compact.checked = preferences.compactButton
     controls.status.textContent = ''
     if (!controls.dialog.open) {
       controls.dialog.showModal()
@@ -92,6 +97,7 @@ export function mountPlayground(): void {
       const preferences = await client.updatePreferences({
         ...languageSettings.read(),
         adaptToPage: adaptation.checked,
+        compactButton: compact.checked,
       })
 
       languageSettings.fill(preferences)

@@ -156,6 +156,12 @@ export function createSettingsStore(storage: {
               isPopupAnchor,
               current.popupAnchor
             ),
+            compactButton: preferenceField(
+              value,
+              'compactButton',
+              isBoolean,
+              current.compactButton
+            ),
           })
         )
       )

@@ -107,7 +107,7 @@ def main():
 
             def completed(target=None):
                 expected = f" && r.querySelector('.translation').lang === {json.dumps(target)}" if target else ''
-                wait_for(lambda: page.evaluate("(() => {const r=document.getElementById('shvyd-root')?.shadowRoot,p=r?.querySelector('.panel');return p && !p.hidden && p.getAttribute('aria-busy')==='false' && (p.getAnimations().forEach(a=>a.finish()), true)" + expected + ";})()"), 'completed translation')
+                wait_for(lambda: page.evaluate("(() => {const r=document.getElementById('shvyd-root')?.shadowRoot,p=r?.querySelector('.panel');return p && !p.hidden && p.getAttribute('aria-busy')==='false' && (p.parentElement.getAnimations({subtree:true}).forEach(a=>a.finish()), true)" + expected + ";})()"), 'completed translation')
                 return page.evaluate("""(() => {
                   const root=document.getElementById('shvyd-root').shadowRoot;
                   const p=root.querySelector('.panel'), o=root.querySelector('.translation');

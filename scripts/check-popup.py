@@ -238,15 +238,38 @@ def main():
             page.evaluate("(()=>{const el=document.getElementById('short');el.style.marginTop=(innerHeight-260)+'px';return true})()")
             open_loading('short')
             worker.resolve(worker.pending.pop(0), LONG)
-            browser.wait_for(lambda: popup("return !root.querySelector('.translation').hidden && root.querySelector('.panel').getAnimations().length===0"), 'grown translation settled')
+            browser.wait_for(lambda: popup("return !root.querySelector('.translation').hidden && root.querySelector('.window').getAnimations({subtree:true}).length===0"), 'grown translation settled')
             edge = popup("const r=root.querySelector('.panel').getBoundingClientRect();return {top:Math.round(r.top),bottom:Math.round(r.bottom),viewport:innerHeight}")
             check('grown-popup-near-bottom-fits-viewport', edge['top'] >= 0 and edge['bottom'] <= edge['viewport'], edge)
             close_popup()
             page.evaluate("document.getElementById('short').style.marginTop=''; window.scrollTo(0, 0); true")
+
+            # 4c. A long selection opens at the size its translation will take, so the popup
+            # neither flips to the other side nor moves when the translation arrives.
+            # Before the size was measured, this popup opened below at 333 px and jumped above at 527 px.
+            def panel_rect():
+                return popup("const r=root.querySelector('.panel').getBoundingClientRect();return {top:Math.round(r.top),height:Math.round(r.height)}")
+
+            page.evaluate("(()=>{const el=document.getElementById('short');el.textContent='Prediction check. '+" + json.dumps(LONG + ' ' + LONG) + ";el.style.marginTop='150px';return true})()")
+            mouse('mousePressed', 700, 470)
+            mouse('mouseReleased', 700, 470, 0)
+            frames()
+            select_text('short')
+            popup("root.querySelector('.bubble').click(); return true")
+            browser.wait_for(lambda: worker.drain() >= 1, 'held prediction request')
+            frames()
+            predicted = panel_rect()
+            # A translation about as long as its source, like a translated YouTube description.
+            worker.resolve(worker.pending.pop(0), '\n\n'.join([LONG] * 2))
+            browser.wait_for(lambda: popup("return !root.querySelector('.translation').hidden && root.querySelector('.window').getAnimations({subtree:true}).length===0"), 'predicted translation settled')
+            arrived = panel_rect()
+            check('long-selection-opens-at-final-size-without-moving', abs(predicted['top'] - arrived['top']) <= 1 and abs(predicted['height'] - arrived['height']) <= 2, {'loading': predicted, 'final': arrived})
+            close_popup()
+            page.evaluate("(()=>{const el=document.getElementById('short');el.textContent=" + json.dumps(SHORT) + ";el.style.marginTop='';return true})()")
             # The long translation is cached now, so it appears without a request.
             select_text('long')
             popup("root.querySelector('.bubble').click(); return true")
-            browser.wait_for(lambda: popup("return !root.querySelector('.translation').hidden && root.querySelector('.panel').getAnimations().length===0"), 'cached translation')
+            browser.wait_for(lambda: popup("return !root.querySelector('.translation').hidden && root.querySelector('.window').getAnimations({subtree:true}).length===0"), 'cached translation')
 
             # 5. Selecting part of the translation keeps the popup open so it can be copied.
             text_box = popup("const r=root.querySelector('.translation').getBoundingClientRect();return {x:r.x,y:r.y,w:r.width}")
@@ -265,7 +288,7 @@ def main():
             page.evaluate("document.getElementById('short').textContent='Scroll edge title'; true")
             open_loading('short')
             worker.resolve(worker.pending.pop(0), '\n\n'.join([LONG] * 3))
-            browser.wait_for(lambda: popup("return !root.querySelector('.translation').hidden && root.querySelector('.panel').getAnimations().length===0"), 'scrolling translation settled')
+            browser.wait_for(lambda: popup("return !root.querySelector('.translation').hidden && root.querySelector('.window').getAnimations({subtree:true}).length===0"), 'scrolling translation settled')
 
             def edges(name):
                 page.evaluate('new Promise(r=>setTimeout(r,250))')
@@ -284,6 +307,91 @@ def main():
             popup("const t=root.querySelector('.translation');t.scrollTop=t.scrollHeight; return true")
             bottom = edges('bottom')
             check('translation-scrolled-to-the-end-has-no-bottom-fade', bottom['above'] and not bottom['below'], bottom)
+            close_popup()
+
+            # 6b. Every edge and corner resizes the window and keeps the opposite edges in place.
+            def panel_box():
+                return popup("const r=root.querySelector('.panel').getBoundingClientRect();return {left:Math.round(r.left),top:Math.round(r.top),right:Math.round(r.right),bottom:Math.round(r.bottom),width:Math.round(r.width),height:Math.round(r.height),sized:root.querySelector('.panel').hasAttribute('data-sized')}")
+
+            def center(selector):
+                return popup("const r=root.querySelector(" + json.dumps(selector) + ").getBoundingClientRect();return {x:r.x+r.width/2,y:r.y+r.height/2}")
+
+            def drag_by(selector, dx, dy):
+                point = center(selector)
+                drag(point['x'], point['y'], point['x'] + dx, point['y'] + dy)
+                frames()
+
+            def handle(name):
+                return f'.resize-handle[data-handle="{name}"]'
+
+            def open_cached_long():
+                select_text('long')
+                popup("root.querySelector('.bubble').click(); return true")
+                browser.wait_for(lambda: popup("return !root.querySelector('.translation').hidden && root.querySelector('.window').getAnimations({subtree:true}).length===0"), 'cached long translation')
+
+            open_cached_long()
+            default_width = panel_box()['width']
+            drag_by('.toolbar', -2000, -2000)
+            drag_by('.toolbar', 400, 200)
+            moves = {'right': (60, 0), 'bottom': (0, -40), 'left': (-50, 0), 'top': (0, -30),
+                     'top-left': (20, 20), 'top-right': (20, -20), 'bottom-left': (-20, 20), 'bottom-right': (30, 30)}
+            for name, (dx, dy) in moves.items():
+                before = panel_box()
+                drag_by(handle(name), dx, dy)
+                after = panel_box()
+                expected = dict(before)
+                if 'left' in name:
+                    expected['left'] += dx
+                if 'right' in name:
+                    expected['right'] += dx
+                if 'top' in name:
+                    expected['top'] += dy
+                if 'bottom' in name:
+                    expected['bottom'] += dy
+                matches = after['sized'] and all(abs(after[key] - expected[key]) <= 1 for key in ['left', 'top', 'right', 'bottom'])
+                check(f'resize-from-{name}', matches, {'before': before, 'after': after, 'move': [dx, dy]})
+            gap = popup("const p=root.querySelector('.panel').getBoundingClientRect(),t=root.querySelector('.translation').getBoundingClientRect();return Math.round(p.bottom-t.bottom)")
+            check('resized-text-fills-window', gap <= 2, {'textGapAtBottom': gap})
+            shot = page.call('Page.captureScreenshot', {'format': 'png'})
+            (OUTPUT / 'resized.png').write_bytes(base64.b64decode(shot['data']))
+            anchored = panel_box()
+            drag_by(handle('bottom-right'), -2000, -2000)
+            smallest = panel_box()
+            check('resized-window-keeps-minimum-size', smallest['width'] == 220 and smallest['height'] == 100 and smallest['left'] == anchored['left'], smallest)
+            drag_by(handle('top-left'), -5000, -5000)
+            largest = panel_box()
+            check('resized-window-stays-inside-viewport', largest['left'] == 12 and largest['top'] == 12 and largest['right'] == smallest['right'], largest)
+            grip = center(handle('right'))
+            for count in [1, 2]:
+                for kind in ['mousePressed', 'mouseReleased']:
+                    page.call('Input.dispatchMouseEvent', {'type': kind, **grip, 'button': 'left', 'buttons': 1 if kind == 'mousePressed' else 0, 'clickCount': count})
+            frames()
+            restored = panel_box()
+            check('double-click-on-edge-restores-default-size', not restored['sized'] and restored['width'] == default_width, restored)
+            drag_by(handle('bottom-right'), 80, 80)
+            close_popup()
+            open_cached_long()
+            reopened = panel_box()
+            check('new-popup-resets-manual-size', not reopened['sized'] and reopened['width'] == default_width, reopened)
+            close_popup()
+
+            # 6c. The Translate button shows only its icon by default; the toolbar menu brings back the word.
+            def bubble_state():
+                return popup("const b=root.querySelector('.bubble'),r=b.getBoundingClientRect();return {compact:b.classList.contains('compact'),labelShown:getComputedStyle(b.querySelector('.bubble-label')).display!=='none',width:Math.round(r.width),height:Math.round(r.height),name:b.getAttribute('aria-label')}")
+
+            select_text('short')
+            icon_only = bubble_state()
+            check('translate-button-is-icon-only-by-default', icon_only['compact'] and not icon_only['labelShown'] and icon_only['width'] == icon_only['height'] and icon_only['name'] == 'Translate selected text', icon_only)
+            box = popup("const b=root.querySelector('.bubble').getBoundingClientRect();return {x:b.x-12,y:b.y-12,width:b.width+24,height:b.height+24}")
+            shot = page.call('Page.captureScreenshot', {'format': 'png', 'clip': {**box, 'scale': 2}})
+            (OUTPUT / 'button-icon-only.png').write_bytes(base64.b64decode(shot['data']))
+            menu.evaluate("document.getElementById('quick-compact').click(), true")
+            browser.wait_for(lambda: menu.evaluate("!document.getElementById('quick-compact').checked && !document.getElementById('quick-status').textContent"), 'menu saved full button')
+            browser.wait_for(lambda: bubble_state()['labelShown'], 'visible button shows its label')
+            labeled = bubble_state()
+            check('visible-button-follows-compact-change', not labeled['compact'] and labeled['width'] > icon_only['width'] + 30 and labeled['height'] == icon_only['height'], labeled)
+            menu.evaluate("document.getElementById('quick-compact').click(), true")
+            browser.wait_for(lambda: menu.evaluate("document.getElementById('quick-compact').checked"), 'menu restored icon-only button')
             close_popup()
 
             # 7. Links colored on an inner span (as on X) set the accent, not the browser's default link color.

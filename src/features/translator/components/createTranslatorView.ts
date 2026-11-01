@@ -1,9 +1,11 @@
+import { RESIZE_HANDLES } from '../logic/resizePanel'
 import { TRANSLATOR_STYLES } from '../translatorStyles'
 import type { createLanguagePicker } from './createLanguagePicker'
 import { icon, make } from './elements'
 
+/** Heroicons "language", outline 24 px. MIT license; see THIRD_PARTY_NOTICES. */
 const TRANSLATE_ICON =
-  'M4 5h11M10 3v2M6 5c0 6 5 9 9 11M14 5c0 6-5 9-10 11M14 21l4-10 4 10M15.5 17h5'
+  'm10.5 21 5.25-11.25L21 21m-9-3h7.5M3 5.621a48.474 48.474 0 0 1 6-.371m0 0c1.12 0 2.233.038 3.334.114M9 5.25V3m3.334 2.364C11.176 10.658 7.69 15.08 3 17.502m9.334-12.138c.896.061 1.785.147 2.666.257m-4.589 8.495a18.023 18.023 0 0 1-3.827-5.802'
 const COPY_ICON = 'M8 8h12v13H8zM16 8V3H3v13h5'
 const CLOSE_ICON = 'M6 6l12 12M18 6 6 18'
 
@@ -62,7 +64,7 @@ export function createTranslatorView(
   const bubble = make('button', 'bubble')
   bubble.type = 'button'
   bubble.setAttribute('aria-label', 'Translate selected text')
-  bubble.append(icon(TRANSLATE_ICON), document.createTextNode('Translate'))
+  bubble.append(icon(TRANSLATE_ICON), make('span', 'bubble-label', 'Translate'))
 
   const copy = iconButton('Copy translation', 'Copy translation', COPY_ICON)
   const closeButton = iconButton('Close translation', 'Close', CLOSE_ICON)
@@ -79,6 +81,11 @@ export function createTranslatorView(
   const output = make('div', 'translation')
   output.setAttribute('aria-live', 'polite')
 
+  // A hidden copy of the text box for measuring the selected text before its
+  // translation arrives. Kept out of the live region so nothing is announced.
+  const measure = make('div', 'translation measure')
+  measure.setAttribute('aria-hidden', 'true')
+
   const status = make('div', 'status')
   status.setAttribute('role', 'status')
 
@@ -90,26 +97,42 @@ export function createTranslatorView(
   const panel = make('section', 'panel')
   panel.setAttribute('role', 'dialog')
   panel.setAttribute('aria-label', 'Selected text translation')
-  panel.append(toolbar, loading, output, status, actions)
+  panel.append(toolbar, loading, output, status, actions, measure)
+
+  // Pointer-only, like moving the window by its toolbar. The handles reach past
+  // the panel's border, so they sit beside it, outside its scroll clipping.
+  const resizeHandles = RESIZE_HANDLES.map((handle) => {
+    const element = make('div', 'resize-handle')
+    element.dataset.handle = handle
+    element.setAttribute('aria-hidden', 'true')
+
+    return { handle, element }
+  })
+
+  const frame = make('div', 'window')
+  frame.append(panel, ...resizeHandles.map(({ element }) => element))
 
   bubble.hidden = true
   panel.hidden = true
-  root.append(style, bubble, panel, picker.menu)
+  root.append(style, bubble, frame, picker.menu)
   document.documentElement.append(host)
 
   return {
     host,
     root,
     bubble,
+    frame,
     panel,
     toolbar,
     copy,
     closeButton,
     loading,
     output,
+    measure,
     status,
     actions,
     retry,
     settings,
+    resizeHandles,
   }
 }

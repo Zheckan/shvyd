@@ -62,6 +62,85 @@ export const TRANSLATOR_STYLES = `
     overflow: auto;
     overscroll-behavior: contain;
   }
+  /* After a manual resize the text fills the chosen height and scrolls inside. */
+  .panel[data-sized] {
+    display: flex;
+    flex-direction: column;
+  }
+  .panel[data-sized] > * {
+    flex-shrink: 0;
+  }
+  .panel[data-sized] .translation,
+  .panel[data-sized] .loading {
+    flex: 1 1 auto;
+    min-height: 0;
+    max-height: none;
+  }
+  .panel[data-sized] .loading {
+    overflow: hidden;
+  }
+  .measure {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    visibility: hidden;
+    pointer-events: none;
+  }
+  /* Positioned box around the panel and its resize handles. */
+  .window {
+    position: fixed;
+  }
+  .window:has(> .panel[hidden]) {
+    display: none;
+  }
+  .window > .panel {
+    position: relative;
+  }
+  /* Each handle reaches 5 px past the border and 3 px into the panel. */
+  .resize-handle {
+    position: absolute;
+    z-index: 1;
+    touch-action: none;
+  }
+  .resize-handle[data-handle="top"],
+  .resize-handle[data-handle="bottom"] {
+    left: 9px;
+    right: 9px;
+    height: 8px;
+    cursor: ns-resize;
+  }
+  .resize-handle[data-handle="left"],
+  .resize-handle[data-handle="right"] {
+    top: 9px;
+    bottom: 9px;
+    width: 8px;
+    cursor: ew-resize;
+  }
+  .resize-handle[data-handle*="-"] {
+    width: 14px;
+    height: 14px;
+  }
+  .resize-handle[data-handle="top-left"],
+  .resize-handle[data-handle="bottom-right"] {
+    cursor: nwse-resize;
+  }
+  .resize-handle[data-handle="top-right"],
+  .resize-handle[data-handle="bottom-left"] {
+    cursor: nesw-resize;
+  }
+  .resize-handle[data-handle^="top"] {
+    top: -5px;
+  }
+  .resize-handle[data-handle^="bottom"] {
+    bottom: -5px;
+  }
+  .resize-handle[data-handle$="left"] {
+    left: -5px;
+  }
+  .resize-handle[data-handle$="right"] {
+    right: -5px;
+  }
   .toolbar {
     display: flex;
     align-items: center;
@@ -336,13 +415,17 @@ export const TRANSLATOR_STYLES = `
     color: var(--shvyd-accent);
     font-size: 13px;
   }
-  /* Same box as .translation: each placeholder line takes one 24 px text line. */
+  /*
+   * The loading box gets the predicted height of the translation. Each
+   * placeholder line sits in the middle of one 24 px text line of .translation.
+   */
   .loading {
-    padding: 6px 17px 18px;
+    padding: 13px 17px 0;
+    overflow: hidden;
   }
   .line {
     height: 10px;
-    margin: 7px 0;
+    margin: 0 0 14px;
     border-radius: 3px;
     background: color-mix(in srgb, var(--shvyd-foreground) 10%, transparent);
   }
@@ -357,5 +440,12 @@ export const TRANSLATOR_STYLES = `
     overflow: hidden;
     white-space: nowrap;
     clip-path: inset(50%);
+  }
+  /* Compact Translate button: the icon alone, in a square button. */
+  .bubble.compact {
+    padding: 8px;
+  }
+  .bubble.compact .bubble-label {
+    display: none;
   }
 `

@@ -16,6 +16,8 @@ export type Preferences = {
   defaultTarget: Language
   /** Place the button and popup by the cursor, or at the end of the selection. */
   popupAnchor: PopupAnchor
+  /** The Translate button shows only its icon, without the word. */
+  compactButton: boolean
 }
 
 export type PopupAnchor = 'cursor' | 'selection'
@@ -43,6 +45,7 @@ export const DEFAULT_SETTINGS: Settings = {
   targetMode: 'last',
   defaultTarget: 'uk',
   popupAnchor: 'cursor',
+  compactButton: true,
   azure: { key: '', region: '' },
   deepl: { key: '', endpoint: 'https://api-free.deepl.com' },
 }
@@ -77,8 +80,10 @@ export function parsePreferences(value: unknown): Preferences {
   const targetMode = value.targetMode ?? 'last'
   const defaultTarget = value.defaultTarget ?? 'uk'
   const popupAnchor = value.popupAnchor ?? DEFAULT_SETTINGS.popupAnchor
+  const compactButton = value.compactButton ?? DEFAULT_SETTINGS.compactButton
   if (
     !isPopupAnchor(popupAnchor) ||
+    typeof compactButton !== 'boolean' ||
     typeof showOtherLanguages !== 'boolean' ||
     (targetMode !== 'last' && targetMode !== 'fixed') ||
     !isLanguage(defaultTarget)
@@ -103,6 +108,7 @@ export function parsePreferences(value: unknown): Preferences {
       ? defaultTarget
       : fallback,
     popupAnchor,
+    compactButton,
   }
 }
 
@@ -199,6 +205,7 @@ export function publicPreferences(settings: Settings): Preferences {
     targetMode: settings.targetMode,
     defaultTarget: settings.defaultTarget,
     popupAnchor: settings.popupAnchor,
+    compactButton: settings.compactButton,
   }
 }
 

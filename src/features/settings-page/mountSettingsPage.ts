@@ -128,6 +128,7 @@ export function mountSettingsPage(
     selectRadio('provider', settings.provider)
     languageSettings.fill(settings)
     input('adaptToPage').checked = settings.adaptToPage
+    input('compactButton').checked = settings.compactButton
     selectRadio('popupAnchor', settings.popupAnchor)
     input('azureKey').value = settings.azure.key
     input('azureRegion').value = settings.azure.region
@@ -142,6 +143,7 @@ export function mountSettingsPage(
       ...languageSettings.read(),
       provider: radio('provider'),
       adaptToPage: input('adaptToPage').checked,
+      compactButton: input('compactButton').checked,
       popupAnchor: radio('popupAnchor'),
       azure: {
         key: input('azureKey').value,
@@ -225,6 +227,7 @@ export function mountSettingsPage(
   }
 
   input('adaptToPage').addEventListener('change', changed)
+  input('compactButton').addEventListener('change', changed)
 
   for (const element of form.querySelectorAll<HTMLInputElement>(
     '[name=popupAnchor]'
@@ -340,6 +343,7 @@ export function mountSettingsPage(
         ...languageSettings.read(),
         provider: radio('provider'),
         adaptToPage: input('adaptToPage').checked,
+        compactButton: input('compactButton').checked,
         popupAnchor: radio('popupAnchor'),
         azure: imported.azure,
         deepl: imported.deepl,

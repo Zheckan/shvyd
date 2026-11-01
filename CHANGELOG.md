@@ -9,6 +9,8 @@ credential-free ZIP built with `bun run package`.
 
 - **Toolbar menu:** clicking the Shvyd icon opens quick settings in the style of the settings page: show or hide Shvyd on the current site, provider, target language, popup position, page style, and a link to all settings. Changes reach open tabs without a reload.
 - **Don't show on this site:** from the toolbar menu. Open tabs on that site drop Shvyd at once, embedded frames follow their page, and turning it back on works without a reload. Settings → Hidden on these sites lists them, with **Show again**.
+- **Compact Translate button**, on by default: the button shows only its icon, now the Heroicons "language" icon (MIT, credited in `THIRD_PARTY_NOTICES`). Turn it off in the toolbar menu or settings to show the word Translate too. A visible button follows the change at once.
+- **Resizable popup:** drag any edge or corner. The opposite edges stay put, the text fills the new size, the window stays inside the viewport, and a double-click on an edge restores the default size. Each new popup starts at the default size.
 - **Popup position:** next to the cursor (default) or at the end of the selection, in the toolbar menu and settings. Keyboard selections use the end of the selection.
 - Local usage counts per day and route: Azure included access, Azure with your own key, and DeepL. Shows requests, characters, reused results, failures, and uncertain timeouts for today and the last 7, 30, and 90 days.
 - DeepL allowance check using the saved key. Uses no characters.
@@ -21,7 +23,7 @@ credential-free ZIP built with `bun run package`.
 ### Changed
 
 - The Translate button appears next to the selection in text fields and on pages that re-render selected text, instead of the top-left corner. Plain text fields, search fields, and text areas can be translated; password and other input types never offer translation.
-- While loading, the placeholder matches the expected length of the translation, the popup opens with a short fade, and its height eases to the final size. No scroll bar appears while loading, and scroll bars follow the popup's light or dark surface.
+- While loading, the placeholder is as tall as the translation will likely be: the selected text is laid out in a hidden copy of the text box, plus about 15% for longer translations, up to the box's scrolling height. The popup keeps the side of the selection it opened on, so a long translation no longer makes it jump across the selection. It opens with a short fade, and its height and position ease to the final size. No scroll bar appears while loading, and scroll bars follow the popup's light or dark surface.
 - You can select and copy part of a translation without the popup closing.
 - Lines and blank lines that a page draws from plain line breaks, such as YouTube descriptions, stay separate in the translation instead of running into one paragraph.
 - The popup's accent follows the color of the page's link text. On X it was lavender, the browser's default link color.

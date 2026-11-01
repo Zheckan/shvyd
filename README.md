@@ -6,7 +6,7 @@ The popup uses consistent SF Pro / system typography with 15 px translation text
 
 Click the Shvyd icon in the browser toolbar for quick settings: turn Shvyd off or back on for the current site, pick the provider and target language, choose whether the popup appears next to the cursor or at the end of the selection, and open all settings. Changes reach open tabs immediately. A site turned off stays off, including in embedded frames, until you turn it back on there or under **Hidden on these sites** in settings.
 
-Drag the empty space in the popup's top bar to move it. The window stays inside the viewport, keeps its position when you change languages, and moves its language menu with it. Each new popup starts beside the selected text again. Selected underlined text, including underlined links, keeps its underline in the translation.
+Drag the empty space in the popup's top bar to move it. The window stays inside the viewport, keeps its position when you change languages, and moves its language menu with it. Drag any edge or corner to resize it; the opposite edges stay put, the text fills the new size, and a double-click on an edge restores the default. Each new popup starts beside the selected text at the default size again. The Translate button shows only its icon; turn off **Compact Translate button** in the toolbar menu or settings to show the word too. Selected underlined text, including underlined links, keeps its underline in the translation.
 
 Selected paragraphs, headings, emphasis, lists, and table cells keep their structure in the translation. Code stays unchanged. The Copy button keeps paragraph breaks, list markers, and table columns as plain text. This uses one provider request; see [selection formatting](docs/formatting.md).
 
@@ -74,7 +74,7 @@ Run the reliability checks without provider keys or a playground server:
 bun run test:reliability
 ```
 
-`bun run test:popup` checks the button's position in text fields, that password fields never offer translation, loading size and scroll bars, a popup that grows near the bottom edge, and selecting part of a translation. Results stay in `.preview/popup-check/`.
+`bun run test:popup` checks the button's position in text fields, that password fields never offer translation, loading size and scroll bars, a popup that grows near the bottom edge, selecting part of a translation, resizing from every edge and corner, and the icon-only Translate button. Results stay in `.preview/popup-check/`.
 
 The reliability check builds the extension and checks delayed replies, language-save failures, rapid target changes, closing, network retry, error classifications, an actual background-worker restart, persistent usage counts, and redacted error-record export in an isolated Helium profile. It requires Helium and Python's `websocket-client`. Results stay in `.preview/reliability-check/`. These browser checks run locally; CI runs the unit tests. See [request reliability](docs/translation-reliability.md) for cache behavior and verification details.
 

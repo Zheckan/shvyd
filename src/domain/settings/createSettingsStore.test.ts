@@ -243,3 +243,25 @@ test('saving some fields keeps newer changes to the others', async () => {
   })
   await expect(store.save(['adaptToPage'])).rejects.toThrow()
 })
+
+test('the Translate button shows only its icon by default, and the choice is saved', async () => {
+  const { compactButton: _removed, ...older } = DEFAULT_SETTINGS
+  let persisted: unknown = structuredClone(older)
+  const storage = {
+    read: async () => persisted,
+    write: async (value: unknown) => {
+      persisted = structuredClone(value)
+    },
+  }
+
+  const store = createSettingsStore(storage)
+  expect((await store.preferences()).compactButton).toBe(true)
+
+  await store.updatePreferences({ compactButton: false })
+  expect((await createSettingsStore(storage).preferences()).compactButton).toBe(
+    false
+  )
+  await expect(
+    store.updatePreferences({ compactButton: 'yes' })
+  ).rejects.toThrow()
+})

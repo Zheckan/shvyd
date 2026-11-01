@@ -14,7 +14,6 @@ import type { TranslationClient } from '@/domain/translation/translation-client'
 import { createLanguagePicker } from './components/createLanguagePicker'
 import { createTranslatorView } from './components/createTranslatorView'
 import { copyTranslation } from './logic/copyTranslation'
-import { estimateLines } from './logic/estimateLines'
 import { renderTranslation } from './logic/formatted-text'
 import {
   isSameSelection,
@@ -23,6 +22,13 @@ import {
   type PageSelection,
 } from './logic/readPageSelection'
 import { applyPageStyle, samplePageStyle } from './logic/page-style'
+import { predictTextBox } from './logic/predictTextBox'
+import {
+  resizePanel,
+  type Rect,
+  type ResizeHandle,
+  type Size,
+} from './logic/resizePanel'
 import { scrollEdges } from './logic/scrollEdges'
 
 /** Minimum distance between the popup and the viewport edge. */
@@ -31,8 +37,10 @@ const VIEWPORT_MARGIN = 12
 const SELECTION_GAP = 9
 /** Distance from the cursor to the button or popup corner, clear of the pointer. */
 const CURSOR_GAP = 12
-/** Horizontal padding inside the translation text block. */
-const TEXT_PADDING_PX = 34
+/** Translations into Ukrainian, Polish, or German usually run a little longer. */
+const TRANSLATION_EXPANSION = 1.15
+/** Smallest window a resize allows: the toolbar and two lines of text. */
+const MIN_PANEL_SIZE: Size = { width: 220, height: 100 }
 const RESIZE_MS = 200
 const OPEN_MS = 140
 
@@ -42,6 +50,16 @@ type DragOrigin = {
   pointerY: number
   left: number
   top: number
+}
+
+type ResizeOrigin = {
+  pointerId: number
+  pointerX: number
+  pointerY: number
+  handle: ResizeHandle
+  element: HTMLElement
+  /** The panel's box when the resize started. */
+  start: Rect
 }
 
 function clamp(value: number, min: number, max: number): number {
@@ -117,16 +135,19 @@ function startTranslator(client: TranslationClient): Translator {
     host,
     root,
     bubble,
+    frame: panelFrame,
     panel,
     toolbar,
     copy,
     closeButton,
     loading,
     output,
+    measure,
     status,
     actions,
     retry,
     settings,
+    resizeHandles,
   } = createTranslatorView(picker)
 
   let preferences = publicPreferences(DEFAULT_SETTINGS)
@@ -149,18 +170,36 @@ function startTranslator(client: TranslationClient): Translator {
   let frame = 0
   let resizeFrame = 0
   let panelPosition: { x: number; y: number } | undefined
+  /** Side of the selection the open popup took; kept until it closes. */
+  let panelSide: 'below' | 'above' | undefined
   let dragOrigin: DragOrigin | undefined
+  /** Size chosen by resizing; the popup's content decides otherwise. */
+  let panelSize: Size | undefined
+  let resizeOrigin: ResizeOrigin | undefined
 
   picker.update({ preferences, target: initialTarget(preferences) })
   void client
     .preferences()
     .then((value) => {
       if (panel.hidden) {
-        preferences = value
+        setPreferences(value)
         picker.update({ preferences, target: initialTarget(preferences) })
       }
     })
     .catch(() => undefined)
+
+  /** Saves `value` and restyles a visible Translate button. */
+  function setPreferences(value: Preferences): void {
+    const compactChanged = value.compactButton !== preferences.compactButton
+    preferences = value
+
+    bubble.classList.toggle('compact', preferences.compactButton)
+    bubble.title = preferences.compactButton ? 'Translate' : ''
+
+    if (compactChanged && !bubble.hidden) {
+      position(bubble)
+    }
+  }
 
   // Visibility and layout
 
@@ -182,12 +221,15 @@ function startTranslator(client: TranslationClient): Translator {
     // Once the popup closes, a selection can no longer belong to it.
     pointerInside = false
 
-    for (const animation of panel.getAnimations()) {
+    for (const animation of panelFrame.getAnimations({ subtree: true })) {
       animation.cancel()
     }
 
     endDrag()
+    endResize()
+    applySize(undefined)
     panelPosition = undefined
+    panelSide = undefined
     generation++
     bubble.hidden = true
     panel.hidden = true
@@ -224,7 +266,16 @@ function startTranslator(client: TranslationClient): Translator {
     // By the cursor the popup starts beside it; at a selection it ends with it.
     let x = cursor ? anchor.left + gap : anchor.right - width
     let y = anchor.bottom + gap
-    if (y + height > window.innerHeight - VIEWPORT_MARGIN) {
+    let below = y + height <= window.innerHeight - VIEWPORT_MARGIN
+
+    // An open popup keeps its side, so a translation taller or shorter than
+    // predicted cannot flip it across the selection.
+    if (element === panel) {
+      below = panelSide ? panelSide === 'below' : below
+      panelSide = below ? 'below' : 'above'
+    }
+
+    if (!below) {
       y = anchor.top - height - gap
     }
 
@@ -235,8 +286,10 @@ function startTranslator(client: TranslationClient): Translator {
 
     x = clamp(x, VIEWPORT_MARGIN, window.innerWidth - width - VIEWPORT_MARGIN)
     y = clamp(y, VIEWPORT_MARGIN, window.innerHeight - height - VIEWPORT_MARGIN)
-    element.style.left = `${x}px`
-    element.style.top = `${y}px`
+    // The panel moves inside a frame that also holds its resize handles.
+    const box = element === panel ? panelFrame : element
+    box.style.left = `${x}px`
+    box.style.top = `${y}px`
 
     if (element === panel) {
       if (panelPosition) {
@@ -324,11 +377,37 @@ function startTranslator(client: TranslationClient): Translator {
 
   const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)')
 
-  /** Placeholder lines sized to the expected translation, not a fixed block. */
+  /**
+   * Draws placeholder lines in a box as tall as the translation will likely be:
+   * the selected text laid out in a hidden copy of the text box, a little longer.
+   */
   function renderSkeleton(): void {
-    const width = panel.clientWidth - TEXT_PADDING_PX
-    const estimate = estimateLines(selected?.text ?? '', width)
-    const lines = Array.from({ length: estimate.lines }, () =>
+    renderTranslation(
+      measure,
+      selected?.content ?? { text: '', format: 'plain' }
+    )
+
+    const style = getComputedStyle(measure)
+    const maxHeight = parseFloat(style.maxHeight)
+    const textWidth =
+      measure.clientWidth -
+      parseFloat(style.paddingLeft) -
+      parseFloat(style.paddingRight)
+    const range = document.createRange()
+    range.selectNodeContents(measure)
+    const lastLine = [...range.getClientRects()].at(-1)
+    const prediction = predictTextBox({
+      sourceHeight: measure.scrollHeight,
+      padding: parseFloat(style.paddingTop) + parseFloat(style.paddingBottom),
+      lineHeight: parseFloat(style.lineHeight),
+      maxHeight: Number.isNaN(maxHeight) ? Infinity : maxHeight,
+      expansion: TRANSLATION_EXPANSION,
+      lastLineRatio: lastLine && textWidth > 0 ? lastLine.width / textWidth : 1,
+    })
+
+    measure.replaceChildren()
+
+    const lines = Array.from({ length: prediction.lines }, () =>
       document.createElement('div')
     )
 
@@ -340,9 +419,16 @@ function startTranslator(client: TranslationClient): Translator {
       .at(-1)
       ?.style.setProperty(
         'width',
-        `${Math.round(estimate.lastLineWidth * 100)}%`
+        `${Math.round(prediction.lastLineWidth * 100)}%`
       )
     loading.replaceChildren(...lines)
+
+    // A resized panel already has its height; the placeholder fills it instead.
+    if (panelSize) {
+      loading.style.removeProperty('height')
+    } else {
+      loading.style.height = `${prediction.height}px`
+    }
   }
 
   /** Fades the edges of the translation that hide text and outlines the toolbar. */
@@ -355,22 +441,43 @@ function startTranslator(client: TranslationClient): Translator {
     panel.toggleAttribute('data-below', edges.below)
   }
 
-  /** Applies `update`, then eases the panel from its old height to the new one. */
+  /**
+   * Applies `update`, then eases the panel from its old height and place to
+   * the new ones. Above the selection a height change also moves the top edge.
+   */
   function resizeSmoothly(update: () => void): void {
-    const before = panel.getBoundingClientRect().height
+    const before = panel.getBoundingClientRect()
     update()
     position(panel)
-    const after = panel.getBoundingClientRect().height
+    const after = panel.getBoundingClientRect()
+    const options = {
+      duration: RESIZE_MS,
+      easing: 'cubic-bezier(0.2, 0.8, 0.2, 1)',
+    }
 
-    if (reducedMotion.matches || panel.hidden || Math.abs(after - before) < 2) {
+    if (reducedMotion.matches || panel.hidden) {
+      return
+    }
+
+    if (Math.abs(after.top - before.top) >= 1) {
+      panelFrame.animate(
+        [
+          { transform: `translateY(${before.top - after.top}px)` },
+          { transform: 'none' },
+        ],
+        options
+      )
+    }
+
+    if (Math.abs(after.height - before.height) < 2) {
       return
     }
 
     panel.style.overflow = 'hidden'
-    panelTargetHeight = after
+    panelTargetHeight = after.height
     const animation = panel.animate(
-      [{ height: `${before}px` }, { height: `${after}px` }],
-      { duration: RESIZE_MS, easing: 'cubic-bezier(0.2, 0.8, 0.2, 1)' }
+      [{ height: `${before.height}px` }, { height: `${after.height}px` }],
+      options
     )
     const restore = () => {
       panelTargetHeight = undefined
@@ -429,7 +536,7 @@ function startTranslator(client: TranslationClient): Translator {
     position(panel)
 
     try {
-      preferences = await client.preferences()
+      setPreferences(await client.preferences())
       if (isStale()) {
         return
       }
@@ -510,7 +617,7 @@ function startTranslator(client: TranslationClient): Translator {
 
     try {
       if (preferences.targetMode === 'last') {
-        preferences = await client.updatePreferences({ target: code })
+        setPreferences(await client.updatePreferences({ target: code }))
       }
 
       if (choice !== choiceGeneration || !selected) {
@@ -582,6 +689,98 @@ function startTranslator(client: TranslationClient): Translator {
     }
   }
 
+  // Resizing
+
+  function applySize(size: Size | undefined): void {
+    panelSize = size
+    panel.toggleAttribute('data-sized', size !== undefined)
+
+    if (size) {
+      panel.style.width = `${size.width}px`
+      panel.style.height = `${size.height}px`
+    } else {
+      panel.style.removeProperty('width')
+      panel.style.removeProperty('height')
+    }
+  }
+
+  function startResize(
+    event: PointerEvent,
+    handle: ResizeHandle,
+    element: HTMLElement
+  ): void {
+    if (event.button !== 0 || !event.isPrimary || panel.hidden) {
+      return
+    }
+
+    event.preventDefault()
+
+    // A running height animation would fight the size the pointer sets.
+    for (const animation of panelFrame.getAnimations({ subtree: true })) {
+      animation.cancel()
+    }
+
+    const bounds = panel.getBoundingClientRect()
+    panelPosition = { x: bounds.left, y: bounds.top }
+    resizeOrigin = {
+      pointerId: event.pointerId,
+      pointerX: event.clientX,
+      pointerY: event.clientY,
+      handle,
+      element,
+      start: {
+        x: bounds.left,
+        y: bounds.top,
+        width: panelSize?.width ?? bounds.width,
+        height: panelSize?.height ?? bounds.height,
+      },
+    }
+
+    element.setPointerCapture(event.pointerId)
+  }
+
+  function moveResize(event: PointerEvent): void {
+    if (!resizeOrigin || event.pointerId !== resizeOrigin.pointerId) {
+      return
+    }
+
+    const box = resizePanel({
+      start: resizeOrigin.start,
+      handle: resizeOrigin.handle,
+      delta: {
+        x: event.clientX - resizeOrigin.pointerX,
+        y: event.clientY - resizeOrigin.pointerY,
+      },
+      viewport: { width: window.innerWidth, height: window.innerHeight },
+      minimum: MIN_PANEL_SIZE,
+      margin: VIEWPORT_MARGIN,
+    })
+
+    panelPosition = { x: box.x, y: box.y }
+    applySize({ width: box.width, height: box.height })
+    position(panel)
+    markScrollEdges()
+  }
+
+  function endResize(): void {
+    if (!resizeOrigin) {
+      return
+    }
+
+    const { pointerId, element } = resizeOrigin
+    resizeOrigin = undefined
+    if (element.hasPointerCapture(pointerId)) {
+      element.releasePointerCapture(pointerId)
+    }
+  }
+
+  function resetSize(): void {
+    endResize()
+    applySize(undefined)
+    position(panel)
+    markScrollEdges()
+  }
+
   // Popup controls
 
   bubble.addEventListener('pointerdown', (event) => event.preventDefault())
@@ -625,7 +824,22 @@ function startTranslator(client: TranslationClient): Translator {
     toolbar.addEventListener(name, endDrag, listen)
   }
 
+  for (const { handle, element } of resizeHandles) {
+    element.addEventListener(
+      'pointerdown',
+      (event) => startResize(event, handle, element),
+      listen
+    )
+    element.addEventListener('pointermove', moveResize, listen)
+    for (const name of ['pointerup', 'pointercancel', 'lostpointercapture']) {
+      element.addEventListener(name, endResize, listen)
+    }
+
+    element.addEventListener('dblclick', resetSize, listen)
+  }
+
   window.addEventListener('blur', endDrag, listen)
+  window.addEventListener('blur', endResize, listen)
   output.addEventListener('scroll', markScrollEdges, {
     passive: true,
     signal: events.signal,
@@ -640,6 +854,7 @@ function startTranslator(client: TranslationClient): Translator {
         const path = event.composedPath()
         if (
           !dragOrigin &&
+          !resizeOrigin &&
           !path.includes(picker.menu) &&
           !path.includes(picker.button)
         ) {
@@ -744,7 +959,7 @@ function startTranslator(client: TranslationClient): Translator {
   return {
     stop,
     applyPreferences: (value) => {
-      preferences = value
+      setPreferences(value)
 
       if (panel.hidden) {
         picker.update({ preferences, target: initialTarget(preferences) })
