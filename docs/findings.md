@@ -99,6 +99,11 @@ confusion, and non-obvious constraints.
   Chrome Web Store rejects uploads whose manifest has `key`, hence
   `bun run package --store`. A relay 403 still reads as included access being
   unavailable, not as a rejected key.
+- YouTube descriptions are one `pre-wrap` span with `\n` characters. Copied
+  into HTML, those newlines collapse into spaces at the provider and in the
+  popup. Selection capture turns newlines into `<br>` when the text's parent has
+  `white-space-collapse` of `preserve`, `preserve-breaks`, or `break-spaces`
+  (outside `pre`/`code`). Azure and DeepL both return the `<br>` tags unchanged.
 - Sites such as X color a link's inner `span` and leave the `<a>` at the
   browser default, which is `#9e9eff` (lavender) on `color-scheme: dark` pages.
   The popup accent comes from the parent of the link's first visible text node.
