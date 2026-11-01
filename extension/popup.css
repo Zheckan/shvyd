@@ -1,0 +1,47 @@
+/* Toolbar menu. Uses the tokens and controls from options.css. */
+body.quick {
+  width: 340px;
+  margin: 0;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  background: var(--card);
+}
+.quick-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 15px;
+}
+.quick-header .badge {
+  margin-left: auto;
+}
+.quick-site strong {
+  overflow-wrap: anywhere;
+}
+.quick hr {
+  margin: 0;
+}
+.quick-fields {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.quick-row {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.quick-row .segments {
+  height: 34px;
+}
+.quick-row select {
+  width: 100%;
+}
+.quick-open {
+  width: 100%;
+}
+#quick-status:empty {
+  display: none;
+}

@@ -18,7 +18,8 @@
   ],
   "background": { "service_worker": "background.js" },
   "action": {
-    "default_title": "Shvyd settings",
+    "default_title": "Shvyd",
+    "default_popup": "popup.html",
     "default_icon": {
       "16": "icons/icon16.png",
       "32": "icons/icon32.png"

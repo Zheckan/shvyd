@@ -102,6 +102,26 @@
                 >
                 <input class="switch" name="adaptToPage" type="checkbox" />
               </label>
+              <hr />
+              <fieldset class="popup-anchor-fieldset">
+                <legend>Show the popup</legend>
+                <div class="segments">
+                  <label
+                    ><input
+                      type="radio"
+                      name="popupAnchor"
+                      value="cursor"
+                    /><span>Next to cursor</span></label
+                  >
+                  <label
+                    ><input
+                      type="radio"
+                      name="popupAnchor"
+                      value="selection"
+                    /><span>End of selection</span></label
+                  >
+                </div>
+              </fieldset>
             </section>
             <section class="card" aria-labelledby="languages-heading">
               <h2 id="languages-heading">Languages</h2>
@@ -399,8 +419,8 @@
           </div>
           <ul id="hidden-site-list" class="site-list" hidden></ul>
           <p id="hidden-sites-empty" class="hint">
-            Shvyd shows on every site. To turn it off on one, open a translation
-            there and choose the crossed-out eye.
+            Shvyd shows on every site. To turn it off on one, open that site and
+            click the Shvyd icon in the browser toolbar.
           </p>
         </section>
         <p class="privacy-note">

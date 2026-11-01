@@ -21,7 +21,7 @@ works only when loaded from the maintainer's `dist/` folder. Anywhere else the
 popup says included access is unavailable; add your own Azure key in settings.
 Pinning one ID for every install needs a relay update first; see
 [releasing](releasing.md). To use DeepL or your own Azure
-key, click the Shvyd toolbar icon to open settings.
+key, click the Shvyd toolbar icon and choose **All settings**.
 
 ## Update
 
@@ -51,7 +51,7 @@ settings.
 
 ## Turn Shvyd off on a site
 
-In the popup, click the crossed-out eye, then **Don't show here**. Open tabs on that site drop Shvyd immediately. To bring it back, open settings → **Hidden on these sites** → **Show again**, then reload that site's tabs.
+On that site, click the Shvyd icon in the browser toolbar and switch the site off. Open tabs on that site drop Shvyd immediately. Switch it back on the same way, or use settings → **Hidden on these sites** → **Show again**; open tabs pick it up without a reload.
 
 ## Pages Shvyd cannot run on
 

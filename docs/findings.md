@@ -106,3 +106,13 @@ confusion, and non-obvious constraints.
 - The popup's height animation can be paused in a headless page that renders no
   frames. The live checks finish running animations before measuring instead of
   waiting for them. Positioning uses the final height while an animation runs.
+- The toolbar menu (`popup.html`) learns the current site by sending `get-site`
+  to the active tab; only the top frame answers. This needs no `tabs` or
+  `activeTab` permission. Pages where Shvyd cannot run give no answer.
+- Router access has three levels: `extension` (content scripts too),
+  `extension-page` (toolbar menu and settings), and `settings-page` (keys,
+  usage, diagnostics). Preference changes and site changes are broadcast to every
+  tab as `TabMessage`s, so open pages follow without a reload.
+- A tab opened in the background renders no frames, so CSS transitions freeze in
+  screenshots of it. Browser checks open the toolbar menu as a background tab
+  (keeping the fixture active) and turn transitions off before capturing it.

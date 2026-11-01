@@ -14,6 +14,14 @@ export type Preferences = {
   showOtherLanguages: boolean
   targetMode: 'last' | 'fixed'
   defaultTarget: Language
+  /** Place the button and popup by the cursor, or at the end of the selection. */
+  popupAnchor: PopupAnchor
+}
+
+export type PopupAnchor = 'cursor' | 'selection'
+
+export function isPopupAnchor(value: unknown): value is PopupAnchor {
+  return value === 'cursor' || value === 'selection'
 }
 
 export type Settings = Preferences & {
@@ -34,6 +42,7 @@ export const DEFAULT_SETTINGS: Settings = {
   showOtherLanguages: true,
   targetMode: 'last',
   defaultTarget: 'uk',
+  popupAnchor: 'cursor',
   azure: { key: '', region: '' },
   deepl: { key: '', endpoint: 'https://api-free.deepl.com' },
 }
@@ -67,7 +76,9 @@ export function parsePreferences(value: unknown): Preferences {
   const showOtherLanguages = value.showOtherLanguages ?? true
   const targetMode = value.targetMode ?? 'last'
   const defaultTarget = value.defaultTarget ?? 'uk'
+  const popupAnchor = value.popupAnchor ?? DEFAULT_SETTINGS.popupAnchor
   if (
+    !isPopupAnchor(popupAnchor) ||
     typeof showOtherLanguages !== 'boolean' ||
     (targetMode !== 'last' && targetMode !== 'fixed') ||
     !isLanguage(defaultTarget)
@@ -91,6 +102,7 @@ export function parsePreferences(value: unknown): Preferences {
     defaultTarget: supportsLanguage(defaultTarget, value.provider)
       ? defaultTarget
       : fallback,
+    popupAnchor,
   }
 }
 
@@ -186,6 +198,7 @@ export function publicPreferences(settings: Settings): Preferences {
     showOtherLanguages: settings.showOtherLanguages,
     targetMode: settings.targetMode,
     defaultTarget: settings.defaultTarget,
+    popupAnchor: settings.popupAnchor,
   }
 }
 

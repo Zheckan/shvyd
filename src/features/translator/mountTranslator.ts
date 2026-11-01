@@ -7,6 +7,7 @@ import {
   DEFAULT_SETTINGS,
   initialTarget,
   publicPreferences,
+  type Preferences,
 } from '@/domain/settings/settings'
 import { TranslationError } from '@/domain/translation/translation'
 import type { TranslationClient } from '@/domain/translation/translation-client'
@@ -27,6 +28,8 @@ import { applyPageStyle, samplePageStyle } from './logic/page-style'
 const VIEWPORT_MARGIN = 12
 /** Distance between the selected text and the popup. */
 const SELECTION_GAP = 9
+/** Distance from the cursor to the button or popup corner, clear of the pointer. */
+const CURSOR_GAP = 12
 /** Horizontal padding inside the translation text block. */
 const TEXT_PADDING_PX = 34
 const RESIZE_MS = 200
@@ -56,29 +59,33 @@ export function mountTranslator(
     return () => undefined
   }
 
-  let stop: (() => void) | undefined
+  let translator: Translator | undefined
   let unmounted = false
 
   function start(): void {
-    if (!unmounted && !stop) {
-      stop = startTranslator(client, site)
+    if (!unmounted && !translator) {
+      translator = startTranslator(client)
     }
   }
 
   function remove(): void {
-    stop?.()
-    stop = undefined
+    translator?.stop()
+    translator = undefined
   }
+
+  client.onTabMessage((message) => {
+    if (message.kind === 'preferences-changed') {
+      translator?.applyPreferences(message.preferences)
+    } else if (message.site === site && message.kind === 'site-hidden') {
+      remove()
+    } else if (message.site === site && message.kind === 'site-shown') {
+      start()
+    }
+  })
 
   if (!site) {
     start()
   } else {
-    client.onSiteHidden((hidden) => {
-      if (hidden === site) {
-        unmounted = true
-        remove()
-      }
-    })
     // If the status cannot be read, keep the previous behavior and show Shvyd.
     client.siteHidden(site).then((hidden) => {
       if (!hidden) {
@@ -93,10 +100,13 @@ export function mountTranslator(
   }
 }
 
-function startTranslator(
-  client: TranslationClient,
-  site: string | undefined
-): () => void {
+type Translator = {
+  stop: () => void
+  /** Settings changed elsewhere; used from the next selection on. */
+  applyPreferences: (value: Preferences) => void
+}
+
+function startTranslator(client: TranslationClient): Translator {
   const picker = createLanguagePicker({
     onSelect: (code) => {
       void chooseTarget(code)
@@ -116,13 +126,7 @@ function startTranslator(
     actions,
     retry,
     settings,
-    hideSite,
-    confirmHide,
-    cancelHide,
   } = createTranslatorView(picker)
-
-  hideSite.hidden = !site
-  hideSite.title = site ? `Don't show Shvyd on ${site}` : ''
 
   let preferences = publicPreferences(DEFAULT_SETTINGS)
   let selected: PageSelection | undefined
@@ -205,7 +209,10 @@ function startTranslator(
       return
     }
 
-    const anchor = selected.anchor()
+    const cursor =
+      preferences.popupAnchor === 'cursor' ? selected.pointer() : undefined
+    const anchor = cursor ?? selected.anchor()
+    const gap = cursor ? CURSOR_GAP : SELECTION_GAP
     const width = element.offsetWidth
     // Mid-animation the panel is shorter than it will be; place it for its final size.
     const height =
@@ -213,10 +220,11 @@ function startTranslator(
         ? panelTargetHeight
         : element.offsetHeight
 
-    let x = anchor.right - width
-    let y = anchor.bottom + SELECTION_GAP
+    // By the cursor the popup starts beside it; at a selection it ends with it.
+    let x = cursor ? anchor.left + gap : anchor.right - width
+    let y = anchor.bottom + gap
     if (y + height > window.innerHeight - VIEWPORT_MARGIN) {
-      y = anchor.top - height - SELECTION_GAP
+      y = anchor.top - height - gap
     }
 
     if (element === panel && panelPosition) {
@@ -254,7 +262,7 @@ function startTranslator(
 
   /** Shows the action row with only these buttons, or hides it when empty. */
   function showActions(...visible: HTMLButtonElement[]): void {
-    for (const button of [retry, settings, confirmHide, cancelHide]) {
+    for (const button of [retry, settings]) {
       button.hidden = !visible.includes(button)
     }
 
@@ -577,48 +585,6 @@ function startTranslator(
 
   closeButton.addEventListener('click', dismiss)
 
-  hideSite.addEventListener('click', () => {
-    if (!site) {
-      return
-    }
-
-    // Ask first: one stray click should not turn Shvyd off for a whole site.
-    generation++
-    picker.close()
-    loading.hidden = true
-    output.hidden = true
-    copy.disabled = true
-    panel.setAttribute('aria-busy', 'false')
-    showMessage(
-      `Stop showing Shvyd on ${site}? You can turn it back on in settings.`
-    )
-    showActions(confirmHide, cancelHide)
-    position(panel)
-    confirmHide.focus()
-  })
-
-  cancelHide.addEventListener('click', () => {
-    void translate()
-  })
-
-  confirmHide.addEventListener('click', async () => {
-    if (!site) {
-      return
-    }
-
-    confirmHide.disabled = true
-
-    try {
-      // The background then tells every frame on this site, including this one.
-      await client.hideSite(site)
-    } catch {
-      showMessage('Shvyd could not turn itself off here. Try again.')
-      position(panel)
-    } finally {
-      confirmHide.disabled = false
-    }
-  })
-
   copy.addEventListener('click', async () => {
     const result = await copyTranslation({
       text: copiedText,
@@ -747,12 +713,23 @@ function startTranslator(
     listen
   )
 
-  return () => {
+  function stop(): void {
     destroyed = true
     dismiss()
     cancelAnimationFrame(frame)
     cancelAnimationFrame(resizeFrame)
     events.abort()
     host.remove()
+  }
+
+  return {
+    stop,
+    applyPreferences: (value) => {
+      preferences = value
+
+      if (panel.hidden) {
+        picker.update({ preferences, target: initialTarget(preferences) })
+      }
+    },
   }
 }

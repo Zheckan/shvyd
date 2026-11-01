@@ -28,10 +28,7 @@ export function mountSiteSettings(
         button.textContent = 'Show again'
         button.setAttribute('aria-label', `Show Shvyd again on ${site}`)
         button.addEventListener('click', () => {
-          void refresh(
-            { kind: 'show-site', site },
-            `Shvyd is back on ${site}. Reload its open tabs.`
-          )
+          void refresh({ kind: 'show-site', site }, `Shvyd is back on ${site}.`)
         })
         item.append(name, button)
 

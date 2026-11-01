@@ -4,7 +4,7 @@ A small Chromium extension for translating selected text without leaving the pag
 
 The popup uses consistent SF Pro / system typography with 15 px translation text. On macOS it uses the native system font; other platforms use their system sans-serif fallback. It takes background, text and accent colors, border, corner radius, and shadow from the area around the selection. Text contrast is checked before using the sampled colors. You can switch page adaptation off in settings.
 
-To turn Shvyd off on a site, click the crossed-out eye in the popup and confirm. It stays off on that site, including in embedded frames, until you choose **Show again** under **Hidden on these sites** in settings.
+Click the Shvyd icon in the browser toolbar for quick settings: turn Shvyd off or back on for the current site, pick the provider and target language, choose whether the popup appears next to the cursor or at the end of the selection, and open all settings. Changes reach open tabs immediately. A site turned off stays off, including in embedded frames, until you turn it back on there or under **Hidden on these sites** in settings.
 
 Drag the empty space in the popup's top bar to move it. The window stays inside the viewport, keeps its position when you change languages, and moves its language menu with it. Each new popup starts beside the selected text again. Selected underlined text, including underlined links, keeps its underline in the translation.
 
@@ -28,7 +28,7 @@ bun run build
 
 Both `build` and the compatibility command `build:local` produce credential-free files. `.env` is used only by local servers, provider benchmarks, and explicit live-test BYOK setup. The build removes the obsolete `dist/local-settings.json` credential bootstrap.
 
-Click the toolbar icon to open settings. Azure uses the included Cloudflare endpoint by default; adding your own Azure key overrides it and calls Azure directly. Removing that key restores included access. DeepL is disabled until you add your own DeepL key. Fields contain only keys you explicitly supplied, including through the optional `.env` import.
+Open **All settings** from the toolbar menu to manage keys. Azure uses the included Cloudflare endpoint by default; adding your own Azure key overrides it and calls Azure directly. Removing that key restores included access. DeepL is disabled until you add your own DeepL key. Fields contain only keys you explicitly supplied, including through the optional `.env` import.
 
 On the first upgrade from the old bootstrap build, saved credentials are cleared once because those records did not distinguish owner keys from BYOK. Language and appearance preferences remain. Reenter any personal BYOK credentials you want to keep.
 

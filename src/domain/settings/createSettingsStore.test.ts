@@ -204,3 +204,25 @@ test('DeepL can only be selected with BYOK and removing its key restores Azure',
     await store.save({ ...own, deepl: { ...own.deepl, key: '' } })
   ).toMatchObject({ provider: 'azure' })
 })
+
+test('the popup appears next to the cursor by default, and the choice is saved', async () => {
+  const { popupAnchor: _removed, ...older } = DEFAULT_SETTINGS
+  let persisted: unknown = structuredClone(older)
+  const storage = {
+    read: async () => persisted,
+    write: async (value: unknown) => {
+      persisted = structuredClone(value)
+    },
+  }
+
+  const store = createSettingsStore(storage)
+  expect((await store.preferences()).popupAnchor).toBe('cursor')
+
+  await store.updatePreferences({ popupAnchor: 'selection' })
+  expect((await createSettingsStore(storage).preferences()).popupAnchor).toBe(
+    'selection'
+  )
+  await expect(
+    store.updatePreferences({ popupAnchor: 'corner' })
+  ).rejects.toThrow()
+})
