@@ -26,3 +26,35 @@ confusion, and non-obvious constraints.
 - TypeScript 7 has no `baseUrl`. The `@/*` alias in `tsconfig.json` uses a
   `paths` entry relative to the config file, and Bun reads the same mapping
   for builds, tests, and scripts.
+- `python3 scripts/check-extension.py --settings-only` checks the installed
+  options page in a temporary Helium profile, including real Azure and DeepL
+  connection tests. Each test translates `Hello`, using five source characters.
+  Results go to `.preview/settings-extension-check/`; the full extension run
+  keeps its separate `.preview/extension-check/` output.
+
+- Both extension build commands are credential-free and remove the legacy
+  `dist/local-settings.json` bootstrap. Included Azure requires a public relay
+  URL; owner credentials belong only on its server. DeepL requires BYOK.
+- Old extension settings have no credential provenance. The security migration
+  clears their keys once, preserving preferences; subsequent BYOK saves carry
+  a provenance marker. The live harness supplies keys explicitly in an isolated
+  profile instead of relying on an embedded bootstrap.
+
+- An active Cloudflare token that can list Workers is not proof of deployment
+  access. The configured benchmark token returned HTTP 403 for Worker secrets
+  and subdomain access. Use a separate `CLOUDFLARE_WORKERS_API_TOKEN` with
+  Workers Scripts Edit and Account Settings Read for relay deployment.
+
+- The release defaults to the deployed public Azure relay URL in
+  `src/config/release.ts`. `SHVYD_AZURE_PROXY_URL` overrides it; explicitly
+  empty disables included access. Both key fields remained empty during the
+  installed extension's successful shared connection and selection tests.
+
+- CSS `:has()` cannot be nested. Inside a forgiving `:is()` list, a nested
+  `:has(:checked)` branch is dropped without warning while the other branches
+  keep working. `extension/options.css` matches radio segments with a
+  descendant selector, such as `:has(> :nth-child(2) :checked)`.
+
+- Generated browser screenshots and raw verification results stay in the ignored
+  `.preview/` directory. The former `docs/prototype/` archive is retained locally
+  at `.preview/prototype/`; the legacy output path is also ignored by Git.

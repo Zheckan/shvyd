@@ -1,12 +1,12 @@
 # Settings design brief
 
-Updated 2026-10-05. Use this brief to design Shvyd's settings page for its first stable release. The page opens in an extension tab. The current version is functional, and the design should preserve its behavior while making setup and everyday preferences easier to understand.
+Updated 2026-10-07. Use this brief to design Shvyd's settings page for its first stable release. The page opens in an extension tab. The current version is functional, and the design should preserve its behavior while making setup and everyday preferences easier to understand.
 
 The [release plan](release-plan.md) defines scope and implementation order. This document describes the desired UI; controls labelled planned do not exist yet.
 
 ## Product and visual direction
 
-Shvyd translates selected page text into a small movable window, so the reader can continue without opening a translator website. Speed and low maintenance matter more than a large feature list. The first users are the owner and one or two friends who configure their own provider credentials.
+Shvyd translates selected page text into a small movable window, so the reader can continue without opening a translator website. Speed and low maintenance matter more than a large feature list. The first users are the owner and one or two friends. Included Azure access uses a server relay; users can override it with their own key. DeepL requires their own key.
 
 Use consistent SF Pro / system typography. On macOS, use the native system font; provide system sans-serif fallbacks elsewhere. The page popup keeps its existing 15 px translation text. Settings may use a clear hierarchy of text sizes. Do not borrow fonts from the page being translated or add a font download.
 
@@ -18,7 +18,7 @@ Suggested grouping: Translation, Languages, Appearance, Usage and diagnostics, a
 
 Existing controls:
 
-- Provider selection: Azure by default; DeepL as an alternative.
+- Provider selection: included Azure by default; DeepL disabled until BYOK is supplied.
 - Azure key and location code. An empty code means Global.
 - DeepL key and official endpoint selection: API Free / Developer or API Pro / Growth.
 - Masked key inputs and explicit Save settings.
@@ -71,7 +71,7 @@ Central sharing is a later option. If shown in a concept, mark it as outside the
 
 Include extension version, setup/help, privacy notice, usage terms, and a support/report-issue link. Contact information will be supplied before publication.
 
-Explain the basic flow near provider setup: selected text goes to the chosen provider after the user clicks Translate. Shvyd has no application account or translation server in this release.
+Explain the basic flow near provider setup: selected text goes to the chosen provider after the user clicks Translate. Included Azure requests pass through Shvyd’s relay; BYOK requests go directly to the chosen provider. Shvyd has no application account. The owner’s key never belongs in the extension or its settings fields.
 
 Use scoped clear controls. Removing a key, clearing logs, clearing usage, and resetting everything have different consequences. A full reset should explain that it removes provider credentials and saved preferences before the user applies it.
 

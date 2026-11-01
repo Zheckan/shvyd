@@ -152,9 +152,11 @@ function readDeepLText(payload: unknown): string {
 export function createTranslationService({
   readSettings,
   fetcher = fetch,
+  managedAzureUrl,
 }: {
   readSettings: () => Promise<Settings>
   fetcher?: Fetcher
+  managedAzureUrl?: string
 }) {
   const cache = new Map<string, Translation>()
 
@@ -190,7 +192,10 @@ export function createTranslationService({
       )
     }
 
-    if (!settings[provider].key) {
+    const sharedAzure =
+      provider === 'azure' && !settings.azure.key && !!managedAzureUrl
+
+    if (!settings[provider].key && !sharedAzure) {
       throw new TranslationError(
         'configuration',
         'Add your provider API key in Shvyd settings.'
@@ -198,7 +203,14 @@ export function createTranslationService({
     }
 
     const text = request.text.trim()
-    const cacheKey = JSON.stringify([provider, request.target, format, text])
+    const cacheKey = JSON.stringify([
+      provider,
+      settings[provider].key,
+      sharedAzure,
+      request.target,
+      format,
+      text,
+    ])
     const cached = cache.get(cacheKey)
     if (cached) {
       cache.delete(cacheKey)
@@ -206,13 +218,21 @@ export function createTranslationService({
       return { ...cached, cached: true, durationMs: 0 }
     }
 
-    const { url, headers, body } = providerRequest({
+    const directRequest = providerRequest({
       provider,
       settings,
       text,
       format,
       providerTarget,
     })
+    const { url, headers, body } =
+      sharedAzure && managedAzureUrl
+        ? {
+            url: managedAzureUrl,
+            headers: { 'Content-Type': 'application/json' },
+            body: { text, format, target: request.target },
+          }
+        : directRequest
 
     const started = performance.now()
     let response: Response

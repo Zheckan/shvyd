@@ -12,3 +12,9 @@ node_modules/
 dist/
 .preview/
 test-results/
+
+# Worker deployment state
+.wrangler/
+
+# Legacy verification output; new artifacts belong in .preview/.
+docs/prototype/

@@ -33,5 +33,4 @@ Run `bun run languages:update` with the existing `DEEPL_API_KEY` configured to r
 
 Azure keeps its standard translation route. DeepL keeps `latency_optimized`. Small live English-source probes to Hindi, Arabic, Traditional Chinese, and Aymara all returned successful DeepL translations with that mode. This is an eligibility spot check, not a speed or quality ranking for every pair. The catalog reports provider support; every language pair has not been individually tested.
 
-See the [language and playground verification report](prototype/2026-10-03/languages/report.md) for the functional checks and screenshots.
-See the [separate language popover verification](prototype/2026-10-03/language-popover/report.md) for menu layout, keyboard behavior, and resize checks.
+The browser checks in `scripts/check-extension.py` and `scripts/check-demo.py` cover language settings, popup layout, keyboard behavior, and resizing. Screenshots and raw results stay in the ignored `.preview/` directory.

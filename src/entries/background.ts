@@ -1,5 +1,7 @@
 import { createSettingsStore } from '@/domain/settings/createSettingsStore'
-import { DEFAULT_SETTINGS } from '@/domain/settings/settings'
+import { isProvider, parseSettings } from '@/domain/settings/settings'
+import { parseReleaseConfig } from '@/domain/settings/release-config'
+import { testConnection } from '@/domain/translation/testConnection'
 import { createTranslationService } from '@/domain/translation/createTranslationService'
 import {
   parseTranslationRequest,
@@ -12,25 +14,24 @@ const ready = chrome.storage.local.setAccessLevel({
 })
 
 const store = createSettingsStore({
+  credentialMode: 'byok',
   read: async () => {
     await ready
     const result = await chrome.storage.local.get('settings')
     return result.settings
   },
   write: (settings) => chrome.storage.local.set({ settings }),
-  seed: async () => {
-    try {
-      const response = await fetch(chrome.runtime.getURL('local-settings.json'))
-      return response.ok
-        ? await response.json()
-        : structuredClone(DEFAULT_SETTINGS)
-    } catch {
-      return structuredClone(DEFAULT_SETTINGS)
-    }
-  },
 })
 
-const translator = createTranslationService({ readSettings: store.settings })
+const config = fetch(chrome.runtime.getURL('release-config.json')).then(
+  async (response) => parseReleaseConfig(await response.json())
+)
+const translator = config.then((value) =>
+  createTranslationService({
+    readSettings: store.settings,
+    managedAzureUrl: value.managedAzureUrl || undefined,
+  })
+)
 
 async function handle(
   value: unknown,
@@ -46,11 +47,12 @@ async function handle(
     case 'update-preferences':
       return store.updatePreferences(value.value)
     case 'translate':
-      return translator.translate(parseTranslationRequest(value))
+      return (await translator).translate(parseTranslationRequest(value))
     case 'open-settings':
       await chrome.runtime.openOptionsPage()
       return null
     case 'get-settings':
+    case 'test-connection':
     case 'save-settings': {
       if (
         sender.url?.split(/[?#]/)[0] !== chrome.runtime.getURL('options.html')
@@ -59,11 +61,27 @@ async function handle(
       }
 
       if (value.kind === 'get-settings') {
-        return store.settings()
+        return {
+          ...(await store.settings()),
+          managedAzureAvailable: !!(await config).managedAzureUrl,
+        }
+      }
+
+      if (value.kind === 'test-connection') {
+        if (!isProvider(value.provider)) {
+          throw new Error('Choose a translation provider.')
+        }
+
+        return testConnection({
+          settings: parseSettings(value.value),
+          provider: value.provider,
+          managedAzureUrl: (await config).managedAzureUrl || undefined,
+        })
       }
 
       const settings = await store.save(value.value)
-      translator.clearCache()
+      const service = await translator
+      service.clearCache()
       return settings
     }
     default:

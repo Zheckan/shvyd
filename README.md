@@ -12,7 +12,7 @@ Selected paragraphs, headings, emphasis, lists, and table cells keep their struc
 
 ```sh
 bun install
-bun run build:local
+bun run build
 ```
 
 1. Open `chrome://extensions` in Helium or another Chromium browser.
@@ -20,13 +20,15 @@ bun run build:local
 3. Click **Load unpacked** and choose this project's `dist` directory.
 4. Reload a normal web page, select some text, and click **Translate**.
 
-`build:local` reads the Azure and DeepL credentials already configured in `.env` and creates an ignored, private `dist/local-settings.json` bootstrap file. It is used when the extension has no saved settings yet. Keep this local build on your machine; use `bun run build` to produce a build without credentials.
+Both `build` and the compatibility command `build:local` produce credential-free files. `.env` is used only by local servers, provider benchmarks, and explicit live-test BYOK setup. The build removes the obsolete `dist/local-settings.json` credential bootstrap.
 
-Click the extension's toolbar icon to open settings. There you can change the provider, target language, page adaptation, or keys. You can also import `.env` there. Existing saved settings take precedence over the bootstrap file, including after rebuilding or reloading the extension.
+Click the toolbar icon to open settings. Azure uses the included Cloudflare endpoint by default; adding your own Azure key overrides it and calls Azure directly. Removing that key restores included access. DeepL is disabled until you add your own DeepL key. Fields contain only keys you explicitly supplied, including through the optional `.env` import.
+
+On the first upgrade from the old bootstrap build, saved credentials are cleared once because those records did not distinguish owner keys from BYOK. Language and appearance preferences remain. Reenter any personal BYOK credentials you want to keep.
 
 The bundled catalog has 173 targets across the two providers. Choose your preferred languages in settings; the popup shows those first, with a searchable **More languages** menu for the rest. The language menu opens in a separate popover, so expanding or searching it keeps the translation window still. It follows its button when the browser is resized. You can hide the additional-language menu. Target choices follow provider support, and preferred languages stay saved across provider changes. See [language choices](docs/languages.md) for the default-language modes and catalog details.
 
-The prototype runs directly in the browser. Its background worker makes the provider request, so no application server is needed. Keys are stored in extension-local storage restricted to trusted extension contexts. The page popup receives only public preferences and the translated text.
+The background worker sends BYOK requests directly to Azure or DeepL. Included Azure access uses a server relay that holds the owner's key; the extension receives only the public endpoint URL. See [shared Azure setup](docs/shared-azure.md); `bun run worker:deploy` deploys it and rebuilds the extension using the dedicated deployment token. The public endpoint is already the release default. User keys are stored in extension-local storage restricted to trusted extension contexts. The page popup receives only public preferences and translated text.
 
 ## Run the playground
 
@@ -58,15 +60,15 @@ python3 -m unittest scripts.test_benchmark_cloud scripts.test_benchmark_opencode
 
 Development tools are installed with `bun install`; `pnpm` runs the commands using those local dependencies. Linting uses Oxlint. Prettier uses single quotes, no semicolons, and two-space indentation. Type checking uses TypeScript 7.
 
-The verification build replaces the local credential bootstrap in `dist`. Run `pnpm build:local` afterward when you want a private build with your configured keys. To run the live extension check on this Mac, leave the demo server running in another terminal:
+To run live checks, configure provider keys in `.env` and leave the demo server running in another terminal. The extension harness explicitly adds BYOK credentials to an isolated profile; it does not embed them in the build:
 
 ```sh
-bun run build:local
+bun run build
 python3 scripts/check-extension.py
 python3 scripts/check-demo.py
 ```
 
-The live check uses a temporary Helium profile, leaving the regular profile alone. It covers both providers, eight page styles, preferred and additional languages, remembered and fixed targets, right-to-left output, formatted paragraphs and lists, underlined links, table cells, unchanged code, long selections, nested cards, window dragging, language-menu anchoring, viewport bounds, and Escape dismissal. The demo check also uses controlled provider responses to verify partial selections, safe HTML rendering, and copying. These scripts use the `websocket-client` Python dependency already required by the local benchmark harness. Screenshots and results are written under the ignored `.preview/extension-check` and `.preview/demo-check` directories.
+The live check uses a temporary Helium profile, leaving the regular profile alone. It covers both providers, eight page styles, preferred and additional languages, remembered and fixed targets, right-to-left output, formatted paragraphs and lists, underlined links, table cells, unchanged code, long selections, nested cards, window dragging, language-menu anchoring, viewport bounds, and Escape dismissal. The demo check also uses controlled provider responses to verify partial selections, safe HTML rendering, and copying. These scripts use the `websocket-client` Python dependency already required by the local benchmark harness. Screenshots and results are written under the ignored `.preview/extension-check` and `.preview/demo-check` directories. Earlier verification artifacts are retained locally in `.preview/prototype/`. Generated verification artifacts are not tracked in Git.
 
 ## Prototype boundaries
 
@@ -83,8 +85,3 @@ The live check uses a temporary Helium profile, leaving the regular profile alon
 - [Future ideas and open questions](docs/future.md)
 - [API key setup](docs/api-keys.md)
 - [Benchmark archive](docs/benchmarks/README.md)
-- [Prototype verification and screenshots](docs/prototype/2026-10-03/report.md)
-- [Language settings and playground verification](docs/prototype/2026-10-03/languages/report.md)
-- [Selection formatting verification](docs/prototype/2026-10-03/formatting/report.md)
-- [Language popover and resize verification](docs/prototype/2026-10-03/language-popover/report.md)
-- [Movable window and underlining verification](docs/prototype/2026-10-04/popup-interactions/report.md)

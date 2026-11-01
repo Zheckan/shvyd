@@ -24,6 +24,8 @@ export type Settings = Preferences & {
   }
 }
 
+export type SettingsView = Settings & { managedAzureAvailable: boolean }
+
 export const DEFAULT_SETTINGS: Settings = {
   provider: 'azure',
   target: 'uk',
@@ -129,8 +131,14 @@ export function parseSettings(value: unknown): Settings {
     throw new Error('Choose an official DeepL endpoint.')
   }
 
+  const deeplKey = credential(value.deepl.key)
+  const provider =
+    preferences.provider === 'deepl' && !deeplKey
+      ? 'azure'
+      : preferences.provider
+
   return {
-    ...preferences,
+    ...parsePreferences({ ...preferences, provider }),
     azure: {
       key: credential(value.azure.key),
       region:
@@ -138,7 +146,34 @@ export function parseSettings(value: unknown): Settings {
           ? ''
           : value.azure.region.toLowerCase(),
     },
-    deepl: { key: credential(value.deepl.key), endpoint: value.deepl.endpoint },
+    deepl: { key: deeplKey, endpoint: value.deepl.endpoint },
+  }
+}
+
+export function migrateUserSettings(value: unknown): Settings {
+  const settings = parseSettings(value)
+
+  if (isRecord(value) && value.credentialOrigin === 'byok') {
+    return settings
+  }
+
+  // Old builds mixed owner bootstrap credentials and user keys in one record.
+  return parseSettings({
+    ...settings,
+    provider: 'azure',
+    azure: { key: '', region: '' },
+    deepl: { key: '', endpoint: settings.deepl.endpoint },
+  })
+}
+
+export function parseSettingsView(value: unknown): SettingsView {
+  if (!isRecord(value) || typeof value.managedAzureAvailable !== 'boolean') {
+    throw new Error('Settings access information could not be read.')
+  }
+
+  return {
+    ...parseSettings(value),
+    managedAzureAvailable: value.managedAzureAvailable,
   }
 }
 

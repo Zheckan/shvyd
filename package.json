@@ -8,7 +8,7 @@
     "build:local": "bun scripts/build.ts --local",
     "dev": "bun scripts/dev.ts",
     "playground": "bun scripts/dev.ts",
-    "test": "bun test src",
+    "test": "bun test src scripts/build.test.ts",
     "typecheck": "tsc --noEmit",
     "lint": "oxlint --deny-warnings src scripts demo",
     "lint:fix": "oxlint --fix --deny-warnings src scripts demo",
@@ -17,7 +17,8 @@
     "verify": "bun run lint && bun run format:check && bun run typecheck && bun run test && bun run build",
     "check": "bun run verify",
     "fix": "pnpm lint:fix && pnpm format && pnpm verify",
-    "languages:update": "bun scripts/update-languages.ts"
+    "languages:update": "bun scripts/update-languages.ts",
+    "worker:deploy": "bun scripts/deploy-worker.ts"
   },
   "devDependencies": {
     "@types/bun": "^1.4.2",

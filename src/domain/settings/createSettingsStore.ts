@@ -3,6 +3,7 @@ import { isRecord } from '@/utils/isRecord'
 import {
   DEFAULT_SETTINGS,
   isProvider,
+  migrateUserSettings,
   parseSettings,
   publicPreferences,
   type Settings,
@@ -28,19 +29,34 @@ function preferenceField<T>(
 
 export function createSettingsStore(storage: {
   read: () => Promise<unknown>
-  write: (settings: Settings) => Promise<void>
-  seed: () => Promise<unknown>
+  write: (settings: Settings & { credentialOrigin?: 'byok' }) => Promise<void>
+  seed?: () => Promise<unknown>
+  credentialMode?: 'byok'
 }) {
   let current = structuredClone(DEFAULT_SETTINGS)
   let queue = Promise.resolve()
 
+  async function persist(settings: Settings): Promise<void> {
+    await storage.write(
+      storage.credentialMode === 'byok'
+        ? { ...settings, credentialOrigin: 'byok' }
+        : settings
+    )
+  }
+
   const ready = (async () => {
     const persisted = await storage.read()
-    if (persisted !== undefined) {
+    if (storage.credentialMode === 'byok') {
+      current =
+        persisted === undefined
+          ? structuredClone(DEFAULT_SETTINGS)
+          : migrateUserSettings(persisted)
+      await persist(current)
+    } else if (persisted !== undefined) {
       current = parseSettings(persisted)
     } else {
-      current = parseSettings(await storage.seed())
-      await storage.write(current)
+      current = parseSettings((await storage.seed?.()) ?? DEFAULT_SETTINGS)
+      await persist(current)
     }
   })()
 
@@ -54,7 +70,7 @@ export function createSettingsStore(storage: {
     const operation = queue.then(async () => {
       await ready
       const next = change(structuredClone(current))
-      await storage.write(next)
+      await persist(next)
       current = next
       return structuredClone(current)
     })
