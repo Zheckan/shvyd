@@ -42,7 +42,10 @@ export async function build(
     await copyFile(resolve(root, 'extension', name), resolve(output, name))
   }
 
-  await copyFile(resolve(root, 'LICENSE'), resolve(output, 'LICENSE'))
+  for (const name of ['LICENSE', 'THIRD_PARTY_NOTICES']) {
+    await copyFile(resolve(root, name), resolve(output, name))
+  }
+
   await cp(resolve(root, 'extension/icons'), resolve(output, 'icons'), {
     recursive: true,
   })

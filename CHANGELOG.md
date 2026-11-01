@@ -9,7 +9,7 @@ credential-free ZIP built with `bun run package`.
 
 - **Toolbar menu:** clicking the Shvyd icon opens quick settings in the style of the settings page: show or hide Shvyd on the current site, provider, target language, popup position, page style, and a link to all settings. Changes reach open tabs without a reload.
 - **Don't show on this site:** from the toolbar menu. Open tabs on that site drop Shvyd at once, embedded frames follow their page, and turning it back on works without a reload. Settings → Hidden on these sites lists them, with **Show again**.
-- **Compact Translate button**, on by default: the button shows only its icon. Turn it off in the toolbar menu or settings to show the word Translate too. A visible button follows the change at once.
+- **Compact Translate button**, on by default: the button shows only its icon, now the Heroicons "language" icon (MIT, credited in `THIRD_PARTY_NOTICES`). Turn it off in the toolbar menu or settings to show the word Translate too. A visible button follows the change at once.
 - **Resizable popup:** drag any edge or corner. The opposite edges stay put, the text fills the new size, the window stays inside the viewport, and a double-click on an edge restores the default size. Each new popup starts at the default size.
 - **Popup position:** next to the cursor (default) or at the end of the selection, in the toolbar menu and settings. Keyboard selections use the end of the selection.
 - Local usage counts per day and route: Azure included access, Azure with your own key, and DeepL. Shows requests, characters, reused results, failures, and uncertain timeouts for today and the last 7, 30, and 90 days.

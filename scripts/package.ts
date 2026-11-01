@@ -24,6 +24,7 @@ export const RELEASE_FILES = [
   'preview.css',
   'release-config.json',
   'LICENSE',
+  'THIRD_PARTY_NOTICES',
   'icons/icon16.png',
   'icons/icon32.png',
   'icons/icon48.png',
