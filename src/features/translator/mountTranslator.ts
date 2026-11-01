@@ -23,6 +23,7 @@ import {
   type PageSelection,
 } from './logic/readPageSelection'
 import { applyPageStyle, samplePageStyle } from './logic/page-style'
+import { scrollEdges } from './logic/scrollEdges'
 
 /** Minimum distance between the popup and the viewport edge. */
 const VIEWPORT_MARGIN = 12
@@ -344,6 +345,16 @@ function startTranslator(client: TranslationClient): Translator {
     loading.replaceChildren(...lines)
   }
 
+  /** Fades the edges of the translation that hide text and outlines the toolbar. */
+  function markScrollEdges(): void {
+    const edges = output.hidden
+      ? { above: false, below: false }
+      : scrollEdges(output)
+
+    panel.toggleAttribute('data-above', edges.above)
+    panel.toggleAttribute('data-below', edges.below)
+  }
+
   /** Applies `update`, then eases the panel from its old height to the new one. */
   function resizeSmoothly(update: () => void): void {
     const before = panel.getBoundingClientRect().height
@@ -386,6 +397,7 @@ function startTranslator(client: TranslationClient): Translator {
 
     output.hidden = true
     output.textContent = ''
+    markScrollEdges()
     copiedText = ''
     copy.disabled = true
     copy.setAttribute('aria-label', 'Copy translation')
@@ -450,9 +462,11 @@ function startTranslator(client: TranslationClient): Translator {
         output.lang = translation.target
         output.dir = getLanguage(translation.target)?.direction ?? 'auto'
         output.hidden = false
+        output.scrollTop = 0
         loading.hidden = true
         status.hidden = true
       })
+      markScrollEdges()
       copy.disabled = false
     } catch (error) {
       if (isStale()) {
@@ -612,6 +626,10 @@ function startTranslator(client: TranslationClient): Translator {
   }
 
   window.addEventListener('blur', endDrag, listen)
+  output.addEventListener('scroll', markScrollEdges, {
+    passive: true,
+    signal: events.signal,
+  })
 
   document.addEventListener(
     'pointerdown',
@@ -709,6 +727,7 @@ function startTranslator(client: TranslationClient): Translator {
         resizeFrame = 0
       })
       positionVisible()
+      markScrollEdges()
     },
     listen
   )

@@ -66,10 +66,16 @@ export const TRANSLATOR_STYLES = `
     display: flex;
     align-items: center;
     gap: 8px;
-    padding: 10px 12px 0 15px;
+    padding: 10px 12px 6px 15px;
+    border-bottom: 1px solid transparent;
+    transition: border-color 150ms ease-out;
     cursor: grab;
     user-select: none;
     touch-action: none;
+  }
+  /* Scrolled text now passes under the toolbar, so mark where it ends. */
+  .panel[data-above] .toolbar {
+    border-bottom-color: var(--shvyd-border);
   }
   .toolbar.dragging {
     cursor: grabbing;
@@ -170,7 +176,7 @@ export const TRANSLATOR_STYLES = `
     flex-shrink: 0;
   }
   .translation {
-    padding: 13px 17px 18px;
+    padding: 6px 17px 18px;
     font-size: 15px;
     line-height: 1.6;
     white-space: pre-wrap;
@@ -179,6 +185,56 @@ export const TRANSLATOR_STYLES = `
     user-select: text;
     max-height: min(55dvh, 480px);
     overflow: auto;
+    /*
+     * Lines fade out at an edge that hides more text instead of being cut.
+     * Layers, top first: the two scrollbar strips stay opaque and are added to
+     * the top fade intersected with the bottom fade. Each fade is 28 px taller
+     * than the box and starts shifted out of view; sliding it in shows the fade.
+     */
+    mask-image:
+      linear-gradient(#000, #000), linear-gradient(#000, #000),
+      linear-gradient(to bottom, transparent, #000 28px),
+      linear-gradient(to top, transparent, #000 28px);
+    mask-size:
+      14px 100%,
+      14px 100%,
+      100% calc(100% + 28px),
+      100% calc(100% + 28px);
+    mask-repeat: no-repeat;
+    mask-composite: add, add, intersect, add;
+    mask-position:
+      left top,
+      right top,
+      left 0 top -28px,
+      left 0 bottom -28px;
+    transition: mask-position 150ms ease-out;
+  }
+  .panel[data-above] .translation {
+    mask-position:
+      left top,
+      right top,
+      left 0 top 0,
+      left 0 bottom -28px;
+  }
+  .panel[data-below] .translation {
+    mask-position:
+      left top,
+      right top,
+      left 0 top -28px,
+      left 0 bottom 0;
+  }
+  .panel[data-above][data-below] .translation {
+    mask-position:
+      left top,
+      right top,
+      left 0 top 0,
+      left 0 bottom 0;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .toolbar,
+    .translation {
+      transition: none;
+    }
   }
   .translation.formatted {
     white-space: normal;
@@ -282,7 +338,7 @@ export const TRANSLATOR_STYLES = `
   }
   /* Same box as .translation: each placeholder line takes one 24 px text line. */
   .loading {
-    padding: 13px 17px 18px;
+    padding: 6px 17px 18px;
   }
   .line {
     height: 10px;
