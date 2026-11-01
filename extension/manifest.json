@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "Shvyd",
   "description": "Select text and translate it in a small popup that fits the page.",
-  "version": "0.1.0",
+  "version": "0.0.1",
   "minimum_chrome_version": "120",
   "permissions": ["storage"],
   "icons": {

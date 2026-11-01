@@ -91,3 +91,8 @@ confusion, and non-obvious constraints.
   frames follow their page. A hidden site gets no Shvyd DOM or listeners at all;
   the content script asks `site-status` before mounting. Hiding broadcasts
   `site-hidden` to every tab; showing again needs a reload of that site's tabs.
+- The relay allows only `ALLOWED_EXTENSION_ORIGINS` (one ID today, the ID Chrome
+  assigns to this repository's `dist/` path). An unpacked ID is the first 32 hex
+  digits of SHA-256 of the absolute folder path, mapped `0-f` to `a-p`, so the
+  same ZIP extracted elsewhere gets HTTP 403 from the relay. The extension now
+  reports that as included access being unavailable, not as a rejected key.

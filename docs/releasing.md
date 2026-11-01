@@ -9,7 +9,10 @@ Nothing here publishes automatically.
    and `extension/manifest.json`. Packaging stops if they differ.
 2. Move the `Unreleased` entries in `CHANGELOG.md` under that version with the
    date.
-3. If the relay handler changed, deploy it first with `bun run worker:deploy`
+3. Make sure the relay allows the extension ID that will run the release:
+   `ALLOWED_EXTENSION_ORIGINS` in `wrangler.jsonc`. Unpacked IDs depend on the
+   folder path; store installs use the store's ID.
+4. If the relay handler or its allowed origins changed, deploy it first with `bun run worker:deploy`
    (see [shared Azure](shared-azure.md)).
 
 ## 2. Build and check

@@ -210,7 +210,25 @@ async function requestText(
     )
   }
 
-  await assertResponseOk(response, call.provider, signal)
+  try {
+    await assertResponseOk(response, call.provider, signal)
+  } catch (error) {
+    // The relay refuses unknown extension IDs; there is no key for the person to fix.
+    if (
+      call.access === 'included' &&
+      error instanceof TranslationError &&
+      error.code === 'authentication'
+    ) {
+      throw new TranslationError(
+        'configuration',
+        'Included Azure access is not available for this installation. Add your own Azure key in Shvyd settings.',
+        error.status
+      )
+    }
+
+    throw error
+  }
+
   let payload: unknown
 
   try {
