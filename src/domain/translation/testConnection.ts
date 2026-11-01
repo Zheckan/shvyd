@@ -5,23 +5,27 @@ import {
   createTranslationService,
   type Fetcher,
 } from './createTranslationService'
+import type { TranslationEvent } from './translation'
 
 export async function testConnection({
   settings,
   provider,
   fetcher,
   managedAzureUrl,
+  onEvent,
 }: {
   settings: Settings
   provider: Provider
   fetcher?: Fetcher
   managedAzureUrl?: string
+  onEvent?: (event: TranslationEvent) => void
 }): Promise<{ durationMs: number }> {
   const parsed = parseSettings(settings)
   const service = createTranslationService({
     readSettings: async () => parsed,
     fetcher,
     managedAzureUrl,
+    onEvent,
   })
   const result = await service.translate({
     text: 'Hello',

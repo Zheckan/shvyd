@@ -70,3 +70,7 @@ confusion, and non-obvious constraints.
   its preference save. Dismissed save failures must also be ignored. The isolated
   `bun run test:reliability` checks these races and actual worker restarts without
   provider keys or API usage; results go to `.preview/reliability-check/`.
+- Usage counters write to `chrome.storage.local` key `usage` after every provider
+  call. `src/test/browser/reliability-storage.js` holds only writes containing
+  `settings`; holding every `set` call would also trap usage writes and break the
+  save counts the reliability harness waits for.

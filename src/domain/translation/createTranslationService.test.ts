@@ -673,3 +673,106 @@ describe('selected-text translation', () => {
     expect(calls).toBe(2)
   })
 })
+
+describe('usage events', () => {
+  const azureSettings = async (): Promise<Settings> => ({
+    ...DEFAULT_SETTINGS,
+    azure: { key: 'test-key', region: '' },
+  })
+
+  test('a provider call is reported once, and cache hits and shared requests are reported as reused', async () => {
+    const events: unknown[] = []
+    let release = () => {}
+    const gate = new Promise<void>((resolve) => {
+      release = resolve
+    })
+    const service = createTranslationService({
+      readSettings: azureSettings,
+      onEvent: (event) => events.push(event),
+      fetcher: async () => {
+        await gate
+        return Response.json({
+          value: [{ translations: [{ text: 'Привіт' }] }],
+        })
+      },
+    })
+
+    const first = service.translate({ text: ' Hello ', target: 'uk' })
+    const second = service.translate({ text: 'Hello', target: 'uk' })
+    await Bun.sleep(0)
+    release()
+    await Promise.all([first, second])
+    await service.translate({ text: 'Hello', target: 'uk' })
+
+    expect(events).toEqual([
+      { kind: 'reused', provider: 'azure', access: 'own-key' },
+      {
+        kind: 'provider-call',
+        provider: 'azure',
+        access: 'own-key',
+        characters: 5,
+        durationMs: expect.any(Number),
+        outcome: 'success',
+      },
+      { kind: 'reused', provider: 'azure', access: 'own-key' },
+    ])
+  })
+
+  test('a failed provider call reports its category and HTTP status, never the response body', async () => {
+    const events: unknown[] = []
+    const service = createTranslationService({
+      readSettings: async () => ({ ...DEFAULT_SETTINGS }),
+      managedAzureUrl: 'https://relay.example/translate',
+      onEvent: (event) => events.push(event),
+      fetcher: async () => new Response('secret details', { status: 429 }),
+    })
+
+    await expect(
+      service.translate({ text: 'Hi there', target: 'uk' })
+    ).rejects.toMatchObject({ code: 'rate-limit' })
+    expect(events).toEqual([
+      {
+        kind: 'provider-call',
+        provider: 'azure',
+        access: 'included',
+        characters: 8,
+        durationMs: expect.any(Number),
+        outcome: 'failure',
+        code: 'rate-limit',
+        status: 429,
+      },
+    ])
+  })
+
+  test('requests rejected before a provider call are not counted', async () => {
+    const events: unknown[] = []
+    const service = createTranslationService({
+      readSettings: async () => ({ ...DEFAULT_SETTINGS }),
+      onEvent: (event) => events.push(event),
+      fetcher: async () => Response.json({}),
+    })
+
+    await expect(
+      service.translate({ text: 'Hello', target: 'uk' })
+    ).rejects.toMatchObject({ code: 'configuration' })
+    expect(events).toEqual([])
+  })
+
+  test('a throwing usage listener cannot break translation', async () => {
+    const service = createTranslationService({
+      readSettings: azureSettings,
+      onEvent: () => {
+        throw new Error('storage failed')
+      },
+      fetcher: async () =>
+        Response.json({ value: [{ translations: [{ text: 'Привіт' }] }] }),
+    })
+
+    expect(
+      await service.translate({ text: 'Hello', target: 'uk' })
+    ).toMatchObject({ text: 'Привіт' })
+    expect(
+      await service.translate({ text: 'Hello', target: 'uk' })
+    ).toMatchObject({ cached: true })
+  })
+})

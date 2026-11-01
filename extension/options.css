@@ -218,6 +218,9 @@ select:focus-visible,
 .segments:has(> :nth-child(3)[aria-pressed='true'], > :nth-child(3) :checked) {
   --segment-index: 2;
 }
+.segments:has(> :nth-child(4)[aria-pressed='true'], > :nth-child(4) :checked) {
+  --segment-index: 3;
+}
 /* Settings load after first paint; place the thumb without sliding. */
 #settings-fields:disabled .segments::before {
   transition: none;
@@ -745,6 +748,67 @@ hr {
 }
 .connection-status[data-state='error'] {
   color: var(--error);
+}
+.settings-column > .card {
+  margin-top: 16px;
+}
+.usage-period {
+  --segment-count: 4;
+  height: 34px;
+}
+.usage-table-wrap {
+  overflow-x: auto;
+}
+.usage-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+  font-variant-numeric: tabular-nums;
+}
+.usage-table th,
+.usage-table td {
+  padding: 8px 6px;
+  border-bottom: 1px solid var(--line);
+  text-align: right;
+  white-space: nowrap;
+}
+.usage-table thead th {
+  font-weight: 400;
+  color: var(--muted);
+}
+.usage-table th:first-child {
+  text-align: left;
+  font-weight: 500;
+  color: var(--ink);
+}
+.usage-table thead th:first-child {
+  font-weight: 400;
+  color: var(--muted);
+}
+.usage-empty {
+  padding: 12px 6px 0;
+}
+.usage-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px 12px;
+}
+.usage-actions > output,
+.usage-actions > p {
+  flex: 1 1 200px;
+}
+.diagnostics-preview {
+  margin: 0;
+  max-height: 280px;
+  overflow: auto;
+  padding: 12px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--pane);
+  font-size: 12px;
+  line-height: 1.5;
 }
 .credential-notes {
   display: flex;

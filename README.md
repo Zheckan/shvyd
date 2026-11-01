@@ -30,6 +30,8 @@ The bundled catalog has 173 targets across the two providers. Choose your prefer
 
 The background worker sends BYOK requests directly to Azure or DeepL. Included Azure access uses a server relay that holds the owner's key; the extension receives only the public endpoint URL. See [shared Azure setup](docs/shared-azure.md); `bun run worker:deploy` deploys it and rebuilds the extension using the dedicated deployment token. The public endpoint is already the release default. User keys are stored in extension-local storage restricted to trusted extension contexts. The page popup receives only public preferences and translated text.
 
+Settings also show local usage counts, a DeepL allowance check, and optional error records you can export for support. They stay in this browser; see [local usage](docs/local-usage.md).
+
 ## Run the playground
 
 ```sh
@@ -66,7 +68,7 @@ Run the reliability checks without provider keys or a playground server:
 bun run test:reliability
 ```
 
-This builds the extension and checks delayed replies, language-save failures, rapid target changes, closing, network retry, error classifications, and an actual background-worker restart in an isolated Helium profile. It requires Helium and Python's `websocket-client`. Results stay in `.preview/reliability-check/`. These browser checks run locally; CI runs the unit tests. See [request reliability](docs/translation-reliability.md) for cache behavior and verification details.
+This builds the extension and checks delayed replies, language-save failures, rapid target changes, closing, network retry, error classifications, an actual background-worker restart, persistent usage counts, and redacted error-record export in an isolated Helium profile. It requires Helium and Python's `websocket-client`. Results stay in `.preview/reliability-check/`. These browser checks run locally; CI runs the unit tests. See [request reliability](docs/translation-reliability.md) for cache behavior and verification details.
 
 To run live checks, configure provider keys in `.env` and leave the demo server running in another terminal. The extension harness explicitly adds BYOK credentials to an isolated profile; it does not embed them in the build:
 
