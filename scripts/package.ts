@@ -85,11 +85,14 @@ export async function packageExtension({
   outputDirectory = resolve(root, 'release'),
   secrets,
   managedAzureUrl = DEFAULT_MANAGED_AZURE_URL,
+  store = false,
 }: {
   outputDirectory?: string
   secrets: string[]
   /** Passed explicitly so a local `.env` override can never reach a release. */
   managedAzureUrl?: string
+  /** For Chrome Web Store upload: the store assigns the ID and rejects `key`. */
+  store?: boolean
 }): Promise<{
   zipPath: string
   sha256: string
@@ -144,9 +147,16 @@ export async function packageExtension({
       throw new Error('The built manifest version does not match package.json.')
     }
 
+    if (store && entries[0]) {
+      delete builtManifest.key
+      entries[0].data = new TextEncoder().encode(
+        JSON.stringify(builtManifest, null, 2) + '\n'
+      )
+    }
+
     const archive = createZip(entries)
     const hash = sha256(archive)
-    const name = `shvyd-${version}.zip`
+    const name = store ? `shvyd-${version}-store.zip` : `shvyd-${version}.zip`
     const zipPath = resolve(outputDirectory, name)
 
     await mkdir(outputDirectory, { recursive: true })
@@ -176,6 +186,7 @@ if (import.meta.main) {
   const result = await packageExtension({
     secrets: secretValues({ ...fileValues, ...Bun.env }),
     managedAzureUrl: relayFlag?.slice('--relay='.length),
+    store: Bun.argv.includes('--store'),
   })
 
   console.info(

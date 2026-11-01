@@ -9,24 +9,23 @@ Shvyd is shared as a ZIP for manual installation in Chromium-based browsers
 2. Optional: check the download. In the download folder, run
    `shasum -a 256 -c shvyd-<version>.zip.sha256`. It should print `OK`.
 3. Extract the ZIP into a folder you will keep, for example
-   `~/Applications/Shvyd`. **Keep using this same folder for every update.** The
-   browser ties the extension's saved settings to the folder's location.
+   `~/Applications/Shvyd`. The browser loads Shvyd from this folder, so don't
+   delete it.
 4. Open `chrome://extensions`, turn on **Developer mode**, click **Load
    unpacked**, and choose that folder.
 5. Reload any open tabs, select text, and click **Translate**.
 
-Azure works through included access only for extension IDs the relay allows.
-An unpacked extension's ID comes from its folder path, so today included access
-works only when loaded from the maintainer's `dist/` folder. Anywhere else the
-popup says included access is unavailable; add your own Azure key in settings.
-Pinning one ID for every install needs a relay update first; see
-[releasing](releasing.md). To use DeepL or your own Azure
-key, click the Shvyd toolbar icon and choose **All settings**.
+Azure works without a key through included access. Every copy of the ZIP has
+the same extension ID (`fccglnmggflkkamnjjkibkbbakdkhgil`), whatever folder it is
+loaded from, and the relay accepts that ID. To use DeepL or your own Azure key,
+click the Shvyd toolbar icon and choose **All settings**.
+
+Builds from before the fixed ID had a different ID. Loading this one starts with
+default settings once; add your keys again.
 
 ## Update
 
-1. Extract the new ZIP **into the same folder**, replacing the old files. Delete
-   the folder's old contents first so no stale files remain.
+1. Delete the old files in the Shvyd folder and extract the new ZIP there.
 2. In `chrome://extensions`, click the reload icon on the Shvyd card.
 3. Reload open tabs. Settings, keys, and usage counts are kept.
 
@@ -34,9 +33,8 @@ The settings header shows the installed version.
 
 ## Roll back
 
-Keep the previous ZIP. To go back, extract it into the same folder the same way,
-then reload the extension. Settings are kept because the folder location has not
-changed.
+Keep the previous ZIP. To go back, extract it the same way and reload the
+extension. Settings are kept because the extension ID does not change.
 
 ## Remove local data
 

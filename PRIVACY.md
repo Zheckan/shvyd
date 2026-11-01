@@ -1,7 +1,6 @@
 # Shvyd privacy policy
 
-**Draft, not yet published.** Operator name and contact are still to be added
-(marked `TODO`). Effective date: set on publication.
+**Draft, not yet published.** Effective date: set on publication.
 
 Shvyd is a browser extension that translates text you select. This policy
 describes what the extension and its translation relay do with your data.
@@ -58,4 +57,4 @@ when the browser stops the extension's background worker.
 
 Changes to this policy will be listed in the changelog and dated here.
 
-Operator: `TODO name`. Contact: `TODO email`.
+Operator: Yevhenii Zhaivoronok. Contact: Zheckan1120@gmail.com.

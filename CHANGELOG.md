@@ -15,6 +15,8 @@ credential-free ZIP built with `bun run package`.
 - Optional error records, off by default: at most 100 records kept for 7 days, with preview, JSON download, and clear.
 - Versioned, reproducible release ZIP built from an explicit file list, with a SHA-256 checksum and a credential scan.
 - The settings header shows the installed version.
+- Every install has the same extension ID, so included Azure works from any folder. Builds from before this change start once with default settings.
+- `bun run package --store` writes the Chrome Web Store upload, which leaves out the manifest key.
 
 ### Changed
 

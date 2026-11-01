@@ -4,6 +4,7 @@
   "description": "Select text and translate it in a small popup that fits the page.",
   "version": "0.0.1",
   "minimum_chrome_version": "120",
+  "key": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAj1onpsIirPz0cYqhTJUWWoQBnphldee0mduFBtDDh8H1ARIp/6k9HTG0pwSDaZXxEtsyZUTR4N/X1Ii4ngEMUIi5fW7cjgFpRCQ+GOUovQJTh02xpEffzMGyBq1+x8P3PRVJnQtPGFFcAS8Tfkb6JS57/IAOMK7Y1ADOkIDSBQK7AfsgLYsnr6yhvhMgtbhqQ+1e32jfzrGfYIsPwskZUqHX0PKx/cnxrK+GghaIhePicDidFBi6gQR4EwSTNzpwguGmrbbQIdaqm4D5Lyu3WZ+34zy7OWbXT4B4swOe/vlQykioMWPJU6pPLfXLIIFyhIy8NeoFYC8HUpcvk8rWgQIDAQAB",
   "permissions": ["storage"],
   "icons": {
     "16": "icons/icon16.png",

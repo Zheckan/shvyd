@@ -90,12 +90,15 @@ confusion, and non-obvious constraints.
   the top-level page's host (`location.ancestorOrigins`, last entry), so embedded
   frames follow their page. A hidden site gets no Shvyd DOM or listeners at all;
   the content script asks `site-status` before mounting. Hiding broadcasts
-  `site-hidden` to every tab; showing again needs a reload of that site's tabs.
-- The relay allows only `ALLOWED_EXTENSION_ORIGINS` (one ID today, the ID Chrome
-  assigns to this repository's `dist/` path). An unpacked ID is the first 32 hex
-  digits of SHA-256 of the absolute folder path, mapped `0-f` to `a-p`, so the
-  same ZIP extracted elsewhere gets HTTP 403 from the relay. The extension now
-  reports that as included access being unavailable, not as a rejected key.
+  `site-hidden` to every tab, and showing again broadcasts `site-shown`.
+- The relay allows only `ALLOWED_EXTENSION_ORIGINS`. Without a manifest `key`,
+  an unpacked ID is the first 32 hex digits of SHA-256 of the absolute folder
+  path, mapped `0-f` to `a-p`, so the same ZIP extracted elsewhere got HTTP 403
+  from the relay. With a `key`, the ID is the same digits of SHA-256 of the
+  key's DER bytes, so every folder gets `fccglnmggflkkamnjjkibkbbakdkhgil`. The
+  Chrome Web Store rejects uploads whose manifest has `key`, hence
+  `bun run package --store`. A relay 403 still reads as included access being
+  unavailable, not as a rejected key.
 - Text selected inside an `input` or `textarea` is not part of the document's
   ranges: Chrome reports a range at the field's parent whose box is empty, so
   positioning from it puts the button at the viewport corner. The popup reads
