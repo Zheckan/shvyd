@@ -1,6 +1,6 @@
 # First stable release plan
 
-Updated 2026-10-31. This plan is for the first stable release, intended for personal use and one or two friends. It does not require a beta programme or promotion. Settings, request reliability, and local usage and diagnostics are implemented on the stacked implementation branches. The remaining release work is documentation and packaging. No release has been published.
+Updated 2026-10-31. This plan is for the first stable release, intended for personal use and one or two friends. It does not require a beta programme or promotion. Settings, request reliability, local usage and diagnostics, and release packaging are implemented on the stacked implementation branches. The remaining release work is the privacy notice, usage terms, license, and the owner decisions listed at the end. No release has been published.
 
 ## Decisions for this release
 
@@ -121,7 +121,7 @@ Prepare concise usage terms covering user-owned provider credentials, provider l
 1. **Design settings.** Produce layouts from the brief, including first use, provider credentials, languages, appearance, usage, diagnostics, and error states. Keep planned controls visibly distinct from existing behavior in the design handoff.
 2. **Implement settings and reliability.** Preserve saved data; add explicit connection validation, usable key removal, request deduplication, bounded cache size, and accurate rate-limit/quota messages. Check keyboard navigation, focus, loading states, and stale responses.
 3. **Add local observability.** Implement counters, bounded diagnostics, clear/export controls, retention, and redaction. Keep central reporting a separate PR if it is approved later.
-4. **Prepare distribution.** Add icons, versioned packaging, a changelog, installation/update instructions, a privacy notice, usage terms, and a license decision. Produce the artifact from a clean build and an explicit file allowlist. Both build commands are credential-free; package only the explicit release file allowlist.
+4. **Prepare distribution.** Packaging, changelog, and install/update instructions are done: see [releasing](releasing.md) and [install](install.md). Remaining: privacy notice, usage terms, and license. Add icons, versioned packaging, a changelog, installation/update instructions, a privacy notice, usage terms, and a license decision. Produce the artifact from a clean build and an explicit file allowlist. Both build commands are credential-free; package only the explicit release file allowlist.
 5. **Verify the artifact.** Run `pnpm check` and relevant browser checks, then install the exact ZIP contents in fresh Chromium and Helium profiles. Verify empty credentials, both providers, update migration, unsupported pages, worker restart, language modes, safe formatted output, copying, dragging, keyboard use, errors, and clearing data. Inspect the ZIP for credentials and development files.
 6. **Review and release manually.** The owner reviews and merges the stack. Tag and publish only when explicitly requested. Keep the last working release and document how to reinstall it without losing settings.
 

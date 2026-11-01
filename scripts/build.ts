@@ -1,5 +1,5 @@
 import { mkdir, copyFile, cp, rm } from 'node:fs/promises'
-import { resolve } from 'node:path'
+import { relative, resolve } from 'node:path'
 import { DEFAULT_MANAGED_AZURE_URL } from '@/config/release'
 import { parseReleaseConfig } from '@/domain/settings/release-config'
 
@@ -61,7 +61,7 @@ export async function build(
   )
 
   console.info(
-    `Built dist/ without provider credentials.${local ? ' build:local no longer embeds .env keys.' : ''}`
+    `Built ${output.startsWith(root) ? relative(root, output) : 'a staging directory'} without provider credentials.${local ? ' build:local no longer embeds .env keys.' : ''}`
   )
 
   for (const item of sizes) {

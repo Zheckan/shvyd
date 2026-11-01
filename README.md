@@ -8,6 +8,10 @@ Drag the empty space in the popup's top bar to move it. The window stays inside 
 
 Selected paragraphs, headings, emphasis, lists, and table cells keep their structure in the translation. Code stays unchanged. The Copy button keeps paragraph breaks, list markers, and table columns as plain text. This uses one provider request; see [selection formatting](docs/formatting.md).
 
+## Install a release
+
+Download the release ZIP and follow [install, update, and roll back](docs/install.md). Changes are listed in the [changelog](CHANGELOG.md); maintainers package releases with `bun run package` as described in [releasing](docs/releasing.md).
+
 ## Load the prototype in Helium
 
 ```sh

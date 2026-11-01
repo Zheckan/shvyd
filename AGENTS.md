@@ -63,6 +63,7 @@ bun run verify        # lint, format check, typecheck, unit tests, build
 bun run fix           # lint fixes and formatting, then verify
 bun run build        # credential-free dist/; build:local is a safe compatibility alias
 bun run dev           # playground on http://localhost:5173
+bun run package       # versioned release ZIP in release/; see docs/releasing.md
 ```
 
 Load `dist/` with **Load unpacked** at `chrome://extensions` to try the
