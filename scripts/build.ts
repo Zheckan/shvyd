@@ -15,8 +15,8 @@ export async function build(
   const config = parseReleaseConfig({ managedAzureUrl })
 
   const result = await Bun.build({
-    entrypoints: ['content.ts', 'background.ts', 'options.ts'].map((name) =>
-      resolve(root, 'src/entries', name)
+    entrypoints: ['content.ts', 'background.ts', 'options.ts', 'popup.ts'].map(
+      (name) => resolve(root, 'src/entries', name)
     ),
     outdir: output,
     target: 'browser',
@@ -36,6 +36,8 @@ export async function build(
     'language-settings.css',
     'usage.css',
     'preview.css',
+    'popup.html',
+    'popup.css',
   ]) {
     await copyFile(resolve(root, 'extension', name), resolve(output, name))
   }

@@ -17,6 +17,12 @@ import {
   credentialAccess,
 } from './logic/credentialAccess'
 import { mountSettingsPreview } from './mountSettingsPreview'
+import {
+  applyTheme,
+  readSavedTheme,
+  saveTheme,
+  type Theme,
+} from '@/ui/savedTheme'
 import { requireIn } from '@/utils/requireIn'
 
 export function mountSettingsPage(
@@ -115,6 +121,7 @@ export function mountSettingsPage(
     selectRadio('provider', settings.provider)
     languageSettings.fill(settings)
     input('adaptToPage').checked = settings.adaptToPage
+    selectRadio('popupAnchor', settings.popupAnchor)
     input('azureKey').value = settings.azure.key
     input('azureRegion').value = settings.azure.region
     input('deeplKey').value = settings.deepl.key
@@ -128,6 +135,7 @@ export function mountSettingsPage(
       ...languageSettings.read(),
       provider: radio('provider'),
       adaptToPage: input('adaptToPage').checked,
+      popupAnchor: radio('popupAnchor'),
       azure: {
         key: input('azureKey').value,
         region: input('azureRegion').value.trim(),
@@ -210,6 +218,12 @@ export function mountSettingsPage(
   }
 
   input('adaptToPage').addEventListener('change', changed)
+
+  for (const element of form.querySelectorAll<HTMLInputElement>(
+    '[name=popupAnchor]'
+  )) {
+    element.addEventListener('change', changed)
+  }
 
   for (const element of form.querySelectorAll<HTMLInputElement>(
     '[name=azureKey], [name=azureRegion], [name=deeplKey], [name=deeplEndpoint]'
@@ -313,6 +327,7 @@ export function mountSettingsPage(
         ...languageSettings.read(),
         provider: radio('provider'),
         adaptToPage: input('adaptToPage').checked,
+        popupAnchor: radio('popupAnchor'),
         azure: imported.azure,
         deepl: imported.deepl,
       })
@@ -336,37 +351,30 @@ export function mountSettingsPage(
     envFile.value = ''
   })
 
-  function theme(value: string): void {
-    const selected = ['light', 'dark', 'auto'].includes(value) ? value : 'auto'
-    document.documentElement.dataset.theme = selected
+  function theme(value: Theme): void {
+    applyTheme(value)
 
     for (const button of document.querySelectorAll<HTMLButtonElement>(
       '[data-theme-choice]'
     )) {
       button.setAttribute(
         'aria-pressed',
-        String(button.dataset.themeChoice === selected)
+        String(button.dataset.themeChoice === value)
       )
     }
   }
 
-  try {
-    theme(localStorage.getItem('shvyd-settings-theme') ?? 'auto')
-  } catch {
-    theme('auto')
-  }
+  theme(readSavedTheme())
 
   for (const button of document.querySelectorAll<HTMLButtonElement>(
     '[data-theme-choice]'
   )) {
     button.addEventListener('click', () => {
-      const value = button.dataset.themeChoice ?? 'auto'
-      theme(value)
+      const value = button.dataset.themeChoice
 
-      try {
-        localStorage.setItem('shvyd-settings-theme', value)
-      } catch {
-        // Theme controls still work if the browser blocks local storage.
+      if (value === 'light' || value === 'dark' || value === 'auto') {
+        theme(value)
+        saveTheme(value)
       }
     })
   }

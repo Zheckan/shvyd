@@ -7,7 +7,9 @@ credential-free ZIP built with `bun run package`.
 
 ### Added
 
-- **Don't show on this site:** the crossed-out eye in the popup turns Shvyd off for the current site after a confirmation. Open tabs on that site drop it at once, and embedded frames follow their page. Settings → Hidden on these sites lists them, with **Show again**.
+- **Toolbar menu:** clicking the Shvyd icon opens quick settings in the style of the settings page: show or hide Shvyd on the current site, provider, target language, popup position, page style, and a link to all settings. Changes reach open tabs without a reload.
+- **Don't show on this site:** from the toolbar menu. Open tabs on that site drop Shvyd at once, embedded frames follow their page, and turning it back on works without a reload. Settings → Hidden on these sites lists them, with **Show again**.
+- **Popup position:** next to the cursor (default) or at the end of the selection, in the toolbar menu and settings. Keyboard selections use the end of the selection.
 - Local usage counts per day and route: Azure included access, Azure with your own key, and DeepL. Shows requests, characters, reused results, failures, and uncertain timeouts for today and the last 7, 30, and 90 days.
 - DeepL allowance check using the saved key. Uses no characters.
 - Optional error records, off by default: at most 100 records kept for 7 days, with preview, JSON download, and clear.

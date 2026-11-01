@@ -5,7 +5,7 @@ import { createTranslationService } from '@/domain/translation/createTranslation
 import { createUsageStore } from '@/domain/usage/createUsageStore'
 import { createExtensionRouter } from './createExtensionRouter'
 
-function router(notified: string[] = []) {
+function router(notified: unknown[] = []) {
   let stored: unknown
   let sitesStored: unknown
   const settings = createSettingsStore({
@@ -31,7 +31,7 @@ function router(notified: string[] = []) {
     settings,
     usage,
     sites,
-    notifySiteHidden: (site) => notified.push(site),
+    notifyTabs: (message) => notified.push(message),
     recordUsage: () => undefined,
     managedAzureUrl: Promise.resolve(undefined),
     translator: Promise.resolve(
@@ -41,8 +41,21 @@ function router(notified: string[] = []) {
   })
 }
 
-const contentScript = { extension: true, settingsPage: false }
-const settingsPage = { extension: true, settingsPage: true }
+const contentScript = {
+  extension: true,
+  extensionPage: false,
+  settingsPage: false,
+}
+const toolbarMenu = {
+  extension: true,
+  extensionPage: true,
+  settingsPage: false,
+}
+const settingsPage = {
+  extension: true,
+  extensionPage: true,
+  settingsPage: true,
+}
 
 describe('extension messages', () => {
   test('a content script cannot read settings, keys, usage, or diagnostics', async () => {
@@ -50,7 +63,6 @@ describe('extension messages', () => {
 
     for (const kind of [
       'hidden-sites',
-      'show-site',
       'get-settings',
       'save-settings',
       'test-connection',
@@ -84,7 +96,7 @@ describe('extension messages', () => {
     expect(
       await handle(
         { kind: 'preferences' },
-        { extension: false, settingsPage: false }
+        { extension: false, extensionPage: false, settingsPage: false }
       )
     ).toMatchObject({ ok: false, message: 'Invalid extension request.' })
     expect(await handle({ kind: 'toString' }, settingsPage)).toMatchObject({
@@ -107,7 +119,7 @@ describe('extension messages', () => {
 
 describe('hidden sites', () => {
   test('a content script can check its site and hide it, and other tabs are told', async () => {
-    const notified: string[] = []
+    const notified: unknown[] = []
     const handle = router(notified)
 
     expect(
@@ -119,7 +131,7 @@ describe('hidden sites', () => {
     expect(
       await handle({ kind: 'hide-site', site: 'example.com' }, contentScript)
     ).toEqual({ ok: true, data: { hidden: true } })
-    expect(notified).toEqual(['example.com'])
+    expect(notified).toEqual([{ kind: 'site-hidden', site: 'example.com' }])
     expect(
       await handle({ kind: 'site-status', site: 'example.com' }, contentScript)
     ).toEqual({ ok: true, data: { hidden: true } })
@@ -140,12 +152,66 @@ describe('hidden sites', () => {
   })
 
   test('an invalid site is rejected and nothing is hidden', async () => {
-    const notified: string[] = []
+    const notified: unknown[] = []
     const handle = router(notified)
 
     expect(
       await handle({ kind: 'hide-site', site: 'not a host' }, contentScript)
     ).toMatchObject({ ok: false })
     expect(notified).toEqual([])
+  })
+})
+
+describe('toolbar menu', () => {
+  test('the menu can show a hidden site again and every tab is told; a page cannot', async () => {
+    const notified: unknown[] = []
+    const handle = router(notified)
+    await handle({ kind: 'hide-site', site: 'example.com' }, toolbarMenu)
+
+    expect(
+      await handle({ kind: 'show-site', site: 'example.com' }, contentScript)
+    ).toMatchObject({ ok: false })
+    expect(
+      await handle({ kind: 'show-site', site: 'example.com' }, toolbarMenu)
+    ).toEqual({ ok: true, data: [] })
+    expect(notified).toEqual([
+      { kind: 'site-hidden', site: 'example.com' },
+      { kind: 'site-shown', site: 'example.com' },
+    ])
+  })
+
+  test('the menu learns which providers work without ever receiving keys', async () => {
+    const handle = router()
+    const reply = await handle({ kind: 'quick-settings' }, toolbarMenu)
+
+    expect(reply).toMatchObject({
+      ok: true,
+      data: {
+        preferences: { provider: 'azure', popupAnchor: 'cursor' },
+        providers: { azure: false, deepl: false },
+      },
+    })
+    expect(JSON.stringify(reply)).not.toContain('key')
+    expect(
+      await handle({ kind: 'quick-settings' }, contentScript)
+    ).toMatchObject({ ok: false })
+  })
+
+  test('changing preferences tells every tab, without keys', async () => {
+    const notified: unknown[] = []
+    const handle = router(notified)
+
+    await handle(
+      { kind: 'update-preferences', value: { popupAnchor: 'selection' } },
+      toolbarMenu
+    )
+
+    expect(notified).toEqual([
+      {
+        kind: 'preferences-changed',
+        preferences: expect.objectContaining({ popupAnchor: 'selection' }),
+      },
+    ])
+    expect(JSON.stringify(notified)).not.toContain('azure":{')
   })
 })

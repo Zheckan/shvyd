@@ -171,6 +171,48 @@ def main():
             check('password-field-never-offers-translation', not popup("return !root.querySelector('.bubble').hidden"), {})
             close_popup()
 
+            # 2b. By default the button appears beside the cursor.
+            def drag_across(element_id):
+                box = page.evaluate("(()=>{const r=document.createRange();r.selectNodeContents(document.getElementById(" + json.dumps(element_id) + "));const b=r.getClientRects()[0];return {x:b.x,y:b.y,w:b.width,h:b.height}})()")
+                y = box['y'] + box['h'] / 2
+                drag(box['x'] + 2, y, box['x'] + box['w'] - 2, y)
+                frames()
+                return (box['x'] + box['w'] - 2, y)
+
+            def bubble_box():
+                return popup("const r=root.querySelector('.bubble').getBoundingClientRect();return {left:r.left,top:r.top,right:r.right,bottom:r.bottom,visible:!root.querySelector('.bubble').hidden}")
+
+            end_x, end_y = drag_across('short')
+            beside = bubble_box()
+            check('button-beside-cursor-by-default', beside['visible'] and abs(beside['left'] - (end_x + 12)) <= 3 and abs(beside['top'] - (end_y + 12)) <= 3, {'bubble': beside, 'pointer': [end_x, end_y]})
+            close_popup()
+
+            # 2c. The toolbar menu switches to the end of the selection, and open pages follow without a reload.
+            menu_id = page.call('Target.createTarget', {'url': f'chrome-extension://{extension_id}/popup.html', 'background': True})['targetId']
+            menu = browser.CDP(browser.wait_for(lambda: next((item for item in targets() if item['id'] == menu_id), None), 'menu')['webSocketDebuggerUrl'])
+            connections.append(menu)
+            menu.call('Runtime.enable')
+            menu.call('Emulation.setDeviceMetricsOverride', {'width': 340, 'height': 600, 'deviceScaleFactor': 2, 'mobile': False})
+            browser.wait_for(lambda: menu.evaluate("document.getElementById('site-name')?.textContent==='127.0.0.1' && document.querySelector('[data-anchor=cursor]')?.getAttribute('aria-pressed')==='true'"), 'menu loaded')
+            # A background tab renders no frames, so transitions would freeze mid-way in screenshots.
+            menu.evaluate("(()=>{const s=document.createElement('style');s.textContent='*,*::before,*::after{transition:none!important}';document.head.append(s);return true})()")
+            for theme in ['light', 'dark']:
+                menu.evaluate(f"document.documentElement.dataset.theme='{theme}', true")
+                height = menu.evaluate('document.body.scrollHeight')
+                shot = menu.call('Page.captureScreenshot', {'format': 'png', 'clip': {'x': 0, 'y': 0, 'width': 340, 'height': height, 'scale': 1}})
+                (OUTPUT / f'menu-{theme}.png').write_bytes(base64.b64decode(shot['data']))
+            menu.evaluate("document.querySelector('[data-anchor=selection]').click(), true")
+            browser.wait_for(lambda: menu.evaluate("document.querySelector('[data-anchor=selection]').getAttribute('aria-pressed')==='true'"), 'menu saved position')
+            page.evaluate('new Promise(r=>setTimeout(r,300))')
+            drag_across('short')
+            at_end = bubble_box()
+            last = page.evaluate("(()=>{const r=document.createRange();r.selectNodeContents(document.getElementById('short'));const rects=r.getClientRects();const b=rects[rects.length-1];return {right:b.right,bottom:b.bottom}})()")
+            check('menu-switches-button-to-selection-end-without-reload', at_end['visible'] and abs(at_end['right'] - last['right']) <= 3 and abs(at_end['top'] - (last['bottom'] + 9)) <= 3, {'bubble': at_end, 'selectionEnd': last})
+            close_popup()
+            menu.evaluate("document.querySelector('[data-anchor=cursor]').click(), true")
+            browser.wait_for(lambda: menu.evaluate("document.querySelector('[data-anchor=cursor]').getAttribute('aria-pressed')==='true'"), 'menu restored position')
+            page.evaluate('new Promise(r=>setTimeout(r,300))')
+
             # 3. Loading has no scroll bar and uses the page's color scheme.
             short_loading = open_loading('short')
             check('loading-has-no-scrollbar', short_loading['scroll'] <= short_loading['client'], short_loading)

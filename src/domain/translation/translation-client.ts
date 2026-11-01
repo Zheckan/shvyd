@@ -16,9 +16,37 @@ export interface TranslationClient {
   openSettings(): Promise<void>
   /** Whether Shvyd is turned off on this site. */
   siteHidden(site: string): Promise<boolean>
-  hideSite(site: string): Promise<void>
-  /** Called when Shvyd is turned off on a site from any tab. */
-  onSiteHidden(listener: (site: string) => void): void
+  /** Called for each change the background announces to every tab. */
+  onTabMessage(listener: (message: TabMessage) => void): void
+}
+
+/** Changes the background announces to every tab, so pages update without a reload. */
+export type TabMessage =
+  | { kind: 'site-hidden'; site: string }
+  | { kind: 'site-shown'; site: string }
+  | { kind: 'preferences-changed'; preferences: Preferences }
+
+export function parseTabMessage(value: unknown): TabMessage | undefined {
+  if (!isRecord(value)) {
+    return undefined
+  }
+
+  try {
+    if (value.kind === 'site-hidden' || value.kind === 'site-shown') {
+      return { kind: value.kind, site: parseSite(value.site) }
+    }
+
+    if (value.kind === 'preferences-changed') {
+      return {
+        kind: 'preferences-changed',
+        preferences: parsePreferences(value.preferences),
+      }
+    }
+  } catch {
+    // Ignore malformed announcements.
+  }
+
+  return undefined
 }
 
 export async function unwrapResponse(value: unknown): Promise<unknown> {
@@ -67,17 +95,12 @@ export function createClient(
 
       return data.hidden
     },
-    hideSite: async (site) => {
-      await send({ kind: 'hide-site', site })
-    },
-    onSiteHidden: (listener) => {
-      subscribe((message) => {
-        if (isRecord(message) && message.kind === 'site-hidden') {
-          try {
-            listener(parseSite(message.site))
-          } catch {
-            // Ignore malformed notifications.
-          }
+    onTabMessage: (listener) => {
+      subscribe((value) => {
+        const message = parseTabMessage(value)
+
+        if (message) {
+          listener(message)
         }
       })
     },

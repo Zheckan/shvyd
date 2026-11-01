@@ -3,6 +3,7 @@ import { createSerialQueue } from '@/utils/createSerialQueue'
 import { isRecord } from '@/utils/isRecord'
 import {
   DEFAULT_SETTINGS,
+  isPopupAnchor,
   isProvider,
   migrateUserSettings,
   parseSettings,
@@ -140,6 +141,12 @@ export function createSettingsStore(storage: {
               'defaultTarget',
               isLanguage,
               current.defaultTarget
+            ),
+            popupAnchor: preferenceField(
+              value,
+              'popupAnchor',
+              isPopupAnchor,
+              current.popupAnchor
             ),
           })
         )

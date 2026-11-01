@@ -10,6 +10,8 @@ export type PageSelection = {
   element: Element
   /** Where to place the button and popup; read again on every layout. */
   anchor: () => DOMRect
+  /** Where the pointer was released over the selection, if it was. */
+  pointer: () => DOMRect | undefined
   identity: Range | { field: Element; start: number; end: number }
 }
 
@@ -90,6 +92,7 @@ function readField(
         element: field,
         anchor: () =>
           pointerWithin(field, point) ?? field.getBoundingClientRect(),
+        pointer: () => pointerWithin(field, point),
         identity: { field, start, end },
       },
     }
@@ -146,6 +149,7 @@ function readRange(point: PagePoint | undefined): SelectionResult {
 
         return pointerWithin(element, point) ?? element.getBoundingClientRect()
       },
+      pointer: () => pointerWithin(element, point),
       identity: range,
     },
   }

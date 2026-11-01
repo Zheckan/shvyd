@@ -1,5 +1,10 @@
 import type { createSettingsStore } from '@/domain/settings/createSettingsStore'
-import { isProvider, parseSettings } from '@/domain/settings/settings'
+import {
+  isProvider,
+  parseSettings,
+  publicPreferences,
+  type Preferences,
+} from '@/domain/settings/settings'
 import type { createSiteStore } from '@/domain/sites/createSiteStore'
 import { parseSite } from '@/domain/sites/sites'
 import { checkDeepLUsage } from '@/domain/translation/checkDeepLUsage'
@@ -10,6 +15,7 @@ import {
   TranslationError,
   type TranslationEvent,
 } from '@/domain/translation/translation'
+import type { TabMessage } from '@/domain/translation/translation-client'
 import type { createUsageStore } from '@/domain/usage/createUsageStore'
 import { isRecord } from '@/utils/isRecord'
 
@@ -17,6 +23,8 @@ import { isRecord } from '@/utils/isRecord'
 export type MessageSender = {
   /** Sent by this extension (content script or extension page). */
   extension: boolean
+  /** Sent by one of the extension's own pages: the toolbar menu or settings. */
+  extensionPage: boolean
   /** Sent by the extension's own settings page. */
   settingsPage: boolean
 }
@@ -27,8 +35,12 @@ export type ExtensionResponse =
 type Message = Record<string, unknown>
 
 type Route = {
-  /** Settings-page routes can read or change keys, usage, and diagnostics. */
-  access: 'extension' | 'settings-page'
+  /**
+   * `extension`: any part of Shvyd, including content scripts on web pages.
+   * `extension-page`: Shvyd's own pages; web pages cannot reach these routes.
+   * `settings-page`: reads or changes keys, usage, and diagnostics.
+   */
+  access: 'extension' | 'extension-page' | 'settings-page'
   run: (message: Message) => unknown
 }
 
@@ -36,7 +48,7 @@ export function createExtensionRouter({
   settings,
   usage,
   sites,
-  notifySiteHidden,
+  notifyTabs,
   translator,
   managedAzureUrl,
   recordUsage,
@@ -45,13 +57,18 @@ export function createExtensionRouter({
   settings: ReturnType<typeof createSettingsStore>
   usage: ReturnType<typeof createUsageStore>
   sites: ReturnType<typeof createSiteStore>
-  /** Tells other pages on the site to remove Shvyd now, without a reload. */
-  notifySiteHidden: (site: string) => void
+  /** Announces a change to every tab, so open pages follow it without a reload. */
+  notifyTabs: (message: TabMessage) => void
   translator: Promise<ReturnType<typeof createTranslationService>>
   managedAzureUrl: Promise<string | undefined>
   recordUsage: (event: TranslationEvent) => void
   openSettings: () => Promise<void>
 }) {
+  function announcePreferences(preferences: Preferences): Preferences {
+    notifyTabs({ kind: 'preferences-changed', preferences })
+    return preferences
+  }
+
   async function changeUsage(change: Promise<void>): Promise<unknown> {
     await change
     return usage.view()
@@ -64,7 +81,8 @@ export function createExtensionRouter({
     },
     'update-preferences': {
       access: 'extension',
-      run: (message) => settings.updatePreferences(message.value),
+      run: async (message) =>
+        announcePreferences(await settings.updatePreferences(message.value)),
     },
     translate: {
       access: 'extension',
@@ -89,16 +107,33 @@ export function createExtensionRouter({
       run: async (message) => {
         const site = parseSite(message.site)
         await sites.hide(site)
-        notifySiteHidden(site)
+        notifyTabs({ kind: 'site-hidden', site })
         return { hidden: true }
       },
     },
     'hidden-sites': { access: 'settings-page', run: () => sites.list() },
     'show-site': {
-      access: 'settings-page',
+      access: 'extension-page',
       run: async (message) => {
-        await sites.show(parseSite(message.site))
+        const site = parseSite(message.site)
+        await sites.show(site)
+        notifyTabs({ kind: 'site-shown', site })
         return sites.list()
+      },
+    },
+    'quick-settings': {
+      access: 'extension-page',
+      run: async () => {
+        const current = await settings.settings()
+        const included = !!(await managedAzureUrl)
+
+        return {
+          preferences: publicPreferences(current),
+          providers: {
+            azure: !!current.azure.key || included,
+            deepl: !!current.deepl.key,
+          },
+        }
       },
     },
     'get-settings': {
@@ -113,6 +148,7 @@ export function createExtensionRouter({
       run: async (message) => {
         const saved = await settings.save(message.value)
         ;(await translator).clearCache()
+        announcePreferences(publicPreferences(saved))
         return saved
       },
     },
@@ -178,6 +214,10 @@ export function createExtensionRouter({
 
     if (route.access === 'settings-page' && !sender.settingsPage) {
       throw new Error('Open the extension settings to change API keys.')
+    }
+
+    if (route.access === 'extension-page' && !sender.extensionPage) {
+      throw new Error('Open Shvyd from the toolbar to change this.')
     }
 
     return route.run(message)

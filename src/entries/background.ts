@@ -3,6 +3,7 @@ import { createSiteStore } from '@/domain/sites/createSiteStore'
 import { parseReleaseConfig } from '@/domain/settings/release-config'
 import { createTranslationService } from '@/domain/translation/createTranslationService'
 import type { TranslationEvent } from '@/domain/translation/translation'
+import type { TabMessage } from '@/domain/translation/translation-client'
 import { createUsageStore } from '@/domain/usage/createUsageStore'
 import { createExtensionRouter } from '@/features/extension-router/createExtensionRouter'
 
@@ -33,13 +34,11 @@ const sites = createSiteStore({
   write: (value) => chrome.storage.local.set({ hiddenSites: value }),
 })
 
-async function notifySiteHidden(site: string): Promise<void> {
-  // Every frame checks the site itself; tabs without Shvyd simply do not answer.
+async function notifyTabs(message: TabMessage): Promise<void> {
+  // Each frame decides whether a message concerns it; tabs without Shvyd do not answer.
   for (const tab of await chrome.tabs.query({})) {
     if (tab.id !== undefined) {
-      chrome.tabs
-        .sendMessage(tab.id, { kind: 'site-hidden', site })
-        .catch(() => undefined)
+      chrome.tabs.sendMessage(tab.id, message).catch(() => undefined)
     }
   }
 }
@@ -57,8 +56,8 @@ const handle = createExtensionRouter({
   settings,
   usage,
   sites,
-  notifySiteHidden: (site) => {
-    void notifySiteHidden(site).catch(() => undefined)
+  notifyTabs: (message) => {
+    void notifyTabs(message).catch(() => undefined)
   },
   recordUsage,
   managedAzureUrl,
@@ -73,16 +72,14 @@ const handle = createExtensionRouter({
 })
 
 const SETTINGS_PAGE = chrome.runtime.getURL('options.html')
+const EXTENSION_ORIGIN = chrome.runtime.getURL('')
 
 chrome.runtime.onMessage.addListener((message: unknown, sender, respond) => {
   void handle(message, {
     extension: sender.id === chrome.runtime.id,
+    extensionPage: !!sender.url?.startsWith(EXTENSION_ORIGIN),
     settingsPage: sender.url?.split(/[?#]/)[0] === SETTINGS_PAGE,
   }).then(respond)
 
   return true
-})
-
-chrome.action.onClicked.addListener(() => {
-  void chrome.runtime.openOptionsPage()
 })

@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="en" data-theme="auto">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Shvyd</title>
+    <link rel="stylesheet" href="options.css" />
+    <link rel="stylesheet" href="popup.css" />
+    <script src="popup.js" defer></script>
+  </head>
+  <body class="quick">
+    <header class="quick-header">
+      <img src="icons/icon32.png" width="20" height="20" alt="" />
+      <strong>Shvyd</strong>
+      <span id="version" class="badge">Version</span>
+    </header>
+    <label class="toggle quick-site">
+      <span
+        ><strong id="site-name">This site</strong
+        ><small id="site-hint">Checking this page…</small></span
+      >
+      <input
+        id="site-enabled"
+        class="switch"
+        type="checkbox"
+        aria-label="Show Shvyd on this site"
+        disabled
+      />
+    </label>
+    <hr />
+    <div class="quick-fields">
+      <div class="quick-row">
+        <span class="field-label" id="provider-label">Translate with</span>
+        <div class="segments" role="group" aria-labelledby="provider-label">
+          <button type="button" data-provider="azure" aria-pressed="false">
+            Azure
+          </button>
+          <button type="button" data-provider="deepl" aria-pressed="false">
+            DeepL
+          </button>
+        </div>
+      </div>
+      <label class="quick-row">
+        <span class="field-label">Translate to</span>
+        <select id="quick-target"></select>
+      </label>
+      <div class="quick-row">
+        <span class="field-label" id="anchor-label">Show the popup</span>
+        <div class="segments" role="group" aria-labelledby="anchor-label">
+          <button type="button" data-anchor="cursor" aria-pressed="false">
+            Next to cursor
+          </button>
+          <button type="button" data-anchor="selection" aria-pressed="false">
+            End of selection
+          </button>
+        </div>
+      </div>
+      <label class="toggle">
+        <span><strong>Match the page’s style</strong></span>
+        <input id="quick-adapt" class="switch" type="checkbox" />
+      </label>
+    </div>
+    <output
+      id="quick-status"
+      class="connection-status"
+      role="status"
+      aria-live="polite"
+    ></output>
+    <button id="open-settings" class="button quick-open" type="button">
+      All settings
+    </button>
+  </body>
+</html>
