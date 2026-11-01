@@ -1,105 +1,113 @@
 # Shvyd
 
-A small Chromium extension for translating selected text without leaving the page. Azure is the default provider; DeepL is available in settings. Ukrainian is the initial target. Choose whether each new popup remembers the last language or always starts with a fixed default.
+Shvyd translates the text you select, in a small popup next to it, so you never leave the page. It works in any Chromium browser.
 
-The popup uses consistent SF Pro / system typography with 15 px translation text. On macOS it uses the native system font; other platforms use their system sans-serif fallback. It takes background, text and accent colors, border, corner radius, and shadow from the area around the selection. Text contrast is checked before using the sampled colors. You can switch page adaptation off in settings.
+The popup takes its look from the page you're reading, so it looks like part of the site. Of the translators I've tried, it's the quickest way to read a sentence in another language and carry on.
 
-Click the Shvyd icon in the browser toolbar for quick settings: turn Shvyd off or back on for the current site, pick the provider and target language, choose whether the popup appears next to the cursor or at the end of the selection, and open all settings. Changes reach open tabs immediately. A site turned off stays off, including in embedded frames, until you turn it back on there or under **Hidden on these sites** in settings.
+> [!NOTE]
+> I built Shvyd quickly as a personal project, so expect rough edges. If something breaks or looks wrong, [open an issue](https://github.com/Zheckan/shvyd/issues) with the page and what you selected.
 
-Drag the empty space in the popup's top bar to move it. The window stays inside the viewport, keeps its position when you change languages, and moves its language menu with it. Drag any edge or corner to resize it; the opposite edges stay put, the text fills the new size, and a double-click on an edge restores the default. Each new popup starts beside the selected text at the default size again. The Translate button shows only its icon; turn off **Compact Translate button** in the toolbar menu or settings to show the word too. Selected underlined text, including underlined links, keeps its underline in the translation.
+## Select text and click the button
 
-Selected paragraphs, headings, emphasis, lists, and table cells keep their structure in the translation. Code stays unchanged. The Copy button keeps paragraph breaks, list markers, and table columns as plain text. This uses one provider request; see [selection formatting](docs/formatting.md).
+Select text on any page, and a small button appears next to it.
 
-## Install a release
+![The Translate button next to a selected paragraph](docs/images/select-text.png)
 
-Download the release ZIP and follow [install, update, and roll back](docs/install.md). Changes are listed in the [changelog](CHANGELOG.md); maintainers package releases with `bun run package` as described in [releasing](docs/releasing.md).
+Click it, and the translation opens beside the selection.
 
-## Load the prototype in Helium
+![The translation popup under the selected paragraph](docs/images/translation-popup.png)
+
+From there you can:
+
+- Pick another language from the menu in the popup's top bar. Your preferred languages come first, and **More languages** searches the rest.
+- Copy the translation, drag the popup by its top bar, or resize it from any edge.
+- Keep the structure of what you selected. Paragraphs, headings, lists, tables, and underlined links stay intact, and code stays untranslated.
+- Click the Shvyd icon in the toolbar to switch languages, turn Shvyd off for the current site, or open **All settings**.
+
+Nothing is sent until you click the button.
+
+## It adapts to every page
+
+Shvyd reads the colors, border, and corner shape around the selection and styles the popup to match. It checks that the text stays readable before using them. To get a plain popup everywhere instead, turn off page adaptation in settings.
+
+| Dark code page                                            | Green paper                                                         |
+| --------------------------------------------------------- | ------------------------------------------------------------------- |
+| ![Popup on a dark page](docs/images/adapts-technical.png) | ![Popup on a green page](docs/images/adapts-forest.png)             |
+| **Neon**                                                  | **High contrast**                                                   |
+| ![Popup on a neon page](docs/images/adapts-neon.png)      | ![Popup on a black-and-white page](docs/images/adapts-contrast.png) |
+
+## Install
+
+Download the latest ZIP from [Releases](https://github.com/Zheckan/shvyd/releases) and follow [install, update, and roll back](docs/install.md). To build it yourself instead:
 
 ```sh
 bun install
 bun run build
 ```
 
-1. Open `chrome://extensions` in Helium or another Chromium browser.
-2. Enable **Developer mode**.
-3. Click **Load unpacked** and choose this project's `dist` directory.
-4. Reload a normal web page, select some text, and click **Translate**.
+1. Open `chrome://extensions`.
+2. Turn on **Developer mode**.
+3. Click **Load unpacked** and choose the `dist` folder.
+4. Reload any open page, select some text, and click the button.
 
-Both `build` and the compatibility command `build:local` produce credential-free files. `.env` is used only by local servers, provider benchmarks, and explicit live-test BYOK setup. The build removes the obsolete `dist/local-settings.json` credential bootstrap.
+## Translation works without a key, but bring your own for reliability
 
-Open **All settings** from the toolbar menu to manage keys. Azure uses the included Cloudflare endpoint by default; adding your own Azure key overrides it and calls Azure directly. Removing that key restores included access. DeepL is disabled until you add your own DeepL key. Fields contain only keys you explicitly supplied, including through the optional `.env` import.
+Out of the box, Shvyd translates through Azure Translator using a shared relay that I run. You don't need an account or a key, and the limit is generous enough for everyday reading.
 
-On the first upgrade from the old bootstrap build, saved credentials are cleared once because those records did not distinguish owner keys from BYOK. Language and appearance preferences remain. Reenter any personal BYOK credentials you want to keep.
+The relay is not a reliable service, though. Everyone shares one free Azure quota of 2 million characters a month, and each IP address gets 20 requests a minute. When the quota runs out, translations fail until it resets. I don't promise it stays up.
 
-The bundled catalog has 173 targets across the two providers. Choose your preferred languages in settings; the popup shows those first, with a searchable **More languages** menu for the rest. The language menu opens in a separate popover, so expanding or searching it keeps the translation window still. It follows its button when the browser is resized. You can hide the additional-language menu. Target choices follow provider support, and preferred languages stay saved across provider changes. See [language choices](docs/languages.md) for the default-language modes and catalog details.
+For translation you can rely on, add your own Azure key. Azure's free tier gives you 2 million characters a month of your own.
 
-The background worker sends BYOK requests directly to Azure or DeepL. Included Azure access uses a server relay that holds the owner's key; the extension receives only the public endpoint URL. See [shared Azure setup](docs/shared-azure.md); `bun run worker:deploy` deploys it and rebuilds the extension using the dedicated deployment token. The public endpoint is already the release default. User keys are stored in extension-local storage restricted to trusted extension contexts. The page popup receives only public preferences and translated text.
+1. Sign in to the [Azure portal](https://portal.azure.com/). A new account may ask for phone and card verification.
+2. Create a resource group, then create a **Translator** resource in it. Choose **Global** as the region and **F0** as the pricing tier.
+3. Open the resource, then **Keys and Endpoint**, and copy **Key 1**.
+4. In Shvyd, click the toolbar icon and open **All settings**.
+5. Paste the key into **Your Azure API key**. Leave **Location code** empty for a Global resource.
+6. Click **Test connection**. Settings save as you change them.
 
-Settings also show local usage counts, a DeepL allowance check, and optional error records you can export for support. They stay in this browser; see [local usage](docs/local-usage.md).
+With your key set, Shvyd calls Azure directly instead of going through the relay. Delete the key to go back to the shared relay. [API key setup](docs/api-keys.md) covers each Azure step in more detail.
 
-## Run the playground
+DeepL is optional and needs your own key. Its free API plan gives 1 million characters in total, not per month. Paste the key into **Your DeepL API key**, then choose DeepL under **Translate with**.
 
-```sh
-pnpm playground
-```
+Your keys stay in the extension's own storage. Pages you visit never see them, and Shvyd builds contain no keys. See the [privacy policy](PRIVACY.md) for what is sent where.
 
-Keep the terminal running and open [the live playground](http://localhost:5173). Press **Ctrl+C** in that terminal when you want to stop it. The playground has eight styles: editorial, technical, journal, warm, forest, contrast, neon, and gradient. Select short or long passages, multilingual and right-to-left text, code, table cells, or text inside nested cards and scroll containers. **Language settings** lets you try preferred languages, a fixed default, and neutral styling in the demo.
+## Limits
 
-The demo uses a loopback server to call Azure or DeepL using `.env`. Its preferences last until that server restarts. The actual extension stores its preferences across browser restarts. For testing the installed extension rather than the demo's injected UI, use [the extension fixture](http://localhost:5173/fixture?style=editorial).
+- One selection can be up to 10,000 characters.
+- Shvyd doesn't run on browser pages such as `chrome://` and the Chrome Web Store, or in the built-in PDF viewer. Password fields never offer translation.
+- On pages with image backgrounds or unusual layouts, the popup may pick colors that don't fit. Turn off page adaptation there, or [report the page](https://github.com/Zheckan/shvyd/issues).
 
-The HTML page is [demo/test-page.html](demo/test-page.html). It also works with a plain static server and the installed extension:
-
-```sh
-python3 -m http.server 5174 --bind 127.0.0.1 --directory demo
-```
-
-Open [the static test page](http://localhost:5174/test-page.html). Its theme picker and selection helpers work without Bun or a demo API server. Configure translation through the extension's own settings. Serve it over HTTP so the extension can run on the page.
-
-## Development and verification
+## Development
 
 ```sh
-pnpm fix
-pnpm check
-python3 -m unittest scripts.test_benchmark_cloud scripts.test_benchmark_opencode_go
+bun install
+bun run dev      # playground with the popup at http://localhost:5173
+bun run fix      # apply lint fixes and formatting, then verify
+bun run verify   # lint, format check, typecheck, unit tests, and build
 ```
 
-`fix` applies safe Oxlint fixes and Prettier formatting, then runs all checks. `check` and `verify` run lint, formatting checks, strict TypeScript checking, the prototype's behavior tests, and a credential-free build. Use `lint:fix` or `format` to run only the editing step. Saved benchmark results, verification evidence, generated files, and local credentials are excluded from formatting.
+The playground calls Azure and DeepL with the keys in `.env`. Copy `.env.example` to start.
 
-Development tools are installed with `bun install`; `pnpm` runs the commands using those local dependencies. Linting uses Oxlint. Prettier uses single quotes, no semicolons, and two-space indentation. Type checking uses TypeScript 7.
+The browser checks run in [Helium](https://helium.computer/) in a temporary profile and need Python's `websocket-client`. Results and screenshots go to `.preview/`.
 
-Run the reliability checks without provider keys or a playground server:
+| Command                              | Also needs                                     | Checks                                                      |
+| ------------------------------------ | ---------------------------------------------- | ----------------------------------------------------------- |
+| `bun run test:popup`                 | Nothing                                        | Button placement, popup size, scrolling, resizing           |
+| `bun run test:reliability`           | Nothing                                        | Retries, error messages, worker restarts, usage counts      |
+| `python3 scripts/check-demo.py`      | `bun run dev`, keys in `.env`                  | Formatting, partial selections, safe HTML, copying          |
+| `python3 scripts/check-extension.py` | `bun run build`, `bun run dev`, keys in `.env` | Both providers live, eight page styles, languages, dragging |
 
-```sh
-bun run test:reliability
-```
+CI runs `bun run verify` and the Python benchmark tests on every pull request. [AGENTS.md](AGENTS.md) describes the project layout and conventions.
 
-`bun run test:popup` checks the button's position in text fields, that password fields never offer translation, loading size and scroll bars, a popup that grows near the bottom edge, selecting part of a translation, resizing from every edge and corner, and the icon-only Translate button. Results stay in `.preview/popup-check/`.
+## More documentation
 
-The reliability check builds the extension and checks delayed replies, language-save failures, rapid target changes, closing, network retry, error classifications, an actual background-worker restart, persistent usage counts, and redacted error-record export in an isolated Helium profile. It requires Helium and Python's `websocket-client`. Results stay in `.preview/reliability-check/`. These browser checks run locally; CI runs the unit tests. See [request reliability](docs/translation-reliability.md) for cache behavior and verification details.
-
-To run live checks, configure provider keys in `.env` and leave the demo server running in another terminal. The extension harness explicitly adds BYOK credentials to an isolated profile; it does not embed them in the build:
-
-```sh
-bun run build
-python3 scripts/check-extension.py
-python3 scripts/check-demo.py
-```
-
-The live check uses a temporary Helium profile, leaving the regular profile alone. It covers both providers, eight page styles, preferred and additional languages, remembered and fixed targets, right-to-left output, formatted paragraphs and lists, underlined links, table cells, unchanged code, long selections, nested cards, window dragging, language-menu anchoring, viewport bounds, and Escape dismissal. The demo check also uses controlled provider responses to verify partial selections, safe HTML rendering, and copying. These scripts use the `websocket-client` Python dependency already required by the local benchmark harness. Screenshots and results are written under the ignored `.preview/extension-check` and `.preview/demo-check` directories. Earlier verification artifacts are retained locally in `.preview/prototype/`. Generated verification artifacts are not tracked in Git.
-
-## Prototype boundaries
-
-- Translation is sent after clicking the selection button. Source detection happens in the same provider request.
-- The selected-text limit is 10,000 characters. Browser internal pages, protected store pages, browser PDF viewers, and text inputs are outside this first pass.
-- Repeated selections use an in-memory cache capped at 32 entries and 512 KiB of UTF-8 payloads. Identical simultaneous requests share one provider call. Saving full settings or restarting the background worker clears the cache; saved preferences and keys remain in browser storage.
-- Page styling is sampled from computed styles. Image backgrounds, unusual layouts, and custom web components may need a neutral fallback or further refinement.
-
-## Project notes
-
-- [First stable release plan](docs/release-plan.md)
-- [Settings design brief](docs/settings-design-brief.md)
-- [Provider choices and measured results](docs/translation-options.md)
-- [Future ideas and open questions](docs/future.md)
-- [API key setup](docs/api-keys.md)
-- [Benchmark archive](docs/benchmarks/README.md)
+- [Changelog](CHANGELOG.md)
+- [Install, update, and roll back](docs/install.md)
+- [Selection formatting](docs/formatting.md)
+- [Language choices](docs/languages.md)
+- [Local usage counts and error records](docs/local-usage.md)
+- [Shared Azure relay](docs/shared-azure.md)
+- [Request reliability and caching](docs/translation-reliability.md)
+- [Releasing](docs/releasing.md)
+- [Provider comparison and benchmarks](docs/translation-options.md)
+- [Future ideas](docs/future.md)
