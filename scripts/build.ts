@@ -1,4 +1,4 @@
-import { mkdir, copyFile, rm } from 'node:fs/promises'
+import { mkdir, copyFile, cp, rm } from 'node:fs/promises'
 import { resolve } from 'node:path'
 import { DEFAULT_MANAGED_AZURE_URL } from '@/config/release'
 import { parseReleaseConfig } from '@/domain/settings/release-config'
@@ -32,6 +32,10 @@ export async function build(
   for (const name of ['manifest.json', 'options.html', 'options.css']) {
     await copyFile(resolve(root, 'extension', name), resolve(output, name))
   }
+
+  await cp(resolve(root, 'extension/icons'), resolve(output, 'icons'), {
+    recursive: true,
+  })
 
   // Remove the old credential-bearing bootstrap even when rebuilding an existing dist/.
   await rm(resolve(output, 'local-settings.json'), { force: true })

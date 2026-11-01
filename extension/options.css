@@ -127,6 +127,10 @@ select:focus-visible,
   backdrop-filter: blur(12px);
 }
 .brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
   font-size: 16px;
   font-weight: 600;
   letter-spacing: -0.2px;
