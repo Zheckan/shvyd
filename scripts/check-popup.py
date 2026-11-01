@@ -286,7 +286,7 @@ def main():
             check('translation-scrolled-to-the-end-has-no-bottom-fade', bottom['above'] and not bottom['below'], bottom)
             close_popup()
 
-            # 6b. Dragging the corner resizes the window; the text fills it, and a double-click restores the size.
+            # 6b. Every edge and corner resizes the window and keeps the opposite edges in place.
             def panel_box():
                 return popup("const r=root.querySelector('.panel').getBoundingClientRect();return {left:Math.round(r.left),top:Math.round(r.top),right:Math.round(r.right),bottom:Math.round(r.bottom),width:Math.round(r.width),height:Math.round(r.height),sized:root.querySelector('.panel').hasAttribute('data-sized')}")
 
@@ -298,6 +298,9 @@ def main():
                 drag(point['x'], point['y'], point['x'] + dx, point['y'] + dy)
                 frames()
 
+            def handle(name):
+                return f'.resize-handle[data-handle="{name}"]'
+
             def open_cached_long():
                 select_text('long')
                 popup("root.querySelector('.bubble').click(); return true")
@@ -306,50 +309,66 @@ def main():
             open_cached_long()
             default_width = panel_box()['width']
             drag_by('.toolbar', -2000, -2000)
-            start_box = panel_box()
-            drag_by('.resize-grip', 120, -60)
-            grown = panel_box()
+            drag_by('.toolbar', 400, 200)
+            moves = {'right': (60, 0), 'bottom': (0, -40), 'left': (-50, 0), 'top': (0, -30),
+                     'top-left': (20, 20), 'top-right': (20, -20), 'bottom-left': (-20, 20), 'bottom-right': (30, 30)}
+            for name, (dx, dy) in moves.items():
+                before = panel_box()
+                drag_by(handle(name), dx, dy)
+                after = panel_box()
+                expected = dict(before)
+                if 'left' in name:
+                    expected['left'] += dx
+                if 'right' in name:
+                    expected['right'] += dx
+                if 'top' in name:
+                    expected['top'] += dy
+                if 'bottom' in name:
+                    expected['bottom'] += dy
+                matches = after['sized'] and all(abs(after[key] - expected[key]) <= 1 for key in ['left', 'top', 'right', 'bottom'])
+                check(f'resize-from-{name}', matches, {'before': before, 'after': after, 'move': [dx, dy]})
             gap = popup("const p=root.querySelector('.panel').getBoundingClientRect(),t=root.querySelector('.translation').getBoundingClientRect();return Math.round(p.bottom-t.bottom)")
-            check('corner-drag-resizes-window-in-place', grown['sized'] and abs(grown['width'] - start_box['width'] - 120) <= 1 and abs(grown['height'] - start_box['height'] + 60) <= 1 and grown['left'] == start_box['left'] and grown['top'] == start_box['top'] and gap <= 2, {'start': start_box, 'grown': grown, 'textGapAtBottom': gap})
+            check('resized-text-fills-window', gap <= 2, {'textGapAtBottom': gap})
             shot = page.call('Page.captureScreenshot', {'format': 'png'})
             (OUTPUT / 'resized.png').write_bytes(base64.b64decode(shot['data']))
-            drag_by('.resize-grip', -2000, -2000)
+            anchored = panel_box()
+            drag_by(handle('bottom-right'), -2000, -2000)
             smallest = panel_box()
-            check('resized-window-keeps-minimum-size', smallest['width'] == 220 and smallest['height'] == 100, smallest)
-            drag_by('.resize-grip', 3000, 3000)
+            check('resized-window-keeps-minimum-size', smallest['width'] == 220 and smallest['height'] == 100 and smallest['left'] == anchored['left'], smallest)
+            drag_by(handle('top-left'), -5000, -5000)
             largest = panel_box()
-            check('resized-window-stays-inside-viewport', largest['right'] == 1268 and largest['bottom'] == 888, largest)
-            grip = center('.resize-grip')
+            check('resized-window-stays-inside-viewport', largest['left'] == 12 and largest['top'] == 12 and largest['right'] == smallest['right'], largest)
+            grip = center(handle('right'))
             for count in [1, 2]:
                 for kind in ['mousePressed', 'mouseReleased']:
                     page.call('Input.dispatchMouseEvent', {'type': kind, **grip, 'button': 'left', 'buttons': 1 if kind == 'mousePressed' else 0, 'clickCount': count})
             frames()
             restored = panel_box()
-            check('double-click-on-grip-restores-default-size', not restored['sized'] and restored['width'] == default_width, restored)
-            drag_by('.resize-grip', 80, 80)
+            check('double-click-on-edge-restores-default-size', not restored['sized'] and restored['width'] == default_width, restored)
+            drag_by(handle('bottom-right'), 80, 80)
             close_popup()
             open_cached_long()
             reopened = panel_box()
             check('new-popup-resets-manual-size', not reopened['sized'] and reopened['width'] == default_width, reopened)
             close_popup()
 
-            # 6c. The compact popup from the toolbar menu reaches open pages and restyles an open popup.
-            def compact_state():
-                return popup("const p=root.querySelector('.panel');return {compact:p.classList.contains('compact'),bubbleCompact:root.querySelector('.bubble').classList.contains('compact'),width:Math.round(p.getBoundingClientRect().width),fontSize:getComputedStyle(root.querySelector('.translation')).fontSize}")
+            # 6c. The Translate button shows only its icon by default; the toolbar menu brings back the word.
+            def bubble_state():
+                return popup("const b=root.querySelector('.bubble'),r=b.getBoundingClientRect();return {compact:b.classList.contains('compact'),labelShown:getComputedStyle(b.querySelector('.bubble-label')).display!=='none',width:Math.round(r.width),height:Math.round(r.height),name:b.getAttribute('aria-label')}")
 
+            select_text('short')
+            icon_only = bubble_state()
+            check('translate-button-is-icon-only-by-default', icon_only['compact'] and not icon_only['labelShown'] and icon_only['width'] == icon_only['height'] and icon_only['name'] == 'Translate selected text', icon_only)
+            box = popup("const b=root.querySelector('.bubble').getBoundingClientRect();return {x:b.x-12,y:b.y-12,width:b.width+24,height:b.height+24}")
+            shot = page.call('Page.captureScreenshot', {'format': 'png', 'clip': {**box, 'scale': 2}})
+            (OUTPUT / 'button-icon-only.png').write_bytes(base64.b64decode(shot['data']))
             menu.evaluate("document.getElementById('quick-compact').click(), true")
-            browser.wait_for(lambda: menu.evaluate("document.getElementById('quick-compact').checked && !document.getElementById('quick-status').textContent"), 'menu saved compact popup')
-            page.evaluate('new Promise(r=>setTimeout(r,300))')
-            open_cached_long()
-            compact = compact_state()
-            check('compact-popup-is-smaller', compact['compact'] and compact['bubbleCompact'] and compact['width'] == 320 and compact['fontSize'] == '13px', compact)
-            shot = page.call('Page.captureScreenshot', {'format': 'png'})
-            (OUTPUT / 'compact.png').write_bytes(base64.b64decode(shot['data']))
+            browser.wait_for(lambda: menu.evaluate("!document.getElementById('quick-compact').checked && !document.getElementById('quick-status').textContent"), 'menu saved full button')
+            browser.wait_for(lambda: bubble_state()['labelShown'], 'visible button shows its label')
+            labeled = bubble_state()
+            check('visible-button-follows-compact-change', not labeled['compact'] and labeled['width'] > icon_only['width'] + 30 and labeled['height'] == icon_only['height'], labeled)
             menu.evaluate("document.getElementById('quick-compact').click(), true")
-            browser.wait_for(lambda: menu.evaluate("!document.getElementById('quick-compact').checked"), 'menu restored full-size popup')
-            browser.wait_for(lambda: not compact_state()['compact'], 'open popup returns to full size')
-            full = compact_state()
-            check('open-popup-follows-compact-change', full['width'] == default_width and full['fontSize'] == '15px', full)
+            browser.wait_for(lambda: menu.evaluate("document.getElementById('quick-compact').checked"), 'menu restored icon-only button')
             close_popup()
 
             # 7. Links colored on an inner span (as on X) set the accent, not the browser's default link color.

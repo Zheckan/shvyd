@@ -244,8 +244,8 @@ test('saving some fields keeps newer changes to the others', async () => {
   await expect(store.save(['adaptToPage'])).rejects.toThrow()
 })
 
-test('the popup is full size by default, and the compact choice is saved', async () => {
-  const { compactPopup: _removed, ...older } = DEFAULT_SETTINGS
+test('the Translate button shows only its icon by default, and the choice is saved', async () => {
+  const { compactButton: _removed, ...older } = DEFAULT_SETTINGS
   let persisted: unknown = structuredClone(older)
   const storage = {
     read: async () => persisted,
@@ -255,13 +255,13 @@ test('the popup is full size by default, and the compact choice is saved', async
   }
 
   const store = createSettingsStore(storage)
-  expect((await store.preferences()).compactPopup).toBe(false)
+  expect((await store.preferences()).compactButton).toBe(true)
 
-  await store.updatePreferences({ compactPopup: true })
-  expect((await createSettingsStore(storage).preferences()).compactPopup).toBe(
-    true
+  await store.updatePreferences({ compactButton: false })
+  expect((await createSettingsStore(storage).preferences()).compactButton).toBe(
+    false
   )
   await expect(
-    store.updatePreferences({ compactPopup: 'yes' })
+    store.updatePreferences({ compactButton: 'yes' })
   ).rejects.toThrow()
 })

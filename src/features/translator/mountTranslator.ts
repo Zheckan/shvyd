@@ -23,7 +23,12 @@ import {
   type PageSelection,
 } from './logic/readPageSelection'
 import { applyPageStyle, samplePageStyle } from './logic/page-style'
-import { resizePanel, type Size } from './logic/resizePanel'
+import {
+  resizePanel,
+  type Rect,
+  type ResizeHandle,
+  type Size,
+} from './logic/resizePanel'
 import { scrollEdges } from './logic/scrollEdges'
 
 /** Minimum distance between the popup and the viewport edge. */
@@ -32,7 +37,9 @@ const VIEWPORT_MARGIN = 12
 const SELECTION_GAP = 9
 /** Distance from the cursor to the button or popup corner, clear of the pointer. */
 const CURSOR_GAP = 12
-/** Smallest window the resize grip allows: the toolbar and two lines of text. */
+/** Horizontal padding inside the translation text block. */
+const TEXT_PADDING_PX = 34
+/** Smallest window a resize allows: the toolbar and two lines of text. */
 const MIN_PANEL_SIZE: Size = { width: 220, height: 100 }
 const RESIZE_MS = 200
 const OPEN_MS = 140
@@ -45,7 +52,15 @@ type DragOrigin = {
   top: number
 }
 
-type ResizeOrigin = DragOrigin & Size
+type ResizeOrigin = {
+  pointerId: number
+  pointerX: number
+  pointerY: number
+  handle: ResizeHandle
+  element: HTMLElement
+  /** The panel's box when the resize started. */
+  start: Rect
+}
 
 function clamp(value: number, min: number, max: number): number {
   return Math.max(min, Math.min(value, max))
@@ -120,6 +135,7 @@ function startTranslator(client: TranslationClient): Translator {
     host,
     root,
     bubble,
+    frame: panelFrame,
     panel,
     toolbar,
     copy,
@@ -130,7 +146,7 @@ function startTranslator(client: TranslationClient): Translator {
     actions,
     retry,
     settings,
-    resizeGrip,
+    resizeHandles,
   } = createTranslatorView(picker)
 
   let preferences = publicPreferences(DEFAULT_SETTINGS)
@@ -154,7 +170,7 @@ function startTranslator(client: TranslationClient): Translator {
   let resizeFrame = 0
   let panelPosition: { x: number; y: number } | undefined
   let dragOrigin: DragOrigin | undefined
-  /** Size chosen with the resize grip; the popup's content decides otherwise. */
+  /** Size chosen by resizing; the popup's content decides otherwise. */
   let panelSize: Size | undefined
   let resizeOrigin: ResizeOrigin | undefined
 
@@ -169,18 +185,16 @@ function startTranslator(client: TranslationClient): Translator {
     })
     .catch(() => undefined)
 
-  /** Saves `value` and restyles an open popup if its density changed. */
+  /** Saves `value` and restyles a visible Translate button. */
   function setPreferences(value: Preferences): void {
-    const densityChanged = value.compactPopup !== preferences.compactPopup
+    const compactChanged = value.compactButton !== preferences.compactButton
     preferences = value
 
-    for (const element of [bubble, panel]) {
-      element.classList.toggle('compact', preferences.compactPopup)
-    }
+    bubble.classList.toggle('compact', preferences.compactButton)
+    bubble.title = preferences.compactButton ? 'Translate' : ''
 
-    if (densityChanged) {
-      positionVisible()
-      markScrollEdges()
+    if (compactChanged && !bubble.hidden) {
+      position(bubble)
     }
   }
 
@@ -259,8 +273,10 @@ function startTranslator(client: TranslationClient): Translator {
 
     x = clamp(x, VIEWPORT_MARGIN, window.innerWidth - width - VIEWPORT_MARGIN)
     y = clamp(y, VIEWPORT_MARGIN, window.innerHeight - height - VIEWPORT_MARGIN)
-    element.style.left = `${x}px`
-    element.style.top = `${y}px`
+    // The panel moves inside a frame that also holds its resize handles.
+    const box = element === panel ? panelFrame : element
+    box.style.left = `${x}px`
+    box.style.top = `${y}px`
 
     if (element === panel) {
       if (panelPosition) {
@@ -350,17 +366,8 @@ function startTranslator(client: TranslationClient): Translator {
 
   /** Placeholder lines sized to the expected translation, not a fixed block. */
   function renderSkeleton(): void {
-    // Computed styles resolve while the text block is hidden.
-    const text = getComputedStyle(output)
-    const width =
-      panel.clientWidth -
-      parseFloat(text.paddingLeft) -
-      parseFloat(text.paddingRight)
-    const estimate = estimateLines(
-      selected?.text ?? '',
-      width,
-      parseFloat(text.fontSize)
-    )
+    const width = panel.clientWidth - TEXT_PADDING_PX
+    const estimate = estimateLines(selected?.text ?? '', width)
     const lines = Array.from({ length: estimate.lines }, () =>
       document.createElement('div')
     )
@@ -630,7 +637,11 @@ function startTranslator(client: TranslationClient): Translator {
     }
   }
 
-  function startResize(event: PointerEvent): void {
+  function startResize(
+    event: PointerEvent,
+    handle: ResizeHandle,
+    element: HTMLElement
+  ): void {
     if (event.button !== 0 || !event.isPrimary || panel.hidden) {
       return
     }
@@ -648,14 +659,17 @@ function startTranslator(client: TranslationClient): Translator {
       pointerId: event.pointerId,
       pointerX: event.clientX,
       pointerY: event.clientY,
-      left: bounds.left,
-      top: bounds.top,
-      width: panelSize?.width ?? bounds.width,
-      height: panelSize?.height ?? bounds.height,
+      handle,
+      element,
+      start: {
+        x: bounds.left,
+        y: bounds.top,
+        width: panelSize?.width ?? bounds.width,
+        height: panelSize?.height ?? bounds.height,
+      },
     }
 
-    panel.toggleAttribute('data-resizing', true)
-    resizeGrip.setPointerCapture(event.pointerId)
+    element.setPointerCapture(event.pointerId)
   }
 
   function moveResize(event: PointerEvent): void {
@@ -663,19 +677,20 @@ function startTranslator(client: TranslationClient): Translator {
       return
     }
 
-    applySize(
-      resizePanel({
-        start: { width: resizeOrigin.width, height: resizeOrigin.height },
-        delta: {
-          x: event.clientX - resizeOrigin.pointerX,
-          y: event.clientY - resizeOrigin.pointerY,
-        },
-        position: { x: resizeOrigin.left, y: resizeOrigin.top },
-        viewport: { width: window.innerWidth, height: window.innerHeight },
-        minimum: MIN_PANEL_SIZE,
-        margin: VIEWPORT_MARGIN,
-      })
-    )
+    const box = resizePanel({
+      start: resizeOrigin.start,
+      handle: resizeOrigin.handle,
+      delta: {
+        x: event.clientX - resizeOrigin.pointerX,
+        y: event.clientY - resizeOrigin.pointerY,
+      },
+      viewport: { width: window.innerWidth, height: window.innerHeight },
+      minimum: MIN_PANEL_SIZE,
+      margin: VIEWPORT_MARGIN,
+    })
+
+    panelPosition = { x: box.x, y: box.y }
+    applySize({ width: box.width, height: box.height })
     position(panel)
     markScrollEdges()
   }
@@ -685,11 +700,10 @@ function startTranslator(client: TranslationClient): Translator {
       return
     }
 
-    const { pointerId } = resizeOrigin
+    const { pointerId, element } = resizeOrigin
     resizeOrigin = undefined
-    panel.removeAttribute('data-resizing')
-    if (resizeGrip.hasPointerCapture(pointerId)) {
-      resizeGrip.releasePointerCapture(pointerId)
+    if (element.hasPointerCapture(pointerId)) {
+      element.releasePointerCapture(pointerId)
     }
   }
 
@@ -743,13 +757,19 @@ function startTranslator(client: TranslationClient): Translator {
     toolbar.addEventListener(name, endDrag, listen)
   }
 
-  resizeGrip.addEventListener('pointerdown', startResize, listen)
-  resizeGrip.addEventListener('pointermove', moveResize, listen)
-  for (const name of ['pointerup', 'pointercancel', 'lostpointercapture']) {
-    resizeGrip.addEventListener(name, endResize, listen)
-  }
+  for (const { handle, element } of resizeHandles) {
+    element.addEventListener(
+      'pointerdown',
+      (event) => startResize(event, handle, element),
+      listen
+    )
+    element.addEventListener('pointermove', moveResize, listen)
+    for (const name of ['pointerup', 'pointercancel', 'lostpointercapture']) {
+      element.addEventListener(name, endResize, listen)
+    }
 
-  resizeGrip.addEventListener('dblclick', resetSize, listen)
+    element.addEventListener('dblclick', resetSize, listen)
+  }
 
   window.addEventListener('blur', endDrag, listen)
   window.addEventListener('blur', endResize, listen)

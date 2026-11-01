@@ -13,7 +13,7 @@ export function mountPlayground(): void {
     '#demo-preferences [name="adaptToPage"]'
   )
   const compact = document.querySelector(
-    '#demo-preferences [name="compactPopup"]'
+    '#demo-preferences [name="compactButton"]'
   )
 
   if (
@@ -72,7 +72,7 @@ export function mountPlayground(): void {
 
     languageSettings.fill(preferences)
     controls.adaptation.checked = preferences.adaptToPage
-    controls.compact.checked = preferences.compactPopup
+    controls.compact.checked = preferences.compactButton
     controls.status.textContent = ''
     if (!controls.dialog.open) {
       controls.dialog.showModal()
@@ -97,7 +97,7 @@ export function mountPlayground(): void {
       const preferences = await client.updatePreferences({
         ...languageSettings.read(),
         adaptToPage: adaptation.checked,
-        compactPopup: compact.checked,
+        compactButton: compact.checked,
       })
 
       languageSettings.fill(preferences)

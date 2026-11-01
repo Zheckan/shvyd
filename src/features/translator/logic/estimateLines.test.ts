@@ -29,11 +29,3 @@ test('very long text is capped, and empty text still shows one line', () => {
   })
   expect(estimateLines('   ', WIDTH).lines).toBe(1)
 })
-
-test('smaller text fits more characters on each line', () => {
-  const text = 'The release keeps settings in this browser. '.repeat(6)
-
-  expect(estimateLines(text, WIDTH, 13).lines).toBeLessThan(
-    estimateLines(text, WIDTH).lines
-  )
-})

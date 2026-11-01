@@ -119,39 +119,6 @@
   line-height: 1.6;
   text-align: start;
 }
-.preview-grip {
-  position: absolute;
-  right: 3px;
-  bottom: 3px;
-  width: 14px;
-  height: 14px;
-  opacity: 0.35;
-}
-/* Mirrors the compact popup in translatorStyles.ts. */
-.preview-popup.compact {
-  right: auto;
-  width: min(320px, calc(100% - 60px));
-}
-.preview-popup.compact .preview-toolbar {
-  gap: 4px;
-  padding: 6px 8px 0 11px;
-}
-.preview-popup.compact .preview-target {
-  font-size: 11px;
-}
-.preview-popup.compact .preview-icons {
-  gap: 4px;
-}
-.preview-popup.compact .preview-icons svg {
-  width: 14px;
-  height: 14px;
-  margin: 5px;
-}
-.preview-popup.compact .preview-translation {
-  padding: 8px 12px 12px;
-  font-size: 13px;
-  line-height: 1.5;
-}
 .preview-menu {
   position: absolute;
   top: 40px;

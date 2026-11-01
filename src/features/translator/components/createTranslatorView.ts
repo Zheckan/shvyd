@@ -1,3 +1,4 @@
+import { RESIZE_HANDLES } from '../logic/resizePanel'
 import { TRANSLATOR_STYLES } from '../translatorStyles'
 import type { createLanguagePicker } from './createLanguagePicker'
 import { icon, make } from './elements'
@@ -6,7 +7,6 @@ const TRANSLATE_ICON =
   'M4 5h11M10 3v2M6 5c0 6 5 9 9 11M14 5c0 6-5 9-10 11M14 21l4-10 4 10M15.5 17h5'
 const COPY_ICON = 'M8 8h12v13H8zM16 8V3H3v13h5'
 const CLOSE_ICON = 'M6 6l12 12M18 6 6 18'
-const RESIZE_ICON = 'M20 11 11 20M20 17l-3 3'
 
 // Keep page styles from resizing or hiding the zero-size host element.
 const HOST_STYLES = {
@@ -63,7 +63,7 @@ export function createTranslatorView(
   const bubble = make('button', 'bubble')
   bubble.type = 'button'
   bubble.setAttribute('aria-label', 'Translate selected text')
-  bubble.append(icon(TRANSLATE_ICON), document.createTextNode('Translate'))
+  bubble.append(icon(TRANSLATE_ICON), make('span', 'bubble-label', 'Translate'))
 
   const copy = iconButton('Copy translation', 'Copy translation', COPY_ICON)
   const closeButton = iconButton('Close translation', 'Close', CLOSE_ICON)
@@ -88,25 +88,34 @@ export function createTranslatorView(
   const actions = make('div', 'actions')
   actions.append(retry, settings)
 
-  // Pointer-only, like moving the window by its toolbar.
-  const resizeGrip = make('div', 'resize-grip')
-  resizeGrip.title = 'Drag to resize. Double-click for the default size.'
-  resizeGrip.append(icon(RESIZE_ICON))
-
   const panel = make('section', 'panel')
   panel.setAttribute('role', 'dialog')
   panel.setAttribute('aria-label', 'Selected text translation')
-  panel.append(toolbar, loading, output, status, actions, resizeGrip)
+  panel.append(toolbar, loading, output, status, actions)
+
+  // Pointer-only, like moving the window by its toolbar. The handles reach past
+  // the panel's border, so they sit beside it, outside its scroll clipping.
+  const resizeHandles = RESIZE_HANDLES.map((handle) => {
+    const element = make('div', 'resize-handle')
+    element.dataset.handle = handle
+    element.setAttribute('aria-hidden', 'true')
+
+    return { handle, element }
+  })
+
+  const frame = make('div', 'window')
+  frame.append(panel, ...resizeHandles.map(({ element }) => element))
 
   bubble.hidden = true
   panel.hidden = true
-  root.append(style, bubble, panel, picker.menu)
+  root.append(style, bubble, frame, picker.menu)
   document.documentElement.append(host)
 
   return {
     host,
     root,
     bubble,
+    frame,
     panel,
     toolbar,
     copy,
@@ -117,6 +126,6 @@ export function createTranslatorView(
     actions,
     retry,
     settings,
-    resizeGrip,
+    resizeHandles,
   }
 }

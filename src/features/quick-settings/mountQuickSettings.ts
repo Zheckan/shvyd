@@ -112,7 +112,7 @@ export function mountQuickSettings({
       })
     )
     adapt.checked = preferences.adaptToPage
-    compact.checked = preferences.compactPopup
+    compact.checked = preferences.compactButton
   }
 
   async function update(change: Partial<Preferences>): Promise<void> {
@@ -208,7 +208,7 @@ export function mountQuickSettings({
   })
 
   compact.addEventListener('change', () => {
-    void update({ compactPopup: compact.checked })
+    void update({ compactButton: compact.checked })
   })
 
   required('#open-settings', HTMLButtonElement).addEventListener(

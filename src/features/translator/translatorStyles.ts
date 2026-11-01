@@ -80,31 +80,59 @@ export const TRANSLATOR_STYLES = `
   .panel[data-sized] .loading {
     overflow: hidden;
   }
-  .resize-grip {
-    position: absolute;
-    right: 1px;
-    bottom: 1px;
-    width: 16px;
-    height: 16px;
-    display: grid;
-    place-items: center;
-    cursor: nwse-resize;
-    touch-action: none;
-    user-select: none;
-    opacity: 0.35;
-    transition: opacity 150ms ease-out;
+  /* Positioned box around the panel and its resize handles. */
+  .window {
+    position: fixed;
   }
-  .resize-grip svg {
+  .window:has(> .panel[hidden]) {
+    display: none;
+  }
+  .window > .panel {
+    position: relative;
+  }
+  /* Each handle reaches 5 px past the border and 3 px into the panel. */
+  .resize-handle {
+    position: absolute;
+    z-index: 1;
+    touch-action: none;
+  }
+  .resize-handle[data-handle="top"],
+  .resize-handle[data-handle="bottom"] {
+    left: 9px;
+    right: 9px;
+    height: 8px;
+    cursor: ns-resize;
+  }
+  .resize-handle[data-handle="left"],
+  .resize-handle[data-handle="right"] {
+    top: 9px;
+    bottom: 9px;
+    width: 8px;
+    cursor: ew-resize;
+  }
+  .resize-handle[data-handle*="-"] {
     width: 14px;
     height: 14px;
   }
-  .resize-grip:hover,
-  .panel[data-resizing] .resize-grip {
-    opacity: 0.8;
-  }
-  .panel[data-resizing] {
+  .resize-handle[data-handle="top-left"],
+  .resize-handle[data-handle="bottom-right"] {
     cursor: nwse-resize;
-    user-select: none;
+  }
+  .resize-handle[data-handle="top-right"],
+  .resize-handle[data-handle="bottom-left"] {
+    cursor: nesw-resize;
+  }
+  .resize-handle[data-handle^="top"] {
+    top: -5px;
+  }
+  .resize-handle[data-handle^="bottom"] {
+    bottom: -5px;
+  }
+  .resize-handle[data-handle$="left"] {
+    left: -5px;
+  }
+  .resize-handle[data-handle$="right"] {
+    right: -5px;
   }
   .toolbar {
     display: flex;
@@ -276,8 +304,7 @@ export const TRANSLATOR_STYLES = `
   }
   @media (prefers-reduced-motion: reduce) {
     .toolbar,
-    .translation,
-    .resize-grip {
+    .translation {
       transition: none;
     }
   }
@@ -403,54 +430,11 @@ export const TRANSLATOR_STYLES = `
     white-space: nowrap;
     clip-path: inset(50%);
   }
-  /* Compact view: smaller text and spacing, and a narrower window. */
+  /* Compact Translate button: the icon alone, in a square button. */
   .bubble.compact {
-    gap: 5px;
-    padding: 5px 8px;
-    font-size: 12px;
-    line-height: 16px;
+    padding: 8px;
   }
-  .bubble.compact svg {
-    width: 14px;
-    height: 14px;
-  }
-  .panel.compact {
-    width: min(320px, calc(100vw - 24px));
-  }
-  .compact .toolbar {
-    gap: 4px;
-    padding: 6px 8px 3px 11px;
-  }
-  .compact .target {
-    font-size: 11px;
-  }
-  .compact .icon {
-    width: 24px;
-    height: 24px;
-  }
-  .compact .icon svg {
-    width: 14px;
-    height: 14px;
-  }
-  .compact .translation {
-    padding: 3px 12px 12px;
-    font-size: 13px;
-    line-height: 1.5;
-    max-height: min(40dvh, 320px);
-  }
-  .compact .loading {
-    padding: 3px 12px 12px;
-  }
-  .compact .line {
-    height: 8px;
-    margin: 6px 0;
-  }
-  .compact .status,
-  .compact .actions {
-    padding: 0 12px 11px;
-    font-size: 12px;
-  }
-  .compact .text-button {
-    font-size: 12px;
+  .bubble.compact .bubble-label {
+    display: none;
   }
 `
