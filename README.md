@@ -77,6 +77,8 @@ The live check uses a temporary Helium profile, leaving the regular profile alon
 
 ## Project notes
 
+- [First stable release plan](docs/release-plan.md)
+- [Settings design brief](docs/settings-design-brief.md)
 - [Provider choices and measured results](docs/translation-options.md)
 - [Future ideas and open questions](docs/future.md)
 - [API key setup](docs/api-keys.md)
