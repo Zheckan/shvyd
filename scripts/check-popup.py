@@ -257,6 +257,31 @@ def main():
 
             shot = page.call('Page.captureScreenshot', {'format': 'png'})
             (OUTPUT / 'popup.png').write_bytes(base64.b64decode(shot['data']))
+            close_popup()
+
+            # 6. Text that scrolls under the toolbar fades at the edge and the toolbar gets a divider.
+            page.evaluate("document.getElementById('short').textContent='Scroll edge title'; true")
+            open_loading('short')
+            worker.resolve(worker.pending.pop(0), '\n\n'.join([LONG] * 3))
+            browser.wait_for(lambda: popup("return !root.querySelector('.translation').hidden && root.querySelector('.panel').getAnimations().length===0"), 'scrolling translation settled')
+
+            def edges(name):
+                page.evaluate('new Promise(r=>setTimeout(r,250))')
+                box = popup("const b=root.querySelector('.panel').getBoundingClientRect();return {x:b.x-10,y:b.y-10,width:b.width+20,height:b.height+20}")
+                shot = page.call('Page.captureScreenshot', {'format': 'png', 'clip': {**box, 'scale': 1}})
+                (OUTPUT / f'scroll-{name}.png').write_bytes(base64.b64decode(shot['data']))
+                return popup("""const panel=root.querySelector('.panel');
+                  return {above:panel.hasAttribute('data-above'),below:panel.hasAttribute('data-below'),
+                  divider:getComputedStyle(root.querySelector('.toolbar')).borderBottomColor}""")
+
+            top = edges('top')
+            check('unscrolled-translation-fades-only-at-the-bottom', not top['above'] and top['below'] and top['divider'] == 'rgba(0, 0, 0, 0)', top)
+            popup("root.querySelector('.translation').scrollTop=200; return true")
+            middle = edges('middle')
+            check('scrolled-translation-fades-under-toolbar-divider', middle['above'] and middle['below'] and middle['divider'] != 'rgba(0, 0, 0, 0)', middle)
+            popup("const t=root.querySelector('.translation');t.scrollTop=t.scrollHeight; return true")
+            bottom = edges('bottom')
+            check('translation-scrolled-to-the-end-has-no-bottom-fade', bottom['above'] and not bottom['below'], bottom)
             results['passed'] = not failures
         finally:
             for connection in connections:
