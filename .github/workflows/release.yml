@@ -1,0 +1,62 @@
+name: Release
+
+# Every merge to main publishes a GitHub release with the extension ZIP.
+# The version comes from scripts/release-version.ts: the owner sets major and
+# minor in package.json and extension/manifest.json, and each merge takes the
+# next patch in that line. The version is stamped in the runner and tagged,
+# never committed back to main.
+
+on:
+  push:
+    branches: [main]
+
+# Run releases one at a time, in merge order, so two merges never pick the
+# same version.
+concurrency:
+  group: release
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
+jobs:
+  release:
+    name: Publish release
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+
+      - uses: oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6 # v2.2.0
+
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
+
+      - name: Verify
+        run: bun run verify
+
+      - name: Choose version
+        id: version
+        run: echo "version=$(bun scripts/release-version.ts)" >> "$GITHUB_OUTPUT"
+
+      - name: Package
+        run: bun run package
+
+      - name: Publish
+        env:
+          GH_TOKEN: ${{ github.token }}
+          VERSION: ${{ steps.version.outputs.version }}
+        run: |
+          gh release create "v$VERSION" \
+            "release/shvyd-$VERSION.zip" \
+            "release/shvyd-$VERSION.zip.sha256" \
+            --target "$GITHUB_SHA" \
+            --title "Shvyd $VERSION" \
+            --generate-notes

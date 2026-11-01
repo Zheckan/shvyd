@@ -1,7 +1,9 @@
 # Install, update, and roll back
 
 Shvyd is shared as a ZIP for manual installation in Chromium-based browsers
-(Chrome, Helium, Edge, Brave). There is no store listing yet.
+(Chrome, Helium, Edge, Brave). There is no store listing. Every merge to
+`main` publishes a new ZIP on the
+[releases page](https://github.com/Zheckan/shvyd/releases).
 
 ## Install
 
