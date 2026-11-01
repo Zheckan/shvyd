@@ -2,6 +2,8 @@
 
 Shvyd translates the text you select, in a small popup next to it, so you never leave the page. It works in any Chromium browser.
 
+**[Download the latest release](https://github.com/Zheckan/shvyd/releases/latest)** and follow the [install steps](#install).
+
 The popup takes its look from the page you're reading, so it looks like part of the site. Of the translators I've tried, it's the quickest way to read a sentence in another language and carry on.
 
 > [!NOTE]
@@ -38,17 +40,14 @@ Shvyd reads the colors, border, and corner shape around the selection and styles
 
 ## Install
 
-Download the latest ZIP from [Releases](https://github.com/Zheckan/shvyd/releases) and follow [install, update, and roll back](docs/install.md). To build it yourself instead:
-
-```sh
-bun install
-bun run build
-```
-
-1. Open `chrome://extensions`.
-2. Turn on **Developer mode**.
-3. Click **Load unpacked** and choose the `dist` folder.
+1. Download `shvyd-<version>.zip` from the [latest release](https://github.com/Zheckan/shvyd/releases/latest) and unzip it into a folder you'll keep. The browser loads Shvyd from there.
+2. Open `chrome://extensions` and turn on **Developer mode**.
+3. Click **Load unpacked** and choose the unzipped folder.
 4. Reload any open page, select some text, and click the button.
+
+To update, replace the files in that folder with the new release and click the reload icon on Shvyd's card in `chrome://extensions`. Your settings stay. [Install, update, and roll back](docs/install.md) has the details.
+
+To build it yourself, run `bun install` and `bun run build`, then load the `dist` folder the same way.
 
 ## Translation works without a key, but bring your own for reliability
 

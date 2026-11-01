@@ -1,12 +1,30 @@
 # Releasing
 
-The owner reviews and merges the stack, and asks for a release explicitly.
-Nothing here publishes automatically.
+Every merge to `main` publishes a GitHub release. The
+[release workflow](../.github/workflows/release.yml) runs `bun run verify`,
+picks the version, builds the ZIP with `bun run package`, tags `v<version>`,
+and attaches the ZIP and its `.sha256`.
+
+## Versions
+
+You own major and minor. CI owns the patch.
+
+- Each merge releases the next patch in the current line: `0.0.1`, `0.0.2`,
+  `0.0.3`, and so on. CI stamps that number into the build and the tag only.
+  It never commits it, so `package.json` keeps the version you set.
+- To start a new line, set the new version, for example `0.1.0` or `1.0.0`, in
+  both `package.json` and `extension/manifest.json`, and merge it. That merge
+  releases exactly that version, and later merges continue from it.
+
+`scripts/release-version.ts` holds the rule, and its test lists the cases.
+
+The steps below are for a release you want to check by hand, such as the first
+release of a new line.
 
 ## 1. Prepare
 
-1. Choose the version (for example `1.0.0`) and set it in both `package.json`
-   and `extension/manifest.json`. Packaging stops if they differ.
+1. For a new line, set the version in both `package.json` and
+   `extension/manifest.json`. Packaging stops if they differ.
 2. Move the `Unreleased` entries in `CHANGELOG.md` under that version with the
    date.
 3. Make sure the relay allows the extension ID that will run the release:
@@ -56,6 +74,6 @@ does not accept `--load-extension`, so use **Load unpacked** by hand. Then check
 
 ## 4. Publish
 
-Tag the release (`git tag v<version>`) and attach the ZIP and `.sha256` to a
-GitHub release only when the owner asks. Keep the previous release's ZIP
-available for rollback; see [install](install.md).
+Merging to `main` publishes the release. Previous releases stay on the
+[releases page](https://github.com/Zheckan/shvyd/releases) for rollback; see
+[install](install.md).

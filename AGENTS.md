@@ -92,6 +92,9 @@ scripts/test_benchmark_opencode_go.py -q`.
 
 CI (`.github/workflows/ci.yml`) runs format, lint, typecheck, unit tests,
 build, and the Python benchmark tests on every pull request.
+Every merge to `main` publishes a GitHub release through
+`.github/workflows/release.yml`; read `docs/releasing.md` before changing
+versions.
 
 ## FINDINGS
 
