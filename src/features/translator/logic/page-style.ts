@@ -98,6 +98,22 @@ function cornerRadius(
   return `${Math.min(20, parseFloat(rounded.borderTopLeftRadius))}px`
 }
 
+/**
+ * The color a link's text is drawn in. Sites such as X color an inner span and
+ * leave the anchor at the browser default, which is lavender on dark pages.
+ */
+function linkTextColor(link: Element): string | undefined {
+  const walker = document.createTreeWalker(link, NodeFilter.SHOW_TEXT)
+
+  for (let node = walker.nextNode(); node; node = walker.nextNode()) {
+    if (node.textContent?.trim() && node.parentElement) {
+      return getComputedStyle(node.parentElement).color
+    }
+  }
+
+  return undefined
+}
+
 export function samplePageStyle(element: Element, adapt: boolean): PageStyle {
   const ancestors: CSSStyleDeclaration[] = []
   for (
@@ -138,10 +154,8 @@ export function samplePageStyle(element: Element, adapt: boolean): PageStyle {
     link = container.querySelector('a[href]')
   }
 
-  let accent =
-    link && adapt
-      ? blend(color(getComputedStyle(link).color), background)
-      : foreground
+  const linkColor = link && adapt ? linkTextColor(link) : undefined
+  let accent = linkColor ? blend(color(linkColor), background) : foreground
 
   if (contrast(accent, background) < 3) {
     accent = foreground

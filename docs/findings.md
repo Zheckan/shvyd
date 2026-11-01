@@ -99,6 +99,14 @@ confusion, and non-obvious constraints.
   Chrome Web Store rejects uploads whose manifest has `key`, hence
   `bun run package --store`. A relay 403 still reads as included access being
   unavailable, not as a rejected key.
+- Sites such as X color a link's inner `span` and leave the `<a>` at the
+  browser default, which is `#9e9eff` (lavender) on `color-scheme: dark` pages.
+  The popup accent comes from the parent of the link's first visible text node.
+- Reloading, updating, or removing the extension leaves the old content script
+  running in open tabs, with `chrome.runtime.id` undefined; Chrome does not inject
+  the new one until the tab reloads. The old copy unmounts on its next
+  `selectionchange` and frees `#shvyd-root`. Two installs at once (for example the
+  path-ID build and the fixed-ID build) each mount their own popup.
 - Text selected inside an `input` or `textarea` is not part of the document's
   ranges: Chrome reports a range at the field's parent whose box is empty, so
   positioning from it puts the button at the viewport corner. The popup reads
