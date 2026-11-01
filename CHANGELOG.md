@@ -23,7 +23,7 @@ credential-free ZIP built with `bun run package`.
 ### Changed
 
 - The Translate button appears next to the selection in text fields and on pages that re-render selected text, instead of the top-left corner. Plain text fields, search fields, and text areas can be translated; password and other input types never offer translation.
-- While loading, the placeholder matches the expected length of the translation, the popup opens with a short fade, and its height eases to the final size. No scroll bar appears while loading, and scroll bars follow the popup's light or dark surface.
+- While loading, the placeholder is as tall as the translation will likely be: the selected text is laid out in a hidden copy of the text box, plus about 15% for longer translations, up to the box's scrolling height. The popup keeps the side of the selection it opened on, so a long translation no longer makes it jump across the selection. It opens with a short fade, and its height and position ease to the final size. No scroll bar appears while loading, and scroll bars follow the popup's light or dark surface.
 - You can select and copy part of a translation without the popup closing.
 - Lines and blank lines that a page draws from plain line breaks, such as YouTube descriptions, stay separate in the translation instead of running into one paragraph.
 - The popup's accent follows the color of the page's link text. On X it was lavender, the browser's default link color.

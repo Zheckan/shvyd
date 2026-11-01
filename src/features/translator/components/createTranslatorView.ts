@@ -81,6 +81,11 @@ export function createTranslatorView(
   const output = make('div', 'translation')
   output.setAttribute('aria-live', 'polite')
 
+  // A hidden copy of the text box for measuring the selected text before its
+  // translation arrives. Kept out of the live region so nothing is announced.
+  const measure = make('div', 'translation measure')
+  measure.setAttribute('aria-hidden', 'true')
+
   const status = make('div', 'status')
   status.setAttribute('role', 'status')
 
@@ -92,7 +97,7 @@ export function createTranslatorView(
   const panel = make('section', 'panel')
   panel.setAttribute('role', 'dialog')
   panel.setAttribute('aria-label', 'Selected text translation')
-  panel.append(toolbar, loading, output, status, actions)
+  panel.append(toolbar, loading, output, status, actions, measure)
 
   // Pointer-only, like moving the window by its toolbar. The handles reach past
   // the panel's border, so they sit beside it, outside its scroll clipping.
@@ -123,6 +128,7 @@ export function createTranslatorView(
     closeButton,
     loading,
     output,
+    measure,
     status,
     actions,
     retry,

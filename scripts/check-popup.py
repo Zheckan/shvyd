@@ -238,15 +238,38 @@ def main():
             page.evaluate("(()=>{const el=document.getElementById('short');el.style.marginTop=(innerHeight-260)+'px';return true})()")
             open_loading('short')
             worker.resolve(worker.pending.pop(0), LONG)
-            browser.wait_for(lambda: popup("return !root.querySelector('.translation').hidden && root.querySelector('.panel').getAnimations().length===0"), 'grown translation settled')
+            browser.wait_for(lambda: popup("return !root.querySelector('.translation').hidden && root.querySelector('.window').getAnimations({subtree:true}).length===0"), 'grown translation settled')
             edge = popup("const r=root.querySelector('.panel').getBoundingClientRect();return {top:Math.round(r.top),bottom:Math.round(r.bottom),viewport:innerHeight}")
             check('grown-popup-near-bottom-fits-viewport', edge['top'] >= 0 and edge['bottom'] <= edge['viewport'], edge)
             close_popup()
             page.evaluate("document.getElementById('short').style.marginTop=''; window.scrollTo(0, 0); true")
+
+            # 4c. A long selection opens at the size its translation will take, so the popup
+            # neither flips to the other side nor moves when the translation arrives.
+            # Before the size was measured, this popup opened below at 333 px and jumped above at 527 px.
+            def panel_rect():
+                return popup("const r=root.querySelector('.panel').getBoundingClientRect();return {top:Math.round(r.top),height:Math.round(r.height)}")
+
+            page.evaluate("(()=>{const el=document.getElementById('short');el.textContent='Prediction check. '+" + json.dumps(LONG + ' ' + LONG) + ";el.style.marginTop='150px';return true})()")
+            mouse('mousePressed', 700, 470)
+            mouse('mouseReleased', 700, 470, 0)
+            frames()
+            select_text('short')
+            popup("root.querySelector('.bubble').click(); return true")
+            browser.wait_for(lambda: worker.drain() >= 1, 'held prediction request')
+            frames()
+            predicted = panel_rect()
+            # A translation about as long as its source, like a translated YouTube description.
+            worker.resolve(worker.pending.pop(0), '\n\n'.join([LONG] * 2))
+            browser.wait_for(lambda: popup("return !root.querySelector('.translation').hidden && root.querySelector('.window').getAnimations({subtree:true}).length===0"), 'predicted translation settled')
+            arrived = panel_rect()
+            check('long-selection-opens-at-final-size-without-moving', abs(predicted['top'] - arrived['top']) <= 1 and abs(predicted['height'] - arrived['height']) <= 2, {'loading': predicted, 'final': arrived})
+            close_popup()
+            page.evaluate("(()=>{const el=document.getElementById('short');el.textContent=" + json.dumps(SHORT) + ";el.style.marginTop='';return true})()")
             # The long translation is cached now, so it appears without a request.
             select_text('long')
             popup("root.querySelector('.bubble').click(); return true")
-            browser.wait_for(lambda: popup("return !root.querySelector('.translation').hidden && root.querySelector('.panel').getAnimations().length===0"), 'cached translation')
+            browser.wait_for(lambda: popup("return !root.querySelector('.translation').hidden && root.querySelector('.window').getAnimations({subtree:true}).length===0"), 'cached translation')
 
             # 5. Selecting part of the translation keeps the popup open so it can be copied.
             text_box = popup("const r=root.querySelector('.translation').getBoundingClientRect();return {x:r.x,y:r.y,w:r.width}")
@@ -265,7 +288,7 @@ def main():
             page.evaluate("document.getElementById('short').textContent='Scroll edge title'; true")
             open_loading('short')
             worker.resolve(worker.pending.pop(0), '\n\n'.join([LONG] * 3))
-            browser.wait_for(lambda: popup("return !root.querySelector('.translation').hidden && root.querySelector('.panel').getAnimations().length===0"), 'scrolling translation settled')
+            browser.wait_for(lambda: popup("return !root.querySelector('.translation').hidden && root.querySelector('.window').getAnimations({subtree:true}).length===0"), 'scrolling translation settled')
 
             def edges(name):
                 page.evaluate('new Promise(r=>setTimeout(r,250))')
@@ -304,7 +327,7 @@ def main():
             def open_cached_long():
                 select_text('long')
                 popup("root.querySelector('.bubble').click(); return true")
-                browser.wait_for(lambda: popup("return !root.querySelector('.translation').hidden && root.querySelector('.panel').getAnimations().length===0"), 'cached long translation')
+                browser.wait_for(lambda: popup("return !root.querySelector('.translation').hidden && root.querySelector('.window').getAnimations({subtree:true}).length===0"), 'cached long translation')
 
             open_cached_long()
             default_width = panel_box()['width']

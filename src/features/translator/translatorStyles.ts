@@ -57,7 +57,6 @@ export const TRANSLATOR_STYLES = `
   }
   .panel {
     width: min(410px, calc(100vw - 24px));
-    max-width: calc(100vw - 24px);
     max-height: calc(100dvh - 24px);
     border-radius: var(--shvyd-radius);
     overflow: auto;
@@ -79,6 +78,14 @@ export const TRANSLATOR_STYLES = `
   }
   .panel[data-sized] .loading {
     overflow: hidden;
+  }
+  .measure {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    visibility: hidden;
+    pointer-events: none;
   }
   /* Positioned box around the panel and its resize handles. */
   .window {
@@ -408,13 +415,17 @@ export const TRANSLATOR_STYLES = `
     color: var(--shvyd-accent);
     font-size: 13px;
   }
-  /* Same box as .translation: each placeholder line takes one 24 px text line. */
+  /*
+   * The loading box gets the predicted height of the translation. Each
+   * placeholder line sits in the middle of one 24 px text line of .translation.
+   */
   .loading {
-    padding: 6px 17px 18px;
+    padding: 13px 17px 0;
+    overflow: hidden;
   }
   .line {
     height: 10px;
-    margin: 7px 0;
+    margin: 0 0 14px;
     border-radius: 3px;
     background: color-mix(in srgb, var(--shvyd-foreground) 10%, transparent);
   }
