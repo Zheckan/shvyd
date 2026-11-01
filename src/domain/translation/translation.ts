@@ -31,6 +31,8 @@ export type ErrorCode =
   | 'configuration'
   | 'authentication'
   | 'quota'
+  | 'rate-limit'
+  | 'timeout'
   | 'network'
   | 'provider'
 

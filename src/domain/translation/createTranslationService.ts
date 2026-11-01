@@ -20,6 +20,11 @@ const AZURE_TRANSLATE_URL =
   'https://api.cognitive.microsofttranslator.com/translate?api-version=2026-06-06'
 const REQUEST_TIMEOUT_MS = 15_000
 const CACHE_LIMIT = 32
+const CACHE_BYTE_LIMIT = 512 * 1024
+const QUOTA_MESSAGE =
+  "The provider's character allowance is exhausted. Check your quota or choose another provider in settings."
+
+const TIMEOUT_MESSAGE = 'Translation took too long. Try again.'
 
 type ProviderRequest = {
   url: string
@@ -80,7 +85,37 @@ function providerRequest({
   }
 }
 
-function assertResponseOk(response: Response): void {
+async function assertResponseOk(
+  response: Response,
+  provider: Provider,
+  signal: AbortSignal
+): Promise<void> {
+  if (response.status === 504) {
+    throw new TranslationError('timeout', TIMEOUT_MESSAGE)
+  }
+
+  if (provider === 'azure' && response.status === 403) {
+    let payload: unknown
+
+    try {
+      payload = await response.json()
+    } catch {
+      // Unknown or malformed errors keep the ordinary authentication classification.
+    }
+
+    if (signal.aborted) {
+      throw new TranslationError('timeout', TIMEOUT_MESSAGE)
+    }
+
+    if (
+      isRecord(payload) &&
+      isRecord(payload.error) &&
+      (payload.error.code === 403001 || payload.error.code === '403001')
+    ) {
+      throw new TranslationError('quota', QUOTA_MESSAGE)
+    }
+  }
+
   if (response.status === 401 || response.status === 403) {
     throw new TranslationError(
       'authentication',
@@ -88,11 +123,15 @@ function assertResponseOk(response: Response): void {
     )
   }
 
-  if (response.status === 429 || response.status === 456) {
+  if (response.status === 429) {
     throw new TranslationError(
-      'quota',
-      "The provider's usage limit was reached. Try later or choose another provider in settings."
+      'rate-limit',
+      'Too many translation requests. Wait a moment and try again.'
     )
+  }
+
+  if (response.status === 456) {
+    throw new TranslationError('quota', QUOTA_MESSAGE)
   }
 
   if (!response.ok) {
@@ -153,14 +192,21 @@ export function createTranslationService({
   readSettings,
   fetcher = fetch,
   managedAzureUrl,
+  requestTimeoutMs = REQUEST_TIMEOUT_MS,
 }: {
   readSettings: () => Promise<Settings>
   fetcher?: Fetcher
   managedAzureUrl?: string
+  requestTimeoutMs?: number
 }) {
-  const cache = new Map<string, Translation>()
+  const cache = new Map<string, { translation: Translation; bytes: number }>()
+  const encoder = new TextEncoder()
+  let cacheBytes = 0
+  const inFlight = new Map<string, Promise<Translation>>()
+  let cacheGeneration = 0
 
   async function translate(request: TranslationRequest): Promise<Translation> {
+    const generation = cacheGeneration
     const format = request.format ?? 'plain'
     if (
       !isLanguage(request.target) ||
@@ -205,83 +251,139 @@ export function createTranslationService({
     const text = request.text.trim()
     const cacheKey = JSON.stringify([
       provider,
-      settings[provider].key,
+      settings[provider],
       sharedAzure,
       request.target,
       format,
       text,
     ])
     const cached = cache.get(cacheKey)
-    if (cached) {
+    if (cached && generation === cacheGeneration) {
       cache.delete(cacheKey)
       cache.set(cacheKey, cached)
-      return { ...cached, cached: true, durationMs: 0 }
+      return { ...cached.translation, cached: true, durationMs: 0 }
     }
 
-    const directRequest = providerRequest({
-      provider,
-      settings,
-      text,
-      format,
-      providerTarget,
-    })
-    const { url, headers, body } =
-      sharedAzure && managedAzureUrl
-        ? {
-            url: managedAzureUrl,
-            headers: { 'Content-Type': 'application/json' },
-            body: { text, format, target: request.target },
-          }
-        : directRequest
+    const pending = inFlight.get(cacheKey)
+    if (pending && generation === cacheGeneration) {
+      return pending
+    }
 
-    const started = performance.now()
-    let response: Response
-    try {
-      response = await fetcher(url, {
-        method: 'POST',
-        headers,
-        body: JSON.stringify(body),
-        signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS),
+    const task = (async () => {
+      const directRequest = providerRequest({
+        provider,
+        settings,
+        text,
+        format,
+        providerTarget,
       })
-    } catch {
-      throw new TranslationError(
-        'network',
-        'Translation could not connect. Check your connection and try again.'
-      )
-    }
+      const { url, headers, body } =
+        sharedAzure && managedAzureUrl
+          ? {
+              url: managedAzureUrl,
+              headers: { 'Content-Type': 'application/json' },
+              body: { text, format, target: request.target },
+            }
+          : directRequest
 
-    assertResponseOk(response)
+      const started = performance.now()
+      const signal = AbortSignal.timeout(requestTimeoutMs)
+      let response: Response
 
-    let payload: unknown
-    try {
-      payload = await response.json()
-    } catch {
-      throw new TranslationError(
-        'provider',
-        'The provider returned an unreadable response. Try again.'
-      )
-    }
+      try {
+        response = await fetcher(url, {
+          method: 'POST',
+          headers,
+          body: JSON.stringify(body),
+          signal,
+        })
+      } catch (error) {
+        if (
+          signal.aborted ||
+          (error instanceof Error && error.name === 'TimeoutError')
+        ) {
+          throw new TranslationError('timeout', TIMEOUT_MESSAGE)
+        }
 
-    const result: Translation = {
-      text:
-        provider === 'azure' ? readAzureText(payload) : readDeepLText(payload),
-      format,
-      provider,
-      target: request.target,
-      cached: false,
-      durationMs: Math.round(performance.now() - started),
-    }
+        throw new TranslationError(
+          'network',
+          'Translation could not connect. Check your connection and try again.'
+        )
+      }
 
-    cache.set(cacheKey, result)
-    if (cache.size > CACHE_LIMIT) {
-      const oldest = cache.keys().next().value
-      if (oldest !== undefined) {
+      await assertResponseOk(response, provider, signal)
+
+      let payload: unknown
+
+      try {
+        payload = await response.json()
+      } catch {
+        if (signal.aborted) {
+          throw new TranslationError('timeout', TIMEOUT_MESSAGE)
+        }
+
+        throw new TranslationError(
+          'provider',
+          'The provider returned an unreadable response. Try again.'
+        )
+      }
+
+      const result: Translation = {
+        text:
+          provider === 'azure'
+            ? readAzureText(payload)
+            : readDeepLText(payload),
+        format,
+        provider,
+        target: request.target,
+        cached: false,
+        durationMs: Math.round(performance.now() - started),
+      }
+
+      if (generation === cacheGeneration) {
+        const bytes =
+          encoder.encode(cacheKey).byteLength +
+          encoder.encode(JSON.stringify(result)).byteLength
+
+        if (bytes <= CACHE_BYTE_LIMIT) {
+          cache.set(cacheKey, { translation: result, bytes })
+          cacheBytes += bytes
+        }
+      }
+
+      while (cache.size > CACHE_LIMIT || cacheBytes > CACHE_BYTE_LIMIT) {
+        const oldest = cache.keys().next().value
+
+        if (oldest === undefined) {
+          break
+        }
+
+        cacheBytes -= cache.get(oldest)?.bytes ?? 0
         cache.delete(oldest)
       }
+
+      return result
+    })()
+
+    if (generation === cacheGeneration) {
+      inFlight.set(cacheKey, task)
     }
 
-    return result
+    try {
+      return await task
+    } finally {
+      if (inFlight.get(cacheKey) === task) {
+        inFlight.delete(cacheKey)
+      }
+    }
   }
 
-  return { translate, clearCache: () => cache.clear() }
+  function clearCache(): void {
+    cacheGeneration++
+    cache.clear()
+    cacheBytes = 0
+    inFlight.clear()
+  }
+
+  return { translate, clearCache }
 }

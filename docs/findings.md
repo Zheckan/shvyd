@@ -58,3 +58,15 @@ confusion, and non-obvious constraints.
 - Generated browser screenshots and raw verification results stay in the ignored
   `.preview/` directory. The former `docs/prototype/` archive is retained locally
   at `.preview/prototype/`; the legacy output path is also ignored by Git.
+
+- HTTP 429 means temporary rate limiting; DeepL 456 and Azure 403 with error
+  code 403001 mean exhausted allowance. Other Azure 403 responses retain the
+  authentication classification. The shared relay preserves these distinctions
+  with sanitized 403001, 429, and 504 responses.
+- Clearing translation cache must invalidate pending writes too. Old provider
+  calls can finish for their existing callers, but cannot refill the cleared cache
+  or remove a newer identical request from the in-flight map.
+- A target choice must invalidate the popup's current translation before awaiting
+  its preference save. Dismissed save failures must also be ignored. The isolated
+  `bun run test:reliability` checks these races and actual worker restarts without
+  provider keys or API usage; results go to `.preview/reliability-check/`.

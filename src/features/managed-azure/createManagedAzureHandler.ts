@@ -141,7 +141,15 @@ export function createManagedAzureHandler({
 
       if (error instanceof TranslationError) {
         if (error.code === 'quota') {
+          // Preserve Azure's documented quota signal without forwarding its body.
+          return Response.json(
+            { error: { code: 403001 } },
+            { status: 403, headers }
+          )
+        } else if (error.code === 'rate-limit') {
           status = 429
+        } else if (error.code === 'timeout') {
+          status = 504
         } else if (
           error.code === 'selection' ||
           error.code === 'configuration'
