@@ -11,6 +11,7 @@ import { unwrapResponse } from '@/domain/translation/translation-client'
 import { mountLanguageSettings } from '@/features/language-settings/mountLanguageSettings'
 import { parseEnvFile } from '@/utils/parseEnvFile'
 import { createSettingsSaver, type SaveState } from './createSettingsSaver'
+import { changedSettings } from './logic/changedSettings'
 import {
   accessText,
   canTranslate,
@@ -46,6 +47,10 @@ export function mountSettingsPage(
   let validationError = false
   let saveState: SaveState = { kind: 'saved' }
   let managedAzureAvailable = false
+  /** The form as last loaded or saved; only fields edited since then are sent. */
+  let base: Settings | undefined
+  /** Each connection test takes a ticket; only the latest may report. */
+  const testRuns = { azure: 0, deepl: 0 }
 
   async function call(request: unknown): Promise<unknown> {
     return unwrapResponse(await send(request))
@@ -53,7 +58,9 @@ export function mountSettingsPage(
 
   const saver = createSettingsSaver({
     save: async (value) => {
-      parseSettings(await call({ kind: 'save-settings', value }))
+      const changes = base ? changedSettings(base, value) : value
+      parseSettings(await call({ kind: 'save-settings', value: changes }))
+      base = value
     },
     onState: (state) => {
       saveState = state
@@ -269,6 +276,8 @@ export function mountSettingsPage(
       }
 
       const result = required(`#${provider}-test-status`, HTMLOutputElement)
+      const run = ++testRuns[provider]
+      const latest = () => run === testRuns[provider]
       let tested: string | undefined
 
       try {
@@ -282,6 +291,7 @@ export function mountSettingsPage(
         )
 
         if (
+          latest() &&
           JSON.stringify(read()[provider]) === tested &&
           result.dataset.state === 'testing'
         ) {
@@ -290,7 +300,10 @@ export function mountSettingsPage(
         }
       } catch (error) {
         // A response for an edited key must never mark the new key as verified.
-        if (result.dataset.state === 'testing' || tested === undefined) {
+        if (
+          latest() &&
+          (result.dataset.state === 'testing' || tested === undefined)
+        ) {
           result.dataset.state = 'error'
           result.textContent =
             error instanceof Error ? error.message : 'Connection test failed.'
@@ -392,6 +405,7 @@ export function mountSettingsPage(
       const settings = parseSettingsView(value)
       managedAzureAvailable = settings.managedAzureAvailable
       fill(settings)
+      base = read()
       loaded = true
       fields.disabled = false
       statusContainer.dataset.state = 'saved'

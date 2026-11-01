@@ -226,3 +226,20 @@ test('the popup appears next to the cursor by default, and the choice is saved',
     store.updatePreferences({ popupAnchor: 'corner' })
   ).rejects.toThrow()
 })
+
+test('saving some fields keeps newer changes to the others', async () => {
+  const store = createSettingsStore({
+    read: async () => undefined,
+    write: async () => {},
+  })
+
+  await store.updatePreferences({ target: 'pl', popupAnchor: 'selection' })
+  const saved = await store.save({ adaptToPage: false })
+
+  expect(saved).toMatchObject({
+    target: 'pl',
+    popupAnchor: 'selection',
+    adaptToPage: false,
+  })
+  await expect(store.save(['adaptToPage'])).rejects.toThrow()
+})

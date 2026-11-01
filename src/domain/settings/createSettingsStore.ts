@@ -80,7 +80,15 @@ export function createSettingsStore(storage: {
   return {
     settings,
     preferences: async () => publicPreferences(await settings()),
-    save: (value: unknown) => update(() => parseSettings(value)),
+    /** Applies the given fields over the stored settings, so other writers' changes stay. */
+    save: (value: unknown) =>
+      update((current) => {
+        if (!isRecord(value)) {
+          throw new Error('Invalid settings.')
+        }
+
+        return parseSettings({ ...current, ...value })
+      }),
     updatePreferences: async (value: unknown) => {
       if (!isRecord(value)) {
         throw new Error('Invalid preferences.')
