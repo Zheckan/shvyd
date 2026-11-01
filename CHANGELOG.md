@@ -23,6 +23,7 @@ credential-free ZIP built with `bun run package`.
 - The Translate button appears next to the selection in text fields and on pages that re-render selected text, instead of the top-left corner. Plain text fields, search fields, and text areas can be translated; password and other input types never offer translation.
 - While loading, the placeholder matches the expected length of the translation, the popup opens with a short fade, and its height eases to the final size. No scroll bar appears while loading, and scroll bars follow the popup's light or dark surface.
 - You can select and copy part of a translation without the popup closing.
+- Lines and blank lines that a page draws from plain line breaks, such as YouTube descriptions, stay separate in the translation instead of running into one paragraph.
 - The popup's accent follows the color of the page's link text. On X it was lavender, the browser's default link color.
 - After Shvyd is reloaded, updated, or removed, the copy left in open tabs removes itself on the next selection instead of showing a Translate button that fails.
 - Long translations fade out at an edge that hides more text instead of being cut off, and a divider appears under the popup's top bar once text scrolls beneath it.

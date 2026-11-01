@@ -134,6 +134,46 @@ function listNumbering(
   return { first, step }
 }
 
+/**
+ * Pages such as YouTube descriptions draw newline characters as line breaks
+ * with `white-space: pre-wrap`. In HTML they would collapse into spaces.
+ * Preformatted blocks are copied as `pre` and keep their newlines themselves.
+ */
+function drawsNewlines(text: Text): boolean {
+  const element = text.parentElement
+
+  if (!element || element.closest('pre,code')) {
+    return false
+  }
+
+  const collapse = getComputedStyle(element).getPropertyValue(
+    'white-space-collapse'
+  )
+
+  return (
+    collapse === 'preserve' ||
+    collapse === 'preserve-breaks' ||
+    collapse === 'break-spaces'
+  )
+}
+
+function appendText(parent: Node, text: string, newlinesAsBreaks: boolean) {
+  if (!newlinesAsBreaks) {
+    parent.appendChild(document.createTextNode(text))
+    return
+  }
+
+  for (const [index, line] of text.split(/\r?\n/).entries()) {
+    if (index > 0) {
+      parent.appendChild(document.createElement('br'))
+    }
+
+    if (line) {
+      parent.appendChild(document.createTextNode(line))
+    }
+  }
+}
+
 /** Copy only selected text and inert formatting. Page attributes never enter the request. */
 export function captureSelection(
   range: Range,
@@ -168,7 +208,7 @@ export function captureSelection(
       if (node instanceof Text) {
         const start = node === range.startContainer ? range.startOffset : 0
         const end = node === range.endContainer ? range.endOffset : node.length
-        parent.appendChild(document.createTextNode(node.data.slice(start, end)))
+        appendText(parent, node.data.slice(start, end), drawsNewlines(node))
         return
       }
 
